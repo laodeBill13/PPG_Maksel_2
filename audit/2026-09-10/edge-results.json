@@ -1,0 +1,188 @@
+[
+  {
+    "file": "arsip",
+    "liveReadFailure": {
+      "displayedRows": 6
+    }
+  },
+  {
+    "file": "dokumentasi",
+    "liveReadFailure": {
+      "displayedRows": 6
+    }
+  },
+  {
+    "file": "laporan",
+    "liveReadFailure": {
+      "displayedRows": 12
+    }
+  },
+  {
+    "file": "program_kerja",
+    "liveReadFailure": {
+      "displayedRows": 12
+    }
+  },
+  {
+    "file": "database_generus",
+    "injection": true
+  },
+  {
+    "file": "dashboard",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalEventDetail",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalQuickGenerus",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalQuickAbsensi",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalQuickEvent",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalDocPreview",
+        "escape": true,
+        "reopenDisplay": "flex"
+      }
+    ]
+  },
+  {
+    "file": "database_generus",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalAddGenerus",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalEditGenerus",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalDetailGenerus",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalDeleteGenerus",
+        "escape": true,
+        "reopenDisplay": "flex"
+      }
+    ]
+  },
+  {
+    "file": "absensi",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalAddAbsensi",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalEditAbsensi",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalDetailAbsensi",
+        "escape": true,
+        "reopenDisplay": "flex"
+      },
+      {
+        "id": "modalDeleteAbsensi",
+        "escape": true,
+        "reopenDisplay": "flex"
+      }
+    ]
+  },
+  {
+    "file": "program_kerja",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalDetail",
+        "escape": true,
+        "reopenDisplay": "block"
+      },
+      {
+        "id": "modalForm",
+        "escape": true,
+        "reopenDisplay": "block"
+      },
+      {
+        "id": "modalHapus",
+        "escape": true,
+        "reopenDisplay": "block"
+      }
+    ]
+  },
+  {
+    "file": "laporan",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalInputLupg",
+        "escape": true,
+        "reopenDisplay": "block"
+      },
+      {
+        "id": "modalDetailLupg",
+        "escape": true,
+        "reopenDisplay": "block"
+      }
+    ]
+  },
+  {
+    "file": "dokumentasi",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalTambah",
+        "escape": true,
+        "reopenDisplay": "block"
+      },
+      {
+        "id": "modalDetailDok",
+        "escape": true,
+        "reopenDisplay": "block"
+      }
+    ]
+  },
+  {
+    "file": "arsip",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalUpload",
+        "escape": true,
+        "reopenDisplay": "block"
+      }
+    ]
+  },
+  {
+    "file": "pengaturan",
+    "drawerClosed": true,
+    "modals": [
+      {
+        "id": "modalReset",
+        "escape": true,
+        "reopenDisplay": "block"
+      }
+    ]
+  }
+]

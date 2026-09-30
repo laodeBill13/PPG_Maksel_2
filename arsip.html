@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arsip Dokumen - PPG Maksel 2</title>
+    <meta name="description" content="Arsip dan penyimpanan berkas digital PPG Maksel 2">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .card-hover { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.03); }
+
+        #mobileSidebarDrawer { transform: translateX(-100%); transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
+        #mobileSidebarDrawer.drawer-open { transform: translateX(0); }
+        #drawerOverlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        #drawerOverlay.overlay-visible { opacity: 1; pointer-events: all; }
+
+        .modal-overlay { backdrop-filter: blur(6px); animation: fadeIn 0.2s ease; }
+        .modal-box { animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+        .toast { animation: toastIn 0.3s ease forwards; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)} }
+        .toast.hide { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(100%)} }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- ================= MOBILE DRAWER OVERLAY ================= -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ================= MOBILE DRAWER SIDEBAR ================= -->
+    <aside id="mobileSidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between shadow-2xl z-50 md:hidden overflow-y-auto">
+        <div class="absolute top-4 right-4">
+            <button onclick="closeMobileDrawer()" class="w-9 h-9 rounded-xl bg-blue-600/50 hover:bg-blue-600 text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div>
+            <div class="p-6 border-b border-blue-600/60 flex items-center gap-3 pr-14">
+                <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-4 py-3">
+                <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span></a>
+                    <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div><span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div><span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div><span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span></a>
+                    <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span></a>
+                    <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span></a>
+                    <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span></a>
+                </nav>
+            </div>
+        </div>
+        <div class="p-4 border-t border-blue-600/60 space-y-3">
+            <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                    <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                </div>
+            </div>
+            <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="flex min-h-screen">
+
+        <!-- ================= DESKTOP SIDEBAR ================= -->
+        <aside class="hidden md:flex sticky top-0 h-screen overflow-hidden w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex-col shadow-xl z-20 shrink-0">
+            <div class="flex-1 min-h-0 overflow-y-auto">
+                <div class="p-6 border-b border-blue-600/60 flex items-center gap-3">
+                    <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-3">
+                    <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                    <nav class="space-y-1.5" id="sidebarMenu">
+                        <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span>
+                        </a>
+                        <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div>
+                            <span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div>
+                            <span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div>
+                            <span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span>
+                        </a>
+                        <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span>
+                        </a>
+                        <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span>
+                        </a>
+                        <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-blue-600/60 space-y-3">
+                <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                        <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                    </div>
+                </div>
+                <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                    <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+
+            <!-- MOBILE TOPBAR -->
+            <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm flex items-center justify-between gap-3">
+                <button onclick="openMobileDrawer()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 bg-cyan-700 text-white rounded-lg flex items-center justify-center font-bold text-xs shrink-0">
+                        <i class="fas fa-folder-open text-[10px]"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 text-sm truncate">Arsip Dokumen</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                </div>
+            </header>
+
+            <!-- DESKTOP TOPBAR -->
+            <header class="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 shadow-xs flex-wrap justify-between items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                        <span class="font-semibold text-blue-700">PPG Maksel 2</span>
+                        <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                        <span>Arsip Dokumen</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+                        Arsip Dokumen Digital
+                    </h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600">
+                        <i class="far fa-calendar-alt text-blue-600"></i>
+                        <span id="liveDateText"></span>
+                        <span class="text-slate-300">|</span>
+                        <i class="far fa-clock text-blue-600"></i>
+                        <span id="liveTimeText" class="font-mono"></span>
+                    </div>
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">A</div>
+                        <div class="hidden sm:block">
+                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Super Admin
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ================= PAGE CONTENT ================= -->
+            <div class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-8 flex-1">
+
+                <!-- HERO BANNER -->
+                <div class="bg-gradient-to-r from-cyan-700 via-teal-700 to-emerald-800 rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-[160px] pointer-events-none">
+                        <i class="fas fa-archive"></i>
+                    </div>
+                    <div class="relative z-1 max-w-2xl">
+                        <span class="bg-cyan-500/40 border border-cyan-400/30 text-cyan-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-3">
+                            <i class="fas fa-folder-open text-[10px]"></i> Manajemen Berkas
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                            Arsip Dokumen Digital PPG
+                        </h2>
+                        <p class="text-cyan-100 text-sm mt-2 leading-relaxed">
+                            Kelola, simpan, dan akses seluruh dokumen penting seperti LUPG, SK, surat-menyurat, dan laporan kegiatan PPG Maksel 2.
+                        </p>
+                        <div class="flex flex-wrap items-center gap-3 mt-6">
+                            <button onclick="bukaUploadArsip()" class="bg-white text-cyan-700 hover:bg-cyan-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i class="fas fa-cloud-upload-alt text-cyan-600"></i>
+                                + Unggah Dokumen
+                            </button>
+                            <div class="flex items-center gap-2 bg-white/15 border border-white/20 px-3 py-2 rounded-xl text-xs font-medium">
+                                <i class="fas fa-folder"></i> <span id="heroKategoriCount">0 Kategori</span>
+                                <span class="text-white/50">|</span>
+                                <i class="fas fa-file-alt"></i> <span id="heroBerkasCount">0 Berkas</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STATS ROW -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Berkas</span>
+                            <span class="w-8 h-8 rounded-xl bg-cyan-50 text-cyan-700 flex items-center justify-center text-sm"><i class="fas fa-file-alt"></i></span>
+                        </div>
+                        <h3 id="statTotalArsip" class="text-2xl font-extrabold text-cyan-700 mt-2">0</h3>
+                        <p class="text-[11px] text-slate-500 mt-0.5">PDF, Excel, Word & Gambar</p>
+                    </div>
+                    <div class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">LUPG</span>
+                            <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-sm"><i class="fas fa-file-invoice"></i></span>
+                        </div>
+                        <h3 id="statLupgArsip" class="text-2xl font-extrabold text-blue-700 mt-2">0</h3>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Laporan bulanan terupload</p>
+                    </div>
+                    <div class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">SK & Surat</span>
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm"><i class="fas fa-stamp"></i></span>
+                        </div>
+                        <h3 id="statSuratArsip" class="text-2xl font-extrabold text-amber-600 mt-2">0</h3>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Surat keputusan & resmi</p>
+                    </div>
+                    <div class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Bulan Ini</span>
+                            <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"><i class="fas fa-plus-circle"></i></span>
+                        </div>
+                        <h3 id="statBulanIniArsip" class="text-2xl font-extrabold text-emerald-600 mt-2">+0</h3>
+                        <p class="text-[11px] text-slate-500 mt-0.5">Berkas baru ditambahkan</p>
+                    </div>
+                </div>
+
+                <!-- FILTER BAR -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                        <div class="relative flex-1">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="filterSearchArsip" oninput="applyArsipFilters()" placeholder="Cari nama dokumen atau catatan..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                        </div>
+                        <select id="filterKategoriArsip" onchange="applyArsipFilters()" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                            <option value="">Semua Kategori</option>
+                            <option value="Laporan LUPG">Laporan LUPG</option>
+                            <option value="SK & Surat">SK & Surat Resmi</option>
+                            <option value="Dokumentasi">Dokumentasi Kegiatan</option>
+                            <option value="Data Generus">Data Generus</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                        <select id="filterTipeArsip" onchange="applyArsipFilters()" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                            <option value="">Semua Tipe</option>
+                            <option value="PDF">PDF</option>
+                            <option value="Excel">Excel</option>
+                            <option value="Word">Word</option>
+                            <option value="Gambar">Gambar</option>
+                        </select>
+                        <button onclick="resetArsipFilters()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-sm font-medium transition flex items-center gap-1.5 shrink-0" title="Reset Filter">
+                            <i class="fas fa-redo-alt text-xs"></i> <span>Reset</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FOLDER CARDS -->
+                <div>
+                    <h3 class="text-base font-bold text-slate-800 mb-4">Kategori Folder</h3>
+                    <div class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+
+                        <div onclick="filterByFolder('Laporan LUPG')" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-xl transition duration-300"><i class="fas fa-file-invoice-dollar"></i></div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-slate-800 group-hover:text-blue-700 transition">Laporan LUPG</h4>
+                                    <p id="folderCountLUPG" class="text-xs text-slate-500 mt-0.5">0 berkas</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-400">Klik untuk filter</span>
+                                <i class="fas fa-arrow-right text-blue-600 text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </div>
+
+                        <div onclick="filterByFolder('SK & Surat')" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center text-xl transition duration-300"><i class="fas fa-stamp"></i></div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-slate-800 group-hover:text-amber-600 transition">SK & Surat Resmi</h4>
+                                    <p id="folderCountSurat" class="text-xs text-slate-500 mt-0.5">0 berkas</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-400">Klik untuk filter</span>
+                                <i class="fas fa-arrow-right text-amber-600 text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </div>
+
+                        <div onclick="filterByFolder('Dokumentasi')" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center text-xl transition duration-300"><i class="fas fa-images"></i></div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-slate-800 group-hover:text-rose-600 transition">Dokumentasi Kegiatan</h4>
+                                    <p id="folderCountDok" class="text-xs text-slate-500 mt-0.5">0 berkas</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-400">Klik untuk filter</span>
+                                <i class="fas fa-arrow-right text-rose-600 text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </div>
+
+                        <div onclick="filterByFolder('Data Generus')" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-start gap-4">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center text-xl transition duration-300"><i class="fas fa-id-card"></i></div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm text-slate-800 group-hover:text-emerald-600 transition">Data Generus</h4>
+                                    <p id="folderCountGenerus" class="text-xs text-slate-500 mt-0.5">0 berkas</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="text-slate-400">Klik untuk filter</span>
+                                <i class="fas fa-arrow-right text-emerald-600 text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- RECENT FILES TABLE -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="flex items-center justify-between p-5 sm:p-6 border-b border-slate-100">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Daftar Berkas Digital</h3>
+                            <p id="tableSubtitleArsip" class="text-xs text-slate-500 mt-0.5">Semua dokumen yang terdaftar dalam sistem</p>
+                        </div>
+                        <button onclick="resetArsipFilters()" class="text-xs font-semibold text-cyan-600 hover:text-cyan-800 transition">Tampilkan Semua →</button>
+                    </div>
+
+                    <!-- EMPTY STATE (ANTI-UI-SLOP) -->
+                    <div id="emptyStateArsip" class="hidden p-10 text-center">
+                        <div class="w-16 h-16 bg-cyan-50 text-cyan-600 rounded-2xl flex items-center justify-center mx-auto mb-3 text-2xl">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <h4 class="text-base font-bold text-slate-800">Tidak ada dokumen ditemukan</h4>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Tidak ada berkas yang sesuai dengan filter atau kata kunci pencarian Anda.</p>
+                        <button onclick="resetArsipFilters()" class="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white rounded-xl text-xs font-semibold transition shadow-sm">
+                            <i class="fas fa-undo text-[10px]"></i> Reset Pencarian
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50/80 border-b border-slate-100">
+                                    <th class="px-5 py-3 text-left">Nama File</th>
+                                    <th class="px-5 py-3 text-left">Kategori</th>
+                                    <th class="px-5 py-3 text-left">Ukuran</th>
+                                    <th class="px-5 py-3 text-left">Tanggal Upload</th>
+                                    <th class="px-5 py-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableArsipBody" class="divide-y divide-slate-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- MODAL UPLOAD DOKUMEN -->
+    <div id="modalUpload" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
+        <div class="modal-box bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+                <h3 class="text-lg font-bold text-slate-800">Unggah Dokumen Baru</h3>
+                <button onclick="closeModal('modalUpload')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
+            </div>
+            <form id="formUploadArsip" onsubmit="unggahDokumen(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Nama Dokumen *</label>
+                    <input type="text" id="inputNamaArsip" required placeholder="Contoh: LUPG_Agustus_2026.pdf" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Kategori *</label>
+                        <select id="inputKategoriArsip" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                            <option value="Laporan LUPG">Laporan LUPG</option>
+                            <option value="SK & Surat">SK & Surat Resmi</option>
+                            <option value="Dokumentasi">Dokumentasi Kegiatan</option>
+                            <option value="Data Generus">Data Generus</option>
+                            <option value="Lainnya">Lainnya</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tanggal *</label>
+                        <input type="date" id="inputTanggalArsip" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tipe Berkas</label>
+                        <select id="inputTipeArsip" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                            <option value="PDF">PDF (.pdf)</option>
+                            <option value="Excel">Excel (.xlsx)</option>
+                            <option value="Word">Word (.docx)</option>
+                            <option value="Gambar">Gambar (.jpg/.png)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Ukuran File (Perkiraan)</label>
+                        <input type="text" id="inputUkuranArsip" placeholder="Contoh: 2.4 MB" value="1.5 MB" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Pilih Berkas</label>
+                    <label class="border-2 border-dashed border-slate-200 rounded-xl p-5 text-center hover:border-cyan-400 transition cursor-pointer flex flex-col items-center justify-center bg-slate-50/50">
+                        <i class="fas fa-cloud-upload-alt text-2xl text-cyan-600 mb-1.5"></i>
+                        <span id="labelNamaFile" class="text-xs text-slate-600 font-medium">Klik untuk memilih berkas dari komputer</span>
+                        <span class="text-[10px] text-slate-400 mt-0.5">PDF, XLSX, DOCX, JPG — max 10MB</span>
+                        <input type="file" id="inputFileArsip" class="hidden" onchange="handleFileSelect(this)">
+                    </label>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Catatan (opsional)</label>
+                    <textarea id="inputCatatanArsip" rows="2" placeholder="Keterangan tambahan dokumen..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-300 bg-slate-50 resize-none"></textarea>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modalUpload')" class="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 transition">Batal</button>
+                    <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fas fa-upload"></i> Unggah Dokumen
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <script src="assets/config.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/demo-seed.js"></script>
+    <script src="assets/supabase-client.js"></script>
+    <script src="assets/sidebar.js"></script>
+    <script>
+    // =========================================================================
+    // ARSIP DATA STORE (Hybrid LocalStorage & Dynamic Render)
+    // =========================================================================
+    let currentArsipList = [];
+    let editArsipId = null;
+
+    async function loadArsipData() {
+        try {
+            currentArsipList = await window.PPG_DB.arsip.list();
+        } catch (error) {
+            currentArsipList = [];
+            showToast(`Arsip gagal dimuat: ${error.message}`, 'error');
+        }
+        updateFolderCounters();
+        applyArsipFilters();
+    }
+
+    function updateFolderCounters() {
+        const cLupg = currentArsipList.filter(x => x.kategori === 'Laporan LUPG').length;
+        const cSurat = currentArsipList.filter(x => x.kategori === 'SK & Surat').length;
+        const cDok = currentArsipList.filter(x => x.kategori === 'Dokumentasi').length;
+        const cGen = currentArsipList.filter(x => x.kategori === 'Data Generus').length;
+
+        const elLupg = document.getElementById('folderCountLUPG');
+        const elSurat = document.getElementById('folderCountSurat');
+        const elDok = document.getElementById('folderCountDok');
+        const elGen = document.getElementById('folderCountGenerus');
+
+        if (elLupg) elLupg.textContent = `${cLupg} berkas`;
+        if (elSurat) elSurat.textContent = `${cSurat} berkas`;
+        if (elDok) elDok.textContent = `${cDok} berkas`;
+        if (elGen) elGen.textContent = `${cGen} berkas`;
+
+        const bulanIni = new Date().toISOString().slice(0, 7);
+        const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+        setText("statTotalArsip", currentArsipList.length);
+        setText("statLupgArsip", cLupg);
+        setText("statSuratArsip", cSurat);
+        setText("statBulanIniArsip", `+${currentArsipList.filter(x => String(x.tanggal || "").startsWith(bulanIni)).length}`);
+        setText("heroBerkasCount", `${currentArsipList.length} Berkas`);
+        setText("heroKategoriCount", `${new Set(currentArsipList.map(x => x.kategori)).size} Kategori`);
+    }
+
+    function getFileIcon(tipe) {
+        switch (tipe) {
+            case 'PDF': return { icon: 'fa-file-pdf', bg: 'bg-red-50 text-red-600' };
+            case 'Excel': return { icon: 'fa-file-excel', bg: 'bg-emerald-50 text-emerald-600' };
+            case 'Word': return { icon: 'fa-file-word', bg: 'bg-blue-50 text-blue-600' };
+            case 'Gambar': return { icon: 'fa-file-image', bg: 'bg-purple-50 text-purple-600' };
+            default: return { icon: 'fa-file-alt', bg: 'bg-slate-100 text-slate-600' };
+        }
+    }
+
+    function getCategoryBadge(kat) {
+        switch (kat) {
+            case 'Laporan LUPG': return 'bg-blue-100 text-blue-700';
+            case 'Data Generus': return 'bg-emerald-100 text-emerald-700';
+            case 'SK & Surat': return 'bg-amber-100 text-amber-700';
+            case 'Dokumentasi': return 'bg-rose-100 text-rose-700';
+            default: return 'bg-slate-100 text-slate-700';
+        }
+    }
+
+    function renderArsipTable(items) {
+        const tbody = document.getElementById('tableArsipBody');
+        const emptyEl = document.getElementById('emptyStateArsip');
+        const subtitle = document.getElementById('tableSubtitleArsip');
+
+        if (subtitle) {
+            subtitle.textContent = `Menampilkan ${items.length} dari ${currentArsipList.length} dokumen`;
+        }
+
+        if (!items || items.length === 0) {
+            tbody.innerHTML = '';
+            emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        emptyEl.classList.add('hidden');
+        tbody.innerHTML = items.map(raw => {
+            const item = window.PPG_DB.escapeRow(raw);
+            const { icon, bg } = getFileIcon(raw.tipe);
+            const badgeColor = getCategoryBadge(raw.kategori);
+            const dateStr = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+
+            return `
+            <tr class="hover:bg-slate-50/60 transition">
+                <td class="px-5 py-3.5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg ${bg} flex items-center justify-center text-sm shadow-xs shrink-0">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                        <div>
+                            <span class="font-medium text-slate-800 block">${item.nama}</span>
+                            <span class="text-[11px] text-slate-400 block">${item.catatan || 'Tanpa catatan'}</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-5 py-3.5">
+                    <span class="text-xs ${badgeColor} px-2.5 py-1 rounded-full font-semibold inline-block">${item.kategori}</span>
+                </td>
+                <td class="px-5 py-3.5 text-slate-500 font-mono text-xs">${item.ukuran || '-'}</td>
+                <td class="px-5 py-3.5 text-slate-500">${dateStr}</td>
+                <td class="px-5 py-3.5 text-center">
+                    <div class="flex items-center justify-center gap-2">
+                        <button onclick="unduhArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-cyan-100 text-slate-600 hover:text-cyan-700 flex items-center justify-center transition text-xs shadow-xs" title="Unduh File">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button onclick="editArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition text-xs" title="Edit Metadata"><i class="fas fa-edit"></i></button>
+                        <button onclick="hapusArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 flex items-center justify-center transition text-xs shadow-xs" title="Hapus Berkas">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    function applyArsipFilters() {
+        const query = (document.getElementById('filterSearchArsip').value || '').toLowerCase().trim();
+        const kat = document.getElementById('filterKategoriArsip').value;
+        const tipe = document.getElementById('filterTipeArsip').value;
+
+        const filtered = currentArsipList.filter(item => {
+            const matchQuery = !query || (item.nama || '').toLowerCase().includes(query) || (item.catatan && item.catatan.toLowerCase().includes(query));
+            const matchKat = !kat || item.kategori === kat;
+            const matchTipe = !tipe || item.tipe === tipe;
+            return matchQuery && matchKat && matchTipe;
+        });
+
+        renderArsipTable(filtered);
+    }
+
+    function filterByFolder(kategori) {
+        document.getElementById('filterKategoriArsip').value = kategori;
+        document.getElementById('filterSearchArsip').value = '';
+        document.getElementById('filterTipeArsip').value = '';
+        applyArsipFilters();
+        showToast(`Memfilter kategori: ${kategori}`, 'info');
+    }
+
+    function resetArsipFilters() {
+        document.getElementById('filterSearchArsip').value = '';
+        document.getElementById('filterKategoriArsip').value = '';
+        document.getElementById('filterTipeArsip').value = '';
+        applyArsipFilters();
+    }
+
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            document.getElementById('labelNamaFile').textContent = file.name;
+            const namaInput = document.getElementById('inputNamaArsip');
+            if (!namaInput.value.trim()) {
+                namaInput.value = file.name;
+            }
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            document.getElementById('inputUkuranArsip').value = `${sizeMB} MB`;
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            const tipeSelect = document.getElementById('inputTipeArsip');
+            if (ext === 'pdf') tipeSelect.value = 'PDF';
+            else if (['xlsx', 'xls', 'csv'].includes(ext)) tipeSelect.value = 'Excel';
+            else if (['docx', 'doc'].includes(ext)) tipeSelect.value = 'Word';
+            else if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) tipeSelect.value = 'Gambar';
+        }
+    }
+
+    function bukaUploadArsip(){editArsipId=null;document.getElementById('formUploadArsip').reset();document.getElementById('labelNamaFile').textContent='Klik untuk memilih berkas dari komputer';openModal('modalUpload');}
+    function editArsip(id){
+        const item=currentArsipList.find(x=>x.id==id);if(!item)return;editArsipId=id;
+        document.getElementById('inputNamaArsip').value=item.nama||'';document.getElementById('inputKategoriArsip').value=item.kategori||'';document.getElementById('inputTanggalArsip').value=item.tanggal||'';document.getElementById('inputTipeArsip').value=item.tipe||'PDF';document.getElementById('inputUkuranArsip').value=item.ukuran||'';document.getElementById('inputCatatanArsip').value=item.catatan||'';document.getElementById('labelNamaFile').textContent='Biarkan kosong jika berkas tidak diganti';openModal('modalUpload');
+    }
+
+    async function unggahDokumen(e) {
+        e.preventDefault();
+        const nama = document.getElementById('inputNamaArsip').value.trim();
+        const kategori = document.getElementById('inputKategoriArsip').value;
+        const tanggal = document.getElementById('inputTanggalArsip').value;
+        const tipe = document.getElementById('inputTipeArsip').value;
+        const ukuran = document.getElementById('inputUkuranArsip').value.trim() || '1.0 MB';
+        const catatan = document.getElementById('inputCatatanArsip').value.trim();
+
+        const newItem = {
+            nama,
+            kategori,
+            tipe,
+            ukuran,
+            tanggal,
+            catatan
+        };
+
+        try {
+            const file=document.getElementById('inputFileArsip').files[0];
+            if(!file&&!editArsipId) throw new Error('Pilih berkas yang akan diunggah');
+            const old=editArsipId ? currentArsipList.find(x=>x.id==editArsipId) : null;
+            if(file){const uploaded=await window.PPG_DB.storage.uploadArsip(file);newItem.fileUrl=uploaded.publicUrl;newItem.storagePath=uploaded.path;}
+            if(old){
+                const saved=await window.PPG_DB.arsip.update(old.id,newItem);
+                currentArsipList=currentArsipList.map(x=>x.id==old.id?saved:x);
+                // File lama dibersihkan setelah metadata baru tersimpan.
+                if(file&&old.storagePath) await window.PPG_DB.storage.removeArsip(old.storagePath);
+            } else {const saved=await window.PPG_DB.arsip.insert(newItem);currentArsipList.unshift(saved);}
+            updateFolderCounters(); applyArsipFilters();
+            closeModal('modalUpload'); editArsipId=null; document.getElementById('formUploadArsip').reset(); document.getElementById('labelNamaFile').textContent='Klik untuk memilih berkas dari komputer'; showToast(old ? 'Metadata arsip berhasil diperbarui!' : 'Dokumen berhasil disimpan ke arsip!', 'success');
+        } catch(error) { showToast(`Dokumen gagal diunggah: ${error.message}`, 'error'); }
+    }
+
+    function unduhArsip(id) {
+        const item=currentArsipList.find(x=>x.id==id); if(!item) return;
+        const url=window.PPG_DB.safeUrl(item.fileUrl);
+        if(url){const a=document.createElement('a');a.href=url;a.download=item.nama;a.target='_blank';a.rel='noopener';a.click();showToast(`Mengunduh berkas: ${item.nama}`,'success');return;}
+        showToast(`Berkas "${item.nama}" hanya data contoh dan tidak memiliki file.`,'error');
+    }
+
+    async function hapusArsip(id) {
+        const item=currentArsipList.find(x=>x.id==id); if(!item) return;
+        if (confirm(`Yakin ingin menghapus berkas "${item.nama}" dari arsip?`)) {
+            try {
+                await window.PPG_DB.arsip.delete(id); await window.PPG_DB.storage.removeArsip(item.storagePath);
+                currentArsipList=currentArsipList.filter(x=>x.id!=id); updateFolderCounters(); applyArsipFilters(); showToast('Berkas berhasil dihapus.', 'info');
+            } catch(error) { showToast(`Berkas gagal dihapus: ${error.message}`, 'error'); }
+        }
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+    });
+
+    function showToast(msg, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        const colors = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-blue-600' };
+        t.className = `toast ${colors[type] || colors.success} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium pointer-events-auto`;
+        t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> `;
+    t.append(document.createTextNode(msg));
+        container.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        const dateEl = document.getElementById('liveDateText');
+        const timeEl = document.getElementById('liveTimeText');
+        if (dateEl) dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+    }
+    updateClock(); setInterval(updateClock, 30000);
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', loadArsipData);
+    </script>
+</body>
+</html>

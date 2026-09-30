@@ -1,0 +1,54 @@
+[
+  {
+    "file": "database_generus",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": false
+  },
+  {
+    "file": "absensi",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": false
+  },
+  {
+    "file": "program_kerja",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": true
+  },
+  {
+    "file": "laporan",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": true
+  },
+  {
+    "file": "dokumentasi",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": true
+  },
+  {
+    "file": "arsip",
+    "create": true,
+    "reload": true,
+    "update": true,
+    "delete": true,
+    "emptyPersists": true
+  },
+  {
+    "file": "pengaturan",
+    "result": true
+  }
+]

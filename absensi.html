@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPG Maksel 2 - Absensi & Presensi</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Supabase JS Client CDN (Ready for live integration) -->
+    <script src="assets/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Print styles for export PDF */
+        @media print {
+            aside, header, #filterSection, #paginationControls, .no-print {
+                display: none !important;
+            }
+            body, main {
+                background: white !important;
+                padding: 0 !important;
+            }
+            #tableContainer {
+                box-shadow: none !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+        }
+
+        /* === MOBILE DRAWER SIDEBAR === */
+        #mobileSidebarDrawer {
+            transform: translateX(-100%);
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileSidebarDrawer.drawer-open {
+            transform: translateX(0);
+        }
+        #drawerOverlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #drawerOverlay.overlay-visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- ================= MOBILE DRAWER OVERLAY ================= -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ================= MOBILE DRAWER SIDEBAR ================= -->
+    <aside id="mobileSidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between shadow-2xl z-50 md:hidden overflow-y-auto">
+        <div class="absolute top-4 right-4">
+            <button onclick="closeMobileDrawer()" class="w-9 h-9 rounded-xl bg-blue-600/50 hover:bg-blue-600 text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div>
+            <div class="p-6 border-b border-blue-600/60 flex items-center gap-3 pr-14">
+                <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0"><i class="fas fa-layer-group"></i></div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-4 py-3">
+                <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                <nav class="space-y-1.5" id="sidebarMenuMobile">
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span></a>
+                    <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div><span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div><span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div><span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span></a>
+                    <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span></a>
+                    <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span></a>
+                    <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span></a>
+                </nav>
+            </div>
+        </div>
+        <div class="p-4 border-t border-blue-600/60 space-y-3">
+            <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                    <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                </div>
+            </div>
+            <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="flex min-h-screen">
+
+        <!-- ================= DESKTOP SIDEBAR ================= -->
+        <aside class="hidden md:flex sticky top-0 h-screen overflow-hidden w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex-col shadow-xl z-20 shrink-0">
+            
+            <div class="flex-1 min-h-0 overflow-y-auto">
+                <!-- Brand Header -->
+                <div class="p-6 border-b border-blue-600/60 flex items-center gap-3">
+                    <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">
+                            PPG Maksel 2
+                        </h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-200 font-medium">
+                                Sistem Generus Terpadu
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links (Direct Screens) -->
+                <div class="px-4 py-3">
+                    <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">
+                        Menu Utama
+                    </p>
+                    <nav class="space-y-1.5" id="sidebarMenu">
+                        <a href="dashboard.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-chart-pie w-5 text-center text-base"></i>
+                            <span>Dashboard</span>
+                        </a>
+
+                        <a href="database_generus.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-user-graduate w-5 text-center text-base"></i>
+                                <span>Database Generus</span>
+                            </div>
+                            <span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="absensi.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-clipboard-check w-5 text-center text-base"></i>
+                                <span>Absensi & Presensi</span>
+                            </div>
+                            <span id="sidebarAbsensiBadge" data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="program_kerja.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-tasks w-5 text-center text-base"></i>
+                                <span>Program Kerja</span>
+                            </div>
+                            <span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="laporan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i>
+                            <span>Laporan LUPG</span>
+                        </a>
+
+                        <a href="dokumentasi.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-photo-video w-5 text-center text-base"></i>
+                            <span>Dokumentasi</span>
+                        </a>
+
+                        <a href="arsip.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-folder-open w-5 text-center text-base"></i>
+                            <span>Arsip Dokumen</span>
+                        </a>
+
+                        <a href="pengaturan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-sliders-h w-5 text-center text-base"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer / User & Logout -->
+            <div class="p-4 border-t border-blue-600/60 space-y-3">
+                <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                        <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                    </div>
+                </div>
+
+                <a href="login.html"
+                    class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                    <i class="fas fa-sign-out-alt text-xs"></i>
+                    <span>Keluar Sistem</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+
+            <!-- MOBILE TOPBAR -->
+            <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm flex items-center justify-between gap-3">
+                <button onclick="openMobileDrawer()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 bg-emerald-600 text-white rounded-lg flex items-center justify-center font-bold shrink-0">
+                        <i class="fas fa-clipboard-check text-[10px]"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 text-sm truncate">Absensi & Presensi</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="openModal('modalAddAbsensi')" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Presensi">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                </div>
+            </header>
+
+            <!-- DESKTOP TOPBAR -->
+            <header class="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 shadow-xs flex-wrap justify-between items-center gap-4">
+                
+                <!-- Breadcrumbs & Title -->
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                        <a href="dashboard.html" class="font-semibold text-blue-700 hover:underline">PPG Maksel 2</a>
+                        <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                        <span>Absensi & Presensi</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+                        Absensi & Presensi Kehadiran Generus
+                    </h2>
+                </div>
+
+                <!-- Action Controls & Status -->
+                <div class="flex items-center gap-4">
+                    
+                    <!-- Supabase Connection Indicator -->
+                    <div id="supabaseStatusBadge" class="hidden sm:flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-medium text-emerald-700" title="Mode Penyimpanan Data">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="storageModeText">Local Data Ready (Supabase Ready)</span>
+                    </div>
+
+                    <!-- Real-Time Date Badge -->
+                    <div class="hidden md:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600">
+                        <i class="far fa-calendar-alt text-blue-600"></i>
+                        <span id="liveDateText">Sabtu, 29 Agustus 2026</span>
+                    </div>
+
+                    <!-- Notification Button -->
+                    <div class="relative">
+                        <button onclick="triggerToast('Presensi Terverifikasi', 'Data absensi kegiatan terbaru telah tersinkronisasi.', 'info')" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition" title="Notifikasi">
+                            <i class="fas fa-bell text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- User Profile Pill -->
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            A
+                        </div>
+                        <div class="hidden sm:block">
+                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="text-[11px] text-emerald-600 font-medium">Administrator</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- ================= CONTENT BODY ================= -->
+            <div class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-8 flex-1">
+
+                <!-- 1. HEADER BANNER & ACTION BAR -->
+                <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 rounded-2xl sm:rounded-3xl p-5 sm:p-7 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-1 flex flex-wrap items-center justify-between gap-6">
+                        <div class="max-w-xl">
+                            <span class="bg-blue-500/40 border border-blue-400/30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
+                                <i class="fas fa-clipboard-check text-[10px]"></i> Manajemen Presensi Santri
+                            </span>
+                            <h2 class="text-2xl font-extrabold tracking-tight">
+                                Rekap Kehadiran Kegiatan & Musyawaroh
+                            </h2>
+                            <p class="text-blue-100 text-xs sm:text-sm mt-1 leading-relaxed">
+                                Catat dan pantau tingkat kehadiran generus pada pengajian rutin, musyawaroh daerah, asrama, dan festival pembinaan.
+                            </p>
+                        </div>
+
+                        <!-- Top Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button onclick="openModal('modalAddAbsensi')" class="bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i class="fas fa-plus-circle text-blue-600"></i>
+                                + Input Presensi Baru
+                            </button>
+
+                            <button onclick="exportAbsensiCSV()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i class="fas fa-file-excel"></i>
+                                Export Excel
+                            </button>
+
+                            <button onclick="printAbsensiPDF()" class="bg-blue-600/80 hover:bg-blue-600 text-white font-medium px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2 border border-blue-400/30 transition">
+                                <i class="fas fa-print"></i>
+                                Cetak PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. STATISTIK KEHADIRAN (4 INTERACTIVE KPI CARDS) -->
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                            Statistik Presensi & Filter Cepat Status
+                        </p>
+                        <span class="text-xs text-blue-600 font-medium cursor-pointer hover:underline" onclick="resetAllFilters()">
+                            <i class="fas fa-undo text-[10px] mr-1"></i> Tampilkan Semua Status
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+                        <!-- Stat 1: Total Catatan -->
+                        <div onclick="resetAllFilters()" id="cardStatTotal" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 group-hover:text-blue-700 transition">Total Presensi</span>
+                                <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-xs">
+                                    <i class="fas fa-users"></i>
+                                </span>
+                            </div>
+                            <h3 class="text-3xl font-extrabold text-blue-700 mt-2" id="countTotal">0</h3>
+                            <p class="text-[11px] text-slate-400 mt-1">Total data santri tercatat</p>
+                        </div>
+
+                        <!-- Stat 2: Hadir -->
+                        <div onclick="filterByStatus('Hadir')" id="cardStatHadir" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 group-hover:text-emerald-700 transition">Hadir</span>
+                                <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+                                    <i class="fas fa-check-circle"></i>
+                                </span>
+                            </div>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 class="text-3xl font-extrabold text-emerald-600" id="countHadir">490</h3>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full" id="pctHadir">92.8%</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Mengikuti kegiatan penuh</p>
+                        </div>
+
+                        <!-- Stat 3: Izin & Sakit -->
+                        <div onclick="filterByStatus('Izin')" id="cardStatIzin" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 group-hover:text-amber-700 transition">Izin / Sakit</span>
+                                <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xs">
+                                    <i class="fas fa-info-circle"></i>
+                                </span>
+                            </div>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 class="text-3xl font-extrabold text-amber-600" id="countIzin">20</h3>
+                                <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full" id="pctIzin">3.8%</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Konfirmasi keterangan wali</p>
+                        </div>
+
+                        <!-- Stat 4: Alpha -->
+                        <div onclick="filterByStatus('Alpha')" id="cardStatAlpha" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-500 group-hover:text-rose-700 transition">Alpha</span>
+                                <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
+                                    <i class="fas fa-times-circle"></i>
+                                </span>
+                            </div>
+                            <div class="flex items-baseline gap-2 mt-2">
+                                <h3 class="text-3xl font-extrabold text-rose-600" id="countAlpha">18</h3>
+                                <span class="text-xs font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full" id="pctAlpha">3.4%</span>
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Tanpa keterangan hadir</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 3. FILTER & SEARCH CONTROLS SECTION -->
+                <div id="filterSection" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs p-6">
+                    <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-filter text-blue-600 text-sm"></i>
+                            <h4 class="font-bold text-sm text-slate-800">Filter & Pencarian Presensi</h4>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="resetAllFilters()" class="text-xs text-slate-500 hover:text-blue-700 font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 transition">
+                                <i class="fas fa-undo text-[10px] mr-1"></i> Reset Filter
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5 mt-4">
+                        
+                        <!-- Search Input -->
+                        <div class="relative lg:col-span-2">
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cari Nama Santri / Catatan</label>
+                            <div class="relative">
+                                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                <input type="text" id="filterSearch" onkeyup="applyFilters()" placeholder="Ketik nama santri..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                            </div>
+                        </div>
+
+                        <!-- Kegiatan Dropdown -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Kegiatan</label>
+                            <select id="filterEvent" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                <option value="">Semua Kegiatan</option>
+                                <option value="Pengajian Rutin Generus">Pengajian Rutin</option>
+                                <option value="Musyawaroh Bulanan">Musyawaroh Bulanan</option>
+                                <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian</option>
+                                <option value="Festival Generus Maksel 2">Festival Generus</option>
+                                <option value="Asrama Al-Quran Liburan">Asrama Al-Quran</option>
+                            </select>
+                        </div>
+
+                        <!-- Kelompok Dropdown -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kelompok</label>
+                            <select id="filterGroup" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                <option value="">Semua Kelompok</option>
+                                <option value="Kelompok A">Kelompok A</option>
+                                <option value="Kelompok B">Kelompok B</option>
+                                <option value="Kelompok C">Kelompok C</option>
+                                <option value="Kelompok D">Kelompok D</option>
+                            </select>
+                        </div>
+
+                        <!-- Status Dropdown -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Status Kehadiran</label>
+                            <select id="filterStatus" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                <option value="">Semua Status</option>
+                                <option value="Hadir">Hadir</option>
+                                <option value="Izin">Izin</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Alpha">Alpha</option>
+                            </select>
+                        </div>
+
+                        <!-- Tanggal Filter -->
+                        <div>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Tanggal Kegiatan</label>
+                            <input type="date" id="filterDate" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 4. ATTENDANCE DATA TABLE SECTION -->
+                <div id="tableContainer" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    
+                    <!-- Table Header & Counter -->
+                    <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-slate-800">Log Kehadiran Santri</span>
+                            <span id="filteredCountBadge" class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
+                                Memuat data...
+                            </span>
+                        </div>
+
+                        <div class="flex items-center gap-3 text-xs text-slate-500 no-print">
+                            <span>Tampilkan:</span>
+                            <select id="pageSizeSelect" onchange="changePageSize()" class="border border-slate-200 rounded-lg px-2 py-1 bg-slate-50 focus:outline-none">
+                                <option value="10" selected>10 baris</option>
+                                <option value="25">25 baris</option>
+                                <option value="50">50 baris</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100 uppercase tracking-wider text-[11px]">
+                                <tr>
+                                    <th class="p-4">Nama Santri</th>
+                                    <th class="p-4 hidden md:table-cell">Kelompok & Desa</th>
+                                    <th class="p-4 hidden sm:table-cell">Kegiatan</th>
+                                    <th class="p-4 hidden lg:table-cell">Tanggal & Waktu</th>
+                                    <th class="p-4 text-center">Status</th>
+                                    <th class="p-4 hidden lg:table-cell">Keterangan</th>
+                                    <th class="p-4 text-right no-print">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="absensiTableBody" class="divide-y divide-slate-100 text-slate-700">
+                                <!-- Populated dynamically by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden p-12 text-center">
+                        <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <h4 class="font-bold text-sm text-slate-700">Data Presensi Tidak Ditemukan</h4>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat seluruh rekaman kehadiran.
+                        </p>
+                        <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-semibold hover:bg-blue-800 transition">
+                            Reset Filter
+                        </button>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div id="paginationControls" class="px-6 py-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-4 no-print">
+                        <div class="text-xs text-slate-500" id="paginationInfo">
+                            Menampilkan 1 - 10 dari 528 data
+                        </div>
+                        <div class="flex items-center gap-1.5" id="paginationButtons">
+                            <!-- Page buttons populated via JS -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="bg-white border-t border-slate-200 px-8 py-4 text-center text-xs text-slate-500 flex flex-wrap justify-between items-center gap-2 no-print">
+                <span>&copy; 2026 PPG Makassar Selatan 2 (Maksel 2). Modul Presensi Terpadu.</span>
+                <span class="text-slate-400 font-mono text-[11px]">Schema v2.4 (Supabase Ready)</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <!-- ================= MODALS & POPUPS ================= -->
+
+    <!-- 1. MODAL INPUT PRESENSI BARU -->
+    <div id="modalAddAbsensi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal('modalAddAbsensi')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-base font-bold">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Catat Presensi Santri</h3>
+                    <p class="text-xs text-slate-500">Input kehadiran peserta kegiatan musyawaroh / pembinaan</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleCreateAbsensi(event)" class="space-y-4 text-xs">
+                
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri <span class="text-red-500">*</span></label>
+                    <input type="text" id="addName" required placeholder="Contoh: Ahmad Fauzi" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori <span class="text-red-500">*</span></label>
+                        <select id="addCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="PAUD">PAUD</option>
+                            <option value="Caberawit">Caberawit</option>
+                            <option value="Pra Remaja">Pra Remaja</option>
+                            <option value="Remaja" selected>Remaja</option>
+                            <option value="Pra Nikah">Pra Nikah</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kelompok & Desa <span class="text-red-500">*</span></label>
+                        <select id="addGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Kelompok A">Kelompok A - Barabaraya</option>
+                            <option value="Kelompok B">Kelompok B - Manggala</option>
+                            <option value="Kelompok C">Kelompok C - Panakkukang</option>
+                            <option value="Kelompok D">Kelompok D - Tamalanrea</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Agenda / Kegiatan <span class="text-red-500">*</span></label>
+                    <select id="addEvent" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Pengajian Rutin Generus">Pengajian Rutin Generus</option>
+                        <option value="Musyawaroh Bulanan">Musyawaroh Bulanan Pengurus</option>
+                        <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian Santri</option>
+                        <option value="Festival Generus Maksel 2">Festival Generus Maksel 2</option>
+                        <option value="Asrama Al-Quran Liburan">Asrama Al-Quran Liburan</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tanggal Kegiatan <span class="text-red-500">*</span></label>
+                        <input type="date" id="addDate" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Waktu Check-In</label>
+                        <input type="time" id="addTime" value="08:00" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Status Kehadiran <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <label class="border border-slate-200 p-2 rounded-xl text-center cursor-pointer hover:bg-slate-50 flex items-center justify-center gap-1.5 font-medium">
+                            <input type="radio" name="addStatus" value="Hadir" checked class="text-emerald-600 focus:ring-emerald-500">
+                            <span class="text-emerald-700">Hadir</span>
+                        </label>
+                        <label class="border border-slate-200 p-2 rounded-xl text-center cursor-pointer hover:bg-slate-50 flex items-center justify-center gap-1.5 font-medium">
+                            <input type="radio" name="addStatus" value="Izin" class="text-amber-600 focus:ring-amber-500">
+                            <span class="text-amber-700">Izin</span>
+                        </label>
+                        <label class="border border-slate-200 p-2 rounded-xl text-center cursor-pointer hover:bg-slate-50 flex items-center justify-center gap-1.5 font-medium">
+                            <input type="radio" name="addStatus" value="Sakit" class="text-blue-600 focus:ring-blue-500">
+                            <span class="text-blue-700">Sakit</span>
+                        </label>
+                        <label class="border border-slate-200 p-2 rounded-xl text-center cursor-pointer hover:bg-slate-50 flex items-center justify-center gap-1.5 font-medium">
+                            <input type="radio" name="addStatus" value="Alpha" class="text-rose-600 focus:ring-rose-500">
+                            <span class="text-rose-700">Alpha</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Keterangan / Catatan Tambahan</label>
+                    <textarea id="addNotes" rows="2" placeholder="Catatan alasan izin, sakit, atau tugas pembinaan..." class="w-full border border-slate-300 rounded-xl px-3.5 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeModal('modalAddAbsensi')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2.5 rounded-xl shadow-sm transition">
+                        <i class="fas fa-save mr-1"></i> Simpan Presensi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MODAL EDIT PRESENSI -->
+    <div id="modalEditAbsensi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal('modalEditAbsensi')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-base font-bold">
+                    <i class="fas fa-edit"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Edit Data Presensi</h3>
+                    <p class="text-xs text-slate-500">Perbarui rekaman kehadiran santri</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleUpdateAbsensi(event)" class="space-y-4 text-xs">
+                <input type="hidden" id="editId">
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri</label>
+                    <input type="text" id="editName" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori</label>
+                        <select id="editCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="PAUD">PAUD</option>
+                            <option value="Caberawit">Caberawit</option>
+                            <option value="Pra Remaja">Pra Remaja</option>
+                            <option value="Remaja">Remaja</option>
+                            <option value="Pra Nikah">Pra Nikah</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kelompok & Desa</label>
+                        <select id="editGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Kelompok A">Kelompok A - Barabaraya</option>
+                            <option value="Kelompok B">Kelompok B - Manggala</option>
+                            <option value="Kelompok C">Kelompok C - Panakkukang</option>
+                            <option value="Kelompok D">Kelompok D - Tamalanrea</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Agenda / Kegiatan</label>
+                    <select id="editEvent" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Pengajian Rutin Generus">Pengajian Rutin Generus</option>
+                        <option value="Musyawaroh Bulanan">Musyawaroh Bulanan Pengurus</option>
+                        <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian Santri</option>
+                        <option value="Festival Generus Maksel 2">Festival Generus Maksel 2</option>
+                        <option value="Asrama Al-Quran Liburan">Asrama Al-Quran Liburan</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tanggal Kegiatan</label>
+                        <input type="date" id="editDate" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Waktu Check-In</label>
+                        <input type="time" id="editTime" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Status Kehadiran</label>
+                    <select id="editStatus" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none font-semibold">
+                        <option value="Hadir" class="text-emerald-700">Hadir</option>
+                        <option value="Izin" class="text-amber-700">Izin</option>
+                        <option value="Sakit" class="text-blue-700">Sakit</option>
+                        <option value="Alpha" class="text-rose-700">Alpha</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Keterangan / Catatan</label>
+                    <textarea id="editNotes" rows="2" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeModal('modalEditAbsensi')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition">
+                        <i class="fas fa-check mr-1"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MODAL DETAIL PRESENSI (WITH DIRECT SCREEN PATHWAYS) -->
+    <div id="modalDetailAbsensi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal('modalDetailAbsensi')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <!-- Ticket Header -->
+            <div class="flex items-center gap-4 pb-5 border-b border-slate-100">
+                <div id="detailAvatar" class="w-14 h-14 rounded-2xl bg-emerald-600 text-white flex items-center justify-center text-xl font-extrabold shadow-sm">
+                    A
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Santri</h3>
+                        <span id="detailCategoryBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Remaja</span>
+                    </div>
+                    <p id="detailGroupVillage" class="text-xs text-slate-500 mt-1">Kelompok A • Barabaraya</p>
+                    <span id="detailStatusPill" class="inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
+                        Hadir
+                    </span>
+                </div>
+            </div>
+
+            <!-- Details Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-5 text-xs">
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 text-[10px] font-semibold uppercase">Agenda Kegiatan</span>
+                    <p id="detailEvent" class="font-bold text-slate-800 mt-0.5">Pengajian Rutin Generus</p>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 text-[10px] font-semibold uppercase">Tanggal & Waktu</span>
+                    <p id="detailDateTime" class="font-bold text-slate-800 mt-0.5">15 Juni 2026 • 08:00 WITA</p>
+                </div>
+                <div class="sm:col-span-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                    <span class="text-slate-400 text-[10px] font-semibold uppercase">Keterangan / Catatan Tambahan</span>
+                    <p id="detailNotes" class="font-bold text-slate-800 mt-0.5 leading-relaxed">-</p>
+                </div>
+            </div>
+
+            <!-- Direct Screen Pathways -->
+            <div class="border-t border-slate-100 pt-4">
+                <p class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2.5">
+                    Aksi Lintas Modul (Direct Screen Pathways)
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <a href="database_generus.html" class="flex items-center justify-center gap-2 p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl text-xs transition border border-blue-200">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Lihat Profil di Database</span>
+                    </a>
+                    <a href="program_kerja.html" class="flex items-center justify-center gap-2 p-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl text-xs transition border border-amber-200">
+                        <i class="fas fa-tasks"></i>
+                        <span>Buka Detail di Proker</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="mt-5 flex gap-2.5">
+                <button type="button" onclick="closeModal('modalDetailAbsensi')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl transition">
+                    Tutup
+                </button>
+                <button type="button" id="btnDetailEdit" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    <i class="fas fa-edit mr-1"></i> Edit Presensi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. MODAL KONFIRMASI HAPUS PRESENSI -->
+    <div id="modalDeleteAbsensi" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 relative">
+            <div class="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-800">Hapus Data Presensi?</h3>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                Apakah Anda yakin ingin membatalkan rekaman presensi santri <strong id="deleteTargetName" class="text-slate-800">...</strong>? Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div class="mt-6 flex gap-3">
+                <button onclick="closeModal('modalDeleteAbsensi')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl transition">
+                    Batal
+                </button>
+                <button onclick="confirmDeleteAbsensi()" class="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-semibold py-2.5 rounded-xl shadow-sm transition">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-3 pointer-events-none no-print"></div>
+
+    <!-- ================= JAVASCRIPT & SUPABASE-READY SERVICE ================= -->
+    <script src="assets/demo-seed.js"></script>
+    <script src="assets/supabase-client.js"></script>
+    <script src="assets/sidebar.js"></script>
+
+    <script>
+        // =========================================================================
+        // 1. SUPABASE CONFIGURATION & DATA SERVICE
+        // =========================================================================
+        // Koneksi dan pemetaan kolom tabel `absensi` ada di assets/supabase-client.js (lihat supabase/schema.sql).
+        if (window.PPG_DB.isLive()) document.getElementById("storageModeText").innerText = "Terhubung ke Supabase Cloud (Live)";
+
+        const AbsensiService = {
+            STORAGE_KEY: "ppg_maksel2_absensi_data",
+
+            async getAll() {
+                return window.PPG_DB.absensi.list();
+            },
+
+            async create(item) {
+                return window.PPG_DB.absensi.insert(item);
+            },
+
+            async update(id, updatedFields) {
+                return window.PPG_DB.absensi.update(id, updatedFields);
+            },
+
+            async delete(id) {
+                return window.PPG_DB.absensi.delete(id);
+            }
+        };
+
+        // =========================================================================
+        // 2. UI CONTROLLER & TABLE RENDERING
+        // =========================================================================
+        let absensiList = [];
+        let filteredAbsensi = [];
+        let currentPage = 1;
+        let pageSize = 10;
+        let deleteTargetId = null;
+
+        async function loadAbsensiData() {
+            try {
+                absensiList = await AbsensiService.getAll();
+            } catch (error) {
+                absensiList = [];
+                triggerToast("Data Gagal Dimuat", error.message, "warning");
+            }
+            updateKPIStats();
+            applyFilters();
+        }
+
+        function updateKPIStats() {
+            const total = absensiList.length;
+            const hadir = absensiList.filter(a => a.status === "Hadir").length;
+            const izin = absensiList.filter(a => a.status === "Izin" || a.status === "Sakit").length;
+            const alpha = absensiList.filter(a => a.status === "Alpha").length;
+
+            const pctHadir = total ? ((hadir / total) * 100).toFixed(1) : '0.0';
+            const pctIzin = total ? ((izin / total) * 100).toFixed(1) : '0.0';
+            const pctAlpha = total ? ((alpha / total) * 100).toFixed(1) : '0.0';
+
+            document.getElementById("countTotal").innerText = total;
+            document.getElementById("countHadir").innerText = hadir;
+            document.getElementById("pctHadir").innerText = pctHadir + "%";
+            document.getElementById("countIzin").innerText = izin;
+            document.getElementById("pctIzin").innerText = pctIzin + "%";
+            document.getElementById("countAlpha").innerText = alpha;
+            document.getElementById("pctAlpha").innerText = pctAlpha + "%";
+
+            const sidebarBadge = document.getElementById("sidebarAbsensiBadge");
+            if (sidebarBadge) sidebarBadge.innerText = pctHadir + "%";
+        }
+
+        function applyFilters() {
+            const search = document.getElementById("filterSearch").value.toLowerCase();
+            const eventVal = document.getElementById("filterEvent").value;
+            const groupVal = document.getElementById("filterGroup").value;
+            const statusVal = document.getElementById("filterStatus").value;
+            const dateVal = document.getElementById("filterDate").value;
+
+            filteredAbsensi = absensiList.filter(item => {
+                const matchSearch = item.name.toLowerCase().includes(search) || 
+                                    (item.notes && item.notes.toLowerCase().includes(search));
+                const matchEvent = eventVal ? item.event === eventVal : true;
+                const matchGroup = groupVal ? item.group === groupVal : true;
+                const matchStatus = statusVal ? item.status === statusVal : true;
+                const matchDate = dateVal ? item.date === dateVal : true;
+
+                return matchSearch && matchEvent && matchGroup && matchStatus && matchDate;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function filterByStatus(status) {
+            document.getElementById("filterStatus").value = status;
+            applyFilters();
+
+            const cards = ["Total", "Hadir", "Izin", "Alpha"];
+            cards.forEach(c => {
+                const cardEl = document.getElementById("cardStat" + c);
+                if (cardEl) {
+                    if (c === status) {
+                        cardEl.classList.add("ring-2", "ring-blue-600", "bg-blue-50/50");
+                    } else {
+                        cardEl.classList.remove("ring-2", "ring-blue-600", "bg-blue-50/50");
+                    }
+                }
+            });
+        }
+
+        function resetAllFilters() {
+            document.getElementById("filterSearch").value = "";
+            document.getElementById("filterEvent").value = "";
+            document.getElementById("filterGroup").value = "";
+            document.getElementById("filterStatus").value = "";
+            document.getElementById("filterDate").value = "";
+
+            const cards = ["Total", "Hadir", "Izin", "Alpha"];
+            cards.forEach(c => {
+                const cardEl = document.getElementById("cardStat" + c);
+                if (cardEl) cardEl.classList.remove("ring-2", "ring-blue-600", "bg-blue-50/50");
+            });
+
+            applyFilters();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById("absensiTableBody");
+            const emptyState = document.getElementById("emptyState");
+            const paginationControls = document.getElementById("paginationControls");
+            const badge = document.getElementById("filteredCountBadge");
+
+            badge.innerText = `${filteredAbsensi.length} Catatan`;
+
+            if (filteredAbsensi.length === 0) {
+                tbody.innerHTML = "";
+                emptyState.classList.remove("hidden");
+                paginationControls.classList.add("hidden");
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+            paginationControls.classList.remove("hidden");
+
+            const start = (currentPage - 1) * pageSize;
+            const end = Math.min(start + pageSize, filteredAbsensi.length);
+            const pageData = filteredAbsensi.slice(start, end);
+
+            let html = "";
+            pageData.forEach(raw => {
+                const item = window.PPG_DB.escapeRow(raw);
+                let statusBadge = "";
+                if (item.status === "Hadir") {
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                        <i class="fas fa-check-circle mr-1"></i> Hadir
+                    </button>`;
+                } else if (item.status === "Izin") {
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                        <i class="fas fa-envelope-open mr-1"></i> Izin
+                    </button>`;
+                } else if (item.status === "Sakit") {
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                        <i class="fas fa-medkit mr-1"></i> Sakit
+                    </button>`;
+                } else {
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                        <i class="fas fa-times-circle mr-1"></i> Alpha
+                    </button>`;
+                }
+
+                html += `
+                    <tr class="hover:bg-slate-50/80 transition duration-150">
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
+                                    ${item.name.charAt(0)}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-slate-800">${item.name}</p>
+                                    <span class="text-[10px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full mt-0.5 inline-block">
+                                        ${item.category}
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4 hidden md:table-cell">
+                            <p class="font-semibold text-slate-800">${item.group}</p>
+                            <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
+                                <i class="fas fa-map-marker-alt text-blue-500 text-[10px]"></i> ${item.village || 'Makassar'}
+                            </p>
+                        </td>
+                        <td class="p-4 hidden sm:table-cell">
+                            <p class="font-semibold text-blue-700">${item.event}</p>
+                        </td>
+                        <td class="p-4 hidden lg:table-cell">
+                            <p class="font-medium text-slate-700">${item.date}</p>
+                            <p class="text-[11px] text-slate-400 mt-0.5 font-mono">${item.time || '-'}</p>
+                        </td>
+                        <td class="p-4 text-center">
+                            ${statusBadge}
+                        </td>
+                        <td class="p-4 text-slate-600 max-w-xs truncate hidden lg:table-cell">
+                            ${item.notes || '<span class="text-slate-400">-</span>'}
+                        </td>
+                        <td class="p-4 text-right no-print">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="showAbsensiDetail(${item.id})" class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition" title="Lihat Tiket Presensi">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </button>
+                                <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition" title="Edit Data Presensi">
+                                    <i class="fas fa-edit text-xs"></i>
+                                </button>
+                                <button onclick="openDeleteModal(${item.id})" class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Hapus Data">
+                                    <i class="fas fa-trash-alt text-xs"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+            renderPagination(start + 1, end, filteredAbsensi.length);
+        }
+
+        async function cycleStatus(id) {
+            const item = absensiList.find(a => a.id == id);
+            if (!item) return;
+            try {
+
+                const order = ["Hadir", "Izin", "Sakit", "Alpha"];
+                const nextIdx = (order.indexOf(item.status) + 1) % order.length;
+                const newStatus = order[nextIdx];
+
+                await AbsensiService.update(id, { status: newStatus });
+                item.status = newStatus;
+
+                triggerToast("Status Presensi Diperbarui", `${item.name} kini berstatus: ${newStatus}`, "success");
+                updateKPIStats();
+                renderTable();
+            } catch (error) {
+                triggerToast("Status Gagal Diubah", error.message, "warning");
+            }
+        }
+
+        function renderPagination(start, end, total) {
+            document.getElementById("paginationInfo").innerText = `Menampilkan ${start} - ${end} dari ${total} data`;
+            const totalPages = Math.ceil(total / pageSize);
+            const btnContainer = document.getElementById("paginationButtons");
+
+            let btns = `
+                <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    Prev
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    const active = i === currentPage ? 'bg-blue-700 text-white font-bold' : 'border border-slate-200 text-slate-700 hover:bg-slate-50';
+                    btns += `
+                        <button onclick="goToPage(${i})" class="px-3 py-1.5 rounded-lg text-xs font-semibold ${active} transition">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    btns += `<span class="px-1 text-slate-400 text-xs">...</span>`;
+                }
+            }
+
+            btns += `
+                <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''} class="px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    Next
+                </button>
+            `;
+
+            btnContainer.innerHTML = btns;
+        }
+
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredAbsensi.length / pageSize);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderTable();
+        }
+
+        function changePageSize() {
+            pageSize = parseInt(document.getElementById("pageSizeSelect").value);
+            currentPage = 1;
+            renderTable();
+        }
+
+        // =========================================================================
+        // 3. FORM HANDLERS & MODALS
+        // =========================================================================
+        async function handleCreateAbsensi(e) {
+            e.preventDefault();
+            try {
+                const statusRadios = document.getElementsByName("addStatus");
+                let selectedStatus = "Hadir";
+                for (const r of statusRadios) {
+                    if (r.checked) { selectedStatus = r.value; break; }
+                }
+
+                const newItem = {
+                    name: document.getElementById("addName").value,
+                    category: document.getElementById("addCategory").value,
+                    group: document.getElementById("addGroup").value,
+                    village: "Barabaraya",
+                    event: document.getElementById("addEvent").value,
+                    date: document.getElementById("addDate").value,
+                    time: document.getElementById("addTime").value || "08:00",
+                    status: selectedStatus,
+                    notes: document.getElementById("addNotes").value
+                };
+
+                const created = await AbsensiService.create(newItem);
+                absensiList.unshift(created);
+
+                closeModal('modalAddAbsensi');
+                e.target.reset();
+                updateKPIStats();
+                applyFilters();
+                triggerToast("Presensi Disimpan!", `Presensi untuk ${newItem.name} berhasil dicatat.`, "success");
+            } catch (error) {
+                triggerToast("Gagal Menyimpan", error.message, "warning");
+            }
+        }
+
+        function openEditModal(id) {
+            const item = absensiList.find(a => a.id == id);
+            if (!item) return;
+
+            document.getElementById("editId").value = item.id;
+            document.getElementById("editName").value = item.name;
+            document.getElementById("editCategory").value = item.category;
+            document.getElementById("editGroup").value = item.group;
+            document.getElementById("editEvent").value = item.event;
+            document.getElementById("editDate").value = item.date;
+            document.getElementById("editTime").value = item.time === "-" ? "" : item.time;
+            document.getElementById("editStatus").value = item.status;
+            document.getElementById("editNotes").value = item.notes || '';
+
+            openModal('modalEditAbsensi');
+        }
+
+        async function handleUpdateAbsensi(e) {
+            e.preventDefault();
+            try {
+                const id = document.getElementById("editId").value;
+                const updated = {
+                    name: document.getElementById("editName").value,
+                    category: document.getElementById("editCategory").value,
+                    group: document.getElementById("editGroup").value,
+                    event: document.getElementById("editEvent").value,
+                    date: document.getElementById("editDate").value,
+                    time: document.getElementById("editTime").value || "-",
+                    status: document.getElementById("editStatus").value,
+                    notes: document.getElementById("editNotes").value
+                };
+
+                await AbsensiService.update(id, updated);
+                const index = absensiList.findIndex(a => a.id == id);
+                if (index !== -1) absensiList[index] = { ...absensiList[index], ...updated };
+
+                closeModal('modalEditAbsensi');
+                updateKPIStats();
+                applyFilters();
+                triggerToast("Presensi Diperbarui", `Perubahan data presensi ${updated.name} berhasil disimpan.`, "success");
+            } catch (error) {
+                triggerToast("Gagal Menyimpan", error.message, "warning");
+            }
+        }
+
+        function showAbsensiDetail(id) {
+            const item = absensiList.find(a => a.id == id);
+            if (!item) return;
+
+            document.getElementById("detailAvatar").innerText = item.name.charAt(0);
+            document.getElementById("detailName").innerText = item.name;
+            document.getElementById("detailCategoryBadge").innerText = item.category;
+            document.getElementById("detailGroupVillage").innerText = `${item.group} • ${item.village || 'Maksel 2'}`;
+            document.getElementById("detailEvent").innerText = item.event;
+            document.getElementById("detailDateTime").innerText = `${item.date} • ${item.time || '08:00'} WITA`;
+            document.getElementById("detailNotes").innerText = item.notes || 'Tidak ada catatan tambahan.';
+
+            const statusPill = document.getElementById("detailStatusPill");
+            statusPill.innerText = item.status;
+            if (item.status === "Hadir") statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-emerald-100 text-emerald-700";
+            else if (item.status === "Izin") statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-amber-100 text-amber-700";
+            else if (item.status === "Sakit") statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-blue-100 text-blue-700";
+            else statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-100 text-rose-700";
+
+            document.getElementById("btnDetailEdit").onclick = () => {
+                closeModal('modalDetailAbsensi');
+                openEditModal(item.id);
+            };
+
+            openModal('modalDetailAbsensi');
+        }
+
+        function openDeleteModal(id) {
+            deleteTargetId = id;
+            document.getElementById("deleteTargetName").innerText = absensiList.find(a => a.id == id)?.name || "";
+            openModal('modalDeleteAbsensi');
+        }
+
+        async function confirmDeleteAbsensi() {
+            if (!deleteTargetId) return;
+            try {
+                const target = absensiList.find(a => a.id == deleteTargetId);
+                const name = target ? target.name : 'Santri';
+
+                await AbsensiService.delete(deleteTargetId);
+                absensiList = absensiList.filter(a => a.id != deleteTargetId);
+
+                closeModal('modalDeleteAbsensi');
+                updateKPIStats();
+                applyFilters();
+                triggerToast("Presensi Dihapus", `Rekaman presensi ${name} telah dihapus.`, "warning");
+            } catch (error) {
+                triggerToast("Gagal Menghapus", error.message, "warning");
+            }
+        }
+
+        // =========================================================================
+        // 4. EXPORT & PDF PRINT
+        // =========================================================================
+        function exportAbsensiCSV() {
+            if (filteredAbsensi.length === 0) {
+                triggerToast("Export Gagal", "Tidak ada data untuk diekspor.", "warning");
+                return;
+            }
+
+            window.PPG_DB.downloadCsv(`Rekap_Presensi_PPG_Maksel2_${new Date().toISOString().slice(0, 10)}.csv`,
+                ["ID", "Nama", "Kategori", "Kelompok", "Desa", "Kegiatan", "Tanggal", "Waktu", "Status", "Keterangan"],
+                filteredAbsensi.map(a => [a.id, a.name, a.category, a.group, a.village, a.event, a.date, a.time, a.status, a.notes]));
+
+            triggerToast("Export Berhasil!", `File CSV (${filteredAbsensi.length} presensi) berhasil diunduh.`, "success");
+        }
+
+        function printAbsensiPDF() {
+            window.print();
+        }
+
+        // =========================================================================
+        // 5. MODAL HELPERS & TOAST
+        // =========================================================================
+        function openModal(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.remove("hidden");
+                el.classList.add("flex");
+            }
+        }
+
+        function closeModal(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.add("hidden");
+                el.classList.remove("flex");
+            }
+        }
+
+        window.addEventListener("click", (e) => {
+            const modals = ['modalAddAbsensi', 'modalEditAbsensi', 'modalDetailAbsensi', 'modalDeleteAbsensi'];
+            modals.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && e.target === el) closeModal(id);
+            });
+        });
+
+        function triggerToast(title, message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            if (!container) return;
+
+            const toast = document.createElement("div");
+            toast.className = `pointer-events-auto flex items-start gap-3 p-4 rounded-2xl shadow-xl border text-xs max-w-sm w-full bg-white transition-all transform duration-300 translate-y-4 opacity-0`;
+
+            let iconColor = "text-blue-600 bg-blue-50";
+            let icon = "fa-info-circle";
+
+            if (type === "success") {
+                iconColor = "text-emerald-600 bg-emerald-50";
+                icon = "fa-check-circle";
+                toast.classList.add("border-emerald-200");
+            } else if (type === "warning") {
+                iconColor = "text-amber-600 bg-amber-50";
+                icon = "fa-exclamation-triangle";
+                toast.classList.add("border-amber-200");
+            } else {
+                toast.classList.add("border-blue-200");
+            }
+
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-xl ${iconColor} flex items-center justify-center text-sm shrink-0 font-bold">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-bold text-slate-800" data-toast-title></h5>
+                    <p class="text-slate-600 mt-0.5 leading-tight text-[11px]" data-toast-message></p>
+                </div>
+            `;
+            toast.querySelector("[data-toast-title]").textContent = title;
+            toast.querySelector("[data-toast-message]").textContent = message;
+
+            container.appendChild(toast);
+
+            setTimeout(() => toast.classList.remove("translate-y-4", "opacity-0"), 10);
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-2");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Default date to today
+            const today = new Date().toISOString().slice(0, 10);
+            const addDateEl = document.getElementById("addDate");
+            if (addDateEl) addDateEl.value = today;
+
+            loadAbsensiData();
+            if (new URLSearchParams(window.location.search).has("tambah")) openModal("modalAddAbsensi");
+        });
+
+        // === MOBILE DRAWER SIDEBAR ===
+        function openMobileDrawer() {
+            document.getElementById('mobileSidebarDrawer').classList.add('drawer-open');
+            document.getElementById('drawerOverlay').classList.add('overlay-visible');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileDrawer() {
+            document.getElementById('mobileSidebarDrawer').classList.remove('drawer-open');
+            document.getElementById('drawerOverlay').classList.remove('overlay-visible');
+            document.body.style.overflow = '';
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMobileDrawer();
+        });
+    </script>
+
+</body>
+
+</html>

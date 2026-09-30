@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan - PPG Maksel 2</title>
+    <meta name="description" content="Pengaturan sistem dan konfigurasi aplikasi PPG Maksel 2">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .card-hover { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.03); }
+
+        #mobileSidebarDrawer { transform: translateX(-100%); transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1); }
+        #mobileSidebarDrawer.drawer-open { transform: translateX(0); }
+        #drawerOverlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        #drawerOverlay.overlay-visible { opacity: 1; pointer-events: all; }
+
+        .setting-card { transition: all 0.2s ease; }
+        .setting-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .toggle-switch { transition: background 0.2s ease; }
+        .toggle-knob { transition: transform 0.2s ease; }
+
+        .modal-overlay { backdrop-filter: blur(6px); animation: fadeIn 0.2s ease; }
+        .modal-box { animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+        .toast { animation: toastIn 0.3s ease forwards; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)} }
+        .toast.hide { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(100%)} }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- ================= MOBILE DRAWER OVERLAY ================= -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ================= MOBILE DRAWER SIDEBAR ================= -->
+    <aside id="mobileSidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between shadow-2xl z-50 md:hidden overflow-y-auto">
+        <div class="absolute top-4 right-4">
+            <button onclick="closeMobileDrawer()" class="w-9 h-9 rounded-xl bg-blue-600/50 hover:bg-blue-600 text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div>
+            <div class="p-6 border-b border-blue-600/60 flex items-center gap-3 pr-14">
+                <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-4 py-3">
+                <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span></a>
+                    <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div><span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div><span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div><span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span></a>
+                    <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span></a>
+                    <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span></a>
+                    <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span></a>
+                </nav>
+            </div>
+        </div>
+        <div class="p-4 border-t border-blue-600/60 space-y-3">
+            <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                    <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                </div>
+            </div>
+            <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="flex min-h-screen">
+
+        <!-- ================= DESKTOP SIDEBAR ================= -->
+        <aside class="hidden md:flex sticky top-0 h-screen overflow-hidden w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex-col shadow-xl z-20 shrink-0">
+            <div class="flex-1 min-h-0 overflow-y-auto">
+                <div class="p-6 border-b border-blue-600/60 flex items-center gap-3">
+                    <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-4 py-3">
+                    <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                    <nav class="space-y-1.5" id="sidebarMenu">
+                        <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span>
+                        </a>
+                        <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div>
+                            <span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div>
+                            <span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div>
+                            <span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+                        <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span>
+                        </a>
+                        <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span>
+                        </a>
+                        <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span>
+                        </a>
+                        <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-blue-600/60 space-y-3">
+                <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                        <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                    </div>
+                </div>
+                <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                    <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+
+            <!-- MOBILE TOPBAR -->
+            <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm flex items-center justify-between gap-3">
+                <button onclick="openMobileDrawer()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 bg-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-xs shrink-0">
+                        <i class="fas fa-sliders-h text-[10px]"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 text-sm truncate">Pengaturan</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                </div>
+            </header>
+
+            <!-- DESKTOP TOPBAR -->
+            <header class="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 shadow-xs flex-wrap justify-between items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                        <span class="font-semibold text-blue-700">PPG Maksel 2</span>
+                        <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                        <span>Pengaturan</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+                        Pengaturan Sistem
+                    </h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600">
+                        <i class="far fa-calendar-alt text-blue-600"></i>
+                        <span id="liveDateText"></span>
+                        <span class="text-slate-300">|</span>
+                        <i class="far fa-clock text-blue-600"></i>
+                        <span id="liveTimeText" class="font-mono"></span>
+                    </div>
+                    <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
+                        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
+                        <span class="text-xs text-emerald-700 font-medium">Supabase Online</span>
+                    </div>
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">A</div>
+                        <div class="hidden sm:block">
+                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Super Admin
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ================= PAGE CONTENT ================= -->
+            <div class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-8 flex-1">
+
+                <!-- PROFIL ADMIN CARD -->
+                <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-[160px] pointer-events-none">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 relative z-1">
+                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center text-3xl font-bold border-2 border-white/30 shrink-0">A</div>
+                        <div class="flex-1">
+                            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">Admin Maksel</h2>
+                            <p class="text-blue-200 text-sm">admin@ppgmaksel2.org</p>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium">Administrator</span>
+                                <span class="text-xs bg-emerald-500/40 px-2.5 py-1 rounded-full font-medium"><i class="fas fa-circle text-emerald-300 text-[8px] mr-1"></i>Aktif</span>
+                            </div>
+                        </div>
+                        <button onclick="document.getElementById('orgName').focus();document.getElementById('orgName').scrollIntoView({behavior:'smooth',block:'center'})" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition flex items-center gap-2 shrink-0">
+                            <i class="fas fa-edit"></i> Edit Profil
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SETTING SECTIONS -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- Profil Organisasi -->
+                    <div class="setting-card bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
+                        <div class="flex items-start gap-4 mb-5">
+                            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-building text-blue-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-semibold text-slate-800">Profil Organisasi</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">Atur informasi dasar organisasi</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-5">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Nama Organisasi</label>
+                                <input type="text" id="orgName" value="PPG Maksel 2" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Deskripsi</label>
+                                <textarea rows="2" id="orgDescription" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-none">Sistem Informasi Generus PPG Masjid As-Salam 2</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Tahun Aktif</label>
+                                <input type="text" id="orgYear" value="2026/2027" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                            </div>
+                        </div>
+                        <button onclick="saveOrganization()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i> Simpan Perubahan
+                        </button>
+                    </div>
+
+                    <!-- Akun Pengguna -->
+                    <div class="setting-card bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
+                        <div class="flex items-start gap-4 mb-5">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-users-cog text-emerald-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-semibold text-slate-800">Akun Pengguna</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">Kelola akun admin dan hak akses</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-5">
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">A</div>
+                                    <div><p class="text-sm font-medium text-slate-800">Admin Maksel</p><p class="text-xs text-slate-400">Administrator</p></div>
+                                </div>
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">P</div>
+                                    <div><p class="text-sm font-medium text-slate-800">Pengurus</p><p class="text-xs text-slate-400">Editor</p></div>
+                                </div>
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 bg-amber-500 rounded-full flex items-center justify-center text-white text-sm font-bold">V</div>
+                                    <div><p class="text-sm font-medium text-slate-800">Viewer</p><p class="text-xs text-slate-400">Read Only</p></div>
+                                </div>
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
+                            </div>
+                        </div>
+                        <button onclick="openUserManagement()" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                            <i class="fas fa-user-plus"></i> Tambah Pengguna
+                        </button>
+                    </div>
+
+                    <!-- Notifikasi -->
+                    <div class="setting-card bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
+                        <div class="flex items-start gap-4 mb-5">
+                            <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-bell text-amber-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-semibold text-slate-800">Notifikasi</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">Konfigurasi pengiriman notifikasi</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4 mb-5">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-sm font-medium text-slate-700">Notifikasi Absensi</p><p class="text-xs text-slate-400">Alert saat santri alpha</p></div>
+                                <button onclick="toggleSwitch(this)" class="toggle-switch relative w-12 h-6 bg-blue-600 rounded-full" data-on="true">
+                                    <span class="toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-sm font-medium text-slate-700">Reminder Program Kerja</p><p class="text-xs text-slate-400">H-3 sebelum kegiatan</p></div>
+                                <button onclick="toggleSwitch(this)" class="toggle-switch relative w-12 h-6 bg-blue-600 rounded-full" data-on="true">
+                                    <span class="toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-sm font-medium text-slate-700">Laporan LUPG Belum Input</p><p class="text-xs text-slate-400">Notifikasi akhir bulan</p></div>
+                                <button onclick="toggleSwitch(this)" class="toggle-switch relative w-12 h-6 bg-gray-300 rounded-full" data-on="false">
+                                    <span class="toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+                                </button>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-sm font-medium text-slate-700">Email Digest Mingguan</p><p class="text-xs text-slate-400">Ringkasan setiap Senin pagi</p></div>
+                                <button onclick="toggleSwitch(this)" class="toggle-switch relative w-12 h-6 bg-blue-600 rounded-full" data-on="true">
+                                    <span class="toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="showToast('Pengaturan notifikasi disimpan','success')" class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                            <i class="fas fa-save"></i> Simpan Pengaturan
+                        </button>
+                    </div>
+
+                    <!-- Supabase Config -->
+                    <div class="setting-card bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
+                        <div class="flex items-start gap-4 mb-5">
+                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-database text-emerald-600 text-xl"></i></div>
+                            <div>
+                                <h3 class="font-semibold text-slate-800">Konfigurasi Supabase</h3>
+                                <p class="text-sm text-slate-500 mt-0.5">Koneksi database cloud</p>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mb-5">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Project URL</label>
+                                <input type="text" id="supabaseUrlInput" placeholder="https://YOUR_PROJECT_ID.supabase.co" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 font-mono text-xs">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">Anon Public Key</label>
+                                <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 font-mono text-xs">
+                            </div>
+                            <div id="supabaseStatusBox" class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 transition-colors">
+                                <i id="supabaseStatusIcon" class="fas fa-info-circle text-blue-500"></i>
+                                <div>
+                                    <p id="supabaseStatusTitle" class="text-xs font-medium text-slate-700">Mode Lokal (Offline / Demo)</p>
+                                    <p id="supabaseStatusDesc" class="text-xs text-slate-500">Masukkan Project URL & Anon Key untuk menghubungkan database live</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="supabaseSaveButton" onclick="saveSupabaseConfig()" class="disabled:opacity-50 disabled:cursor-not-allowed w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fas fa-plug"></i> Simpan & Hubungkan Database
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DANGER ZONE -->
+                <div class="bg-white rounded-2xl shadow-xs border border-red-100 p-6">
+                    <div class="flex items-start gap-4 mb-5">
+                        <div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-exclamation-triangle text-red-600 text-xl"></i></div>
+                        <div>
+                            <h3 class="font-semibold text-red-700">Zona Berbahaya</h3>
+                            <p class="text-sm text-slate-500 mt-0.5">Tindakan berikut tidak dapat dibatalkan</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <button onclick="backupLocalData()" class="flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
+                            <i class="fas fa-download text-blue-600"></i> Backup Data
+                        </button>
+                        <button onclick="restoreLocalData()" class="flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
+                            <i class="fas fa-upload text-amber-600"></i> Restore Data
+                        </button>
+                        <button onclick="openModal('modalReset')" class="flex items-center justify-center gap-2 border border-red-200 hover:bg-red-50 text-red-600 py-3 rounded-xl text-sm font-medium transition">
+                            <i class="fas fa-trash-alt text-red-600"></i> Reset Semua Data
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- MODAL RESET CONFIRM -->
+    <div id="modalReset" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-6">
+        <div class="modal-box bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-500 text-2xl"></i></div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Reset Semua Data?</h3>
+            <p class="text-sm text-slate-500 mb-6">Seluruh data lokal di browser ini (generus, absensi, program kerja, LUPG, dokumentasi, arsip) akan dikosongkan. Data di Supabase tidak terpengaruh. Tindakan ini tidak bisa dibatalkan!</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('modalReset')" class="flex-1 border border-slate-200 text-slate-600 py-3 rounded-xl text-sm font-medium hover:bg-slate-50 transition">Batal</button>
+                <button onclick="doReset()" class="flex-1 bg-red-500 text-white py-3 rounded-xl text-sm font-medium hover:bg-red-600 transition"><i class="fas fa-trash mr-2"></i>Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Supabase JS Client & App Helper -->
+    <script src="assets/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/demo-seed.js"></script>
+    <script src="assets/supabase-client.js"></script>
+    <script src="assets/sidebar.js"></script>
+    <script>
+    // Supabase Live Sync Handler
+    function refreshSupabaseUI() {
+        const urlInput = document.getElementById('supabaseUrlInput');
+        const keyInput = document.getElementById('supabaseKeyInput');
+        const box = document.getElementById('supabaseStatusBox');
+        const icon = document.getElementById('supabaseStatusIcon');
+        const title = document.getElementById('supabaseStatusTitle');
+        const desc = document.getElementById('supabaseStatusDesc');
+
+        const cfg = window.PPG_DB ? window.PPG_DB.getConfig() : { url: '', key: '' };
+        if (urlInput) urlInput.value = cfg.url || '';
+        if (keyInput) keyInput.value = cfg.key || '';
+        const locked = window.PPG_DB?.isConfigLocked();
+        [urlInput, keyInput, document.getElementById('supabaseSaveButton')].forEach(el => { if (el) el.disabled = Boolean(locked); });
+
+        if (window.PPG_DB && window.PPG_DB.isLive()) {
+            box.className = 'flex items-center gap-2 p-3 bg-emerald-50 rounded-xl border border-emerald-200 transition-colors';
+            icon.className = 'fas fa-check-circle text-emerald-600';
+            title.textContent = 'Terhubung ke Supabase Cloud (Live)';
+            title.className = 'text-xs font-semibold text-emerald-800';
+            desc.textContent = locked ? 'Dikonfigurasi lewat assets/config.js untuk semua pengguna.' : 'Database cloud aktif dan siap sinkronisasi data.';
+            desc.className = 'text-xs text-emerald-600';
+        } else {
+            box.className = 'flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 transition-colors';
+            icon.className = 'fas fa-info-circle text-blue-500';
+            title.textContent = 'Mode Lokal (Offline / Demo)';
+            title.className = 'text-xs font-medium text-slate-700';
+            desc.textContent = 'Data disimpan di browser (localStorage). Masukkan URL & Anon Key untuk menghubungkan database live.';
+            desc.className = 'text-xs text-slate-500';
+        }
+    }
+
+    async function saveSupabaseConfig() {
+        const url = document.getElementById('supabaseUrlInput').value.trim();
+        const key = document.getElementById('supabaseKeyInput').value.trim();
+
+        if (!url || !key) {
+            if (confirm('Kosongkan konfigurasi dan kembali ke Mode Lokal (Demo)?')) {
+                window.PPG_DB.setConfig('', '');
+                refreshSupabaseUI();
+                showToast('Kembali ke mode penyimpanan lokal (Demo)', 'info');
+            }
+            return;
+        }
+
+        showToast('Memverifikasi koneksi ke Supabase...', 'info');
+
+        try {
+            const isOk = window.PPG_DB.setConfig(url, key);
+            if (isOk) {
+                // Test ping query
+                const client = window.PPG_DB.getClient();
+                const { error } = await client.from('pengaturan_sistem').select('id').limit(1);
+                refreshSupabaseUI();
+                if (error) {
+                    const authNeeded=/row-level|permission|jwt/i.test(error.message||'');
+                    showToast(authNeeded?'Konfigurasi tersimpan. Silakan logout lalu login dengan akun Supabase.':'Terkoneksi ke server, tapi schema belum siap. Jalankan schema.sql di SQL Editor.', 'info');
+                } else {
+                    showToast('Berhasil terhubung ke Supabase Database!', 'success');
+                }
+            } else {
+                refreshSupabaseUI();
+                showToast('Gagal inisialisasi Supabase. Periksa URL dan Anon Key.', 'error');
+            }
+        } catch (e) {
+            refreshSupabaseUI();
+            showToast('Error koneksi: ' + e.message, 'error');
+        }
+    }
+
+    async function loadOrganization() {
+        try {
+            const rows=await window.PPG_DB.pengaturan.list(); const data=rows.find(row=>row.id==='config_utama')||rows[0]; if(!data)return;
+            document.getElementById('orgName').value=data.nama_organisasi||''; document.getElementById('orgDescription').value=data.deskripsi||''; document.getElementById('orgYear').value=data.tahun_kepengurusan||'';
+        } catch(error) { showToast(`Profil gagal dimuat: ${error.message}`,'error'); }
+    }
+    async function saveOrganization() {
+        const data={nama_organisasi:document.getElementById('orgName').value.trim(),deskripsi:document.getElementById('orgDescription').value.trim(),tahun_kepengurusan:document.getElementById('orgYear').value.trim()};
+        try {
+            const rows=await window.PPG_DB.pengaturan.list(); const exists=rows.some(row=>row.id==='config_utama');
+            if(exists) await window.PPG_DB.pengaturan.update('config_utama',data); else await window.PPG_DB.pengaturan.insert({id:'config_utama',...data});
+            showToast('Profil organisasi berhasil disimpan','success');
+        } catch(error) { showToast(`Profil gagal disimpan: ${error.message}`,'error'); }
+    }
+
+    document.addEventListener('DOMContentLoaded',()=>{
+        refreshSupabaseUI();loadOrganization();
+        try{const states=JSON.parse(localStorage.getItem('ppg_notification_settings')||'null');if(Array.isArray(states))document.querySelectorAll('.toggle-switch').forEach((button,index)=>{if(states[index]!==undefined&&states[index]!== (button.dataset.on==='true'))toggleSwitch(button);});}catch{}
+    });
+
+    document.querySelectorAll('.modal-overlay').forEach(el => {
+        el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+    });
+
+    function toggleSwitch(btn) {
+        const isOn = btn.dataset.on === 'true';
+        const knob = btn.querySelector('.toggle-knob');
+        if (isOn) {
+            btn.dataset.on = 'false';
+            btn.classList.remove('bg-blue-600'); btn.classList.add('bg-gray-300');
+            knob.className = 'toggle-knob absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm';
+        } else {
+            btn.dataset.on = 'true';
+            btn.classList.remove('bg-gray-300'); btn.classList.add('bg-blue-600');
+            knob.className = 'toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm';
+        }
+        const states=[...document.querySelectorAll('.toggle-switch')].map(item=>item.dataset.on==='true');localStorage.setItem('ppg_notification_settings',JSON.stringify(states));
+        showToast('Pengaturan diperbarui', 'success');
+    }
+
+    function openUserManagement(){
+        const {url}=window.PPG_DB.getConfig();const match=url.match(/https:\/\/([^.]+)\.supabase\.co/);
+        if(!match){showToast('Hubungkan Supabase terlebih dahulu untuk mengelola pengguna.','error');return;}
+        window.open(`https://supabase.com/dashboard/project/${match[1]}/auth/users`,'_blank','noopener');
+    }
+    function backupLocalData(){
+        const keys=['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_pengaturan_data','ppg_notification_settings'];const backup={version:1,createdAt:new Date().toISOString(),data:{}};keys.forEach(key=>{if(localStorage.getItem(key)!==null)backup.data[key]=localStorage.getItem(key);});
+        const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));a.download=`backup-ppg-maksel2-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);showToast('Backup lokal berhasil diunduh','success');
+    }
+    function restoreLocalData(){
+        const input=document.createElement('input');input.type='file';input.accept='application/json';input.onchange=async()=>{try{const parsed=JSON.parse(await input.files[0].text());if(parsed.version!==1||!parsed.data)throw new Error('Format backup tidak valid');const allowed=new Set(['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_pengaturan_data','ppg_notification_settings']);Object.entries(parsed.data).forEach(([key,value])=>{if(allowed.has(key)&&typeof value==='string')localStorage.setItem(key,value);});showToast('Backup berhasil dipulihkan. Halaman akan dimuat ulang.','success');setTimeout(()=>location.reload(),900);}catch(error){showToast(`Restore gagal: ${error.message}`,'error');}};input.click();
+    }
+
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+    function doReset() {
+        // Disimpan sebagai array kosong (bukan dihapus) agar data contoh tidak muncul lagi setelah reload.
+        ['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data'].forEach(k => localStorage.setItem(k, '[]'));
+        localStorage.removeItem('ppg_pengaturan_data');
+        closeModal('modalReset');
+        showToast('Semua data lokal berhasil direset', 'success');
+    }
+
+    function showToast(msg, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const t = document.createElement('div');
+        const colors = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-blue-600' };
+        t.className = `toast ${colors[type] || colors.success} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium pointer-events-auto`;
+        t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> `;
+    t.append(document.createTextNode(msg));
+        container.appendChild(t);
+        setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 3000);
+    }
+
+    // Live Clock
+    function updateClock() {
+        const now = new Date();
+        const dateEl = document.getElementById('liveDateText');
+        const timeEl = document.getElementById('liveTimeText');
+        if (dateEl) dateEl.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+    }
+    updateClock(); setInterval(updateClock, 30000);
+    </script>
+</body>
+</html>

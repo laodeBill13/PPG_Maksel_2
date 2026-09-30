@@ -1,0 +1,308 @@
+[
+  {
+    "file": "absensi.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 2
+  },
+  {
+    "file": "absensi.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "absensi.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "arsip.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 2
+  },
+  {
+    "file": "arsip.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "arsip.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "dashboard.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 7
+  },
+  {
+    "file": "dashboard.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 4
+  },
+  {
+    "file": "dashboard.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 4
+  },
+  {
+    "file": "database_generus.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 2
+  },
+  {
+    "file": "database_generus.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "database_generus.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "dokumentasi.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 2
+  },
+  {
+    "file": "dokumentasi.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "dokumentasi.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "index.html",
+    "width": 375,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "index.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "index.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "laporan.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 2
+  },
+  {
+    "file": "laporan.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "laporan.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "login.html",
+    "width": 375,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 1
+  },
+  {
+    "file": "login.html",
+    "width": 768,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 1
+  },
+  {
+    "file": "login.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 1
+  },
+  {
+    "file": "lupa_password.html",
+    "width": 375,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "lupa_password.html",
+    "width": 768,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "lupa_password.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": true,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 0
+  },
+  {
+    "file": "pengaturan.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [
+      "openModal",
+      "closeModal"
+    ],
+    "buttonsWithoutNames": 6
+  },
+  {
+    "file": "pengaturan.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [
+      "openModal",
+      "closeModal"
+    ],
+    "buttonsWithoutNames": 4
+  },
+  {
+    "file": "pengaturan.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [
+      "openModal",
+      "closeModal"
+    ],
+    "buttonsWithoutNames": 4
+  },
+  {
+    "file": "program_kerja.html",
+    "width": 375,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 14
+  },
+  {
+    "file": "program_kerja.html",
+    "width": 768,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 12
+  },
+  {
+    "file": "program_kerja.html",
+    "width": 1440,
+    "errors": [],
+    "overflow": false,
+    "deadLinks": 0,
+    "missingHandlers": [],
+    "buttonsWithoutNames": 12
+  }
+]

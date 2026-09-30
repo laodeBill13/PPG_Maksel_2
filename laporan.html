@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan LUPG - PPG Maksel 2</title>
+    <meta name="description" content="Monitoring dan Rekapitulasi Laporan LUPG Generus PPG Maksel 2">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { font-family: 'Poppins', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: #f1f5f9; } ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 3px; }
+        .sidebar-gradient { background: linear-gradient(180deg, #1d4ed8 0%, #1e3a8a 100%); }
+        .sidebar-link { transition: all 0.2s ease; }
+        .sidebar-link:hover { background: rgba(255,255,255,0.15); transform: translateX(4px); }
+        .sidebar-link.active { background: rgba(255,255,255,0.2); border-left: 3px solid #fff; }
+        .modal-overlay { backdrop-filter: blur(6px); animation: fadeIn 0.2s ease; }
+        .modal-box { animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1); }
+        @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+        @keyframes slideUp { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+        .toast { animation: toastIn 0.3s ease forwards; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)} }
+        .toast.hide { animation: toastOut 0.3s ease forwards; }
+        @keyframes toastOut { from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(100%)} }
+        .bottom-nav-link { transition: all 0.2s ease; }
+        .bottom-nav-link.active { color: #1d4ed8; }
+        .bottom-nav-link.active .nav-dot { display: block; }
+        .nav-dot { display: none; }
+        /* === MOBILE DRAWER SIDEBAR === */
+        #mobileSidebarDrawer {
+            transform: translateX(-100%);
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileSidebarDrawer.drawer-open {
+            transform: translateX(0);
+        }
+        #drawerOverlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #drawerOverlay.overlay-visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .bar-item { transition: height 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .progress-bar { transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+        tr { transition: background 0.15s ease; }
+    </style>
+</head>
+<body class="bg-slate-100 text-gray-800">
+
+    <!-- ================= MOBILE DRAWER OVERLAY ================= -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ================= MOBILE DRAWER SIDEBAR ================= -->
+    <aside id="mobileSidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between shadow-2xl z-50 md:hidden overflow-y-auto">
+        <div class="absolute top-4 right-4">
+            <button onclick="closeMobileDrawer()" class="w-9 h-9 rounded-xl bg-blue-600/50 hover:bg-blue-600 text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <div>
+            <div class="p-6 border-b border-blue-600/60 flex items-center gap-3 pr-14">
+                <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-4 py-3">
+                <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                <nav class="space-y-1.5" id="sidebarMenuMobile">
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span></a>
+                    <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div><span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div><span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div><span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span></a>
+                    <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span></a>
+                    <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span></a>
+                    <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span></a>
+                </nav>
+            </div>
+        </div>
+        <div class="p-4 border-t border-blue-600/60 space-y-3">
+            <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow"><i class="fas fa-shield-alt"></i></div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                    <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                </div>
+            </div>
+            <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="flex min-h-screen w-full">
+
+        <!-- ================= DESKTOP SIDEBAR ================= -->
+        <aside class="hidden md:flex sticky top-0 h-screen overflow-hidden w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex-col shadow-xl z-20 shrink-0">
+            <div class="flex-1 min-h-0 overflow-y-auto">
+                <!-- Brand Header -->
+                <div class="p-6 border-b border-blue-600/60 flex items-center gap-3">
+                    <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">
+                            PPG Maksel 2
+                        </h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-200 font-medium">
+                                Sistem Generus Terpadu
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links (Direct Screens) -->
+                <div class="px-4 py-3">
+                    <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">
+                        Menu Utama
+                    </p>
+                    <nav class="space-y-1.5" id="sidebarMenu">
+                        <a href="dashboard.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-chart-pie w-5 text-center text-base"></i>
+                            <span>Dashboard</span>
+                        </a>
+
+                        <a href="database_generus.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-user-graduate w-5 text-center text-base"></i>
+                                <span>Database Generus</span>
+                            </div>
+                            <span id="sidebarGenerusBadge" data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="absensi.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-clipboard-check w-5 text-center text-base"></i>
+                                <span>Absensi & Presensi</span>
+                            </div>
+                            <span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="program_kerja.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-tasks w-5 text-center text-base"></i>
+                                <span>Program Kerja</span>
+                            </div>
+                            <span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="laporan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i>
+                            <span>Laporan LUPG</span>
+                        </a>
+
+                        <a href="dokumentasi.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-photo-video w-5 text-center text-base"></i>
+                            <span>Dokumentasi</span>
+                        </a>
+
+                        <a href="arsip.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-folder-open w-5 text-center text-base"></i>
+                            <span>Arsip Dokumen</span>
+                        </a>
+
+                        <a href="pengaturan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-sliders-h w-5 text-center text-base"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer / User & Logout -->
+            <div class="p-4 border-t border-blue-600/60 space-y-3">
+                <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                        <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                    </div>
+                </div>
+
+                <a href="login.html"
+                    class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                    <i class="fas fa-sign-out-alt text-xs"></i>
+                    <span>Keluar Sistem</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden min-h-screen">
+
+            <!-- MOBILE TOPBAR -->
+            <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm flex items-center justify-between gap-3">
+                <button onclick="openMobileDrawer()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold shrink-0">
+                        <i class="fas fa-file-invoice-dollar text-[10px]"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 text-sm truncate">Laporan LUPG</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button onclick="bukaTambahLupg()" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Laporan" aria-label="Input Laporan">
+                        <i class="fas fa-plus text-sm"></i>
+                    </button>
+                    <button onclick="exportCSV()" class="w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Export Excel" aria-label="Export Excel">
+                        <i class="fas fa-download text-sm"></i>
+                    </button>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                </div>
+            </header>
+
+            <!-- DESKTOP TOPBAR -->
+            <header class="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 shadow-sm flex-wrap justify-between items-center gap-4 w-full">
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                        <a href="dashboard.html" class="font-semibold text-blue-700 hover:underline">PPG Maksel 2</a>
+                        <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                        <span>Laporan LUPG</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
+                        Laporan LUPG PPG Maksel 2
+                    </h2>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div id="liveClock" class="text-sm text-slate-500 font-medium"></div>
+                    <button onclick="bukaTambahLupg()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                        <i class="fas fa-plus-circle"></i> + Input Laporan
+                    </button>
+                    <button onclick="exportCSV()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="window.print()" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                        <i class="fas fa-print"></i> Cetak PDF
+                    </button>
+                    <!-- User Profile Pill -->
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            A
+                        </div>
+                        <div class="hidden sm:block text-left">
+                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="text-[11px] text-emerald-600 font-medium">Administrator</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+        <div class="p-4 md:p-8 flex-1 pb-24 md:pb-8">
+
+            <!-- KPI CARDS -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-file-alt text-blue-600 text-lg"></i></div>
+                        <span id="kpiPeriode" class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">-</span>
+                    </div>
+                    <div id="kpiTarget" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Target Peserta</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-check-circle text-emerald-600 text-lg"></i></div>
+                        <span id="kpiTrend" class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-medium">-</span>
+                    </div>
+                    <div id="kpiTercapai" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Tercapai</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center"><i class="fas fa-hourglass-half text-amber-600 text-lg"></i></div>
+                        <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">Pending</span>
+                    </div>
+                    <div id="kpiBelum" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Belum Tercapai</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fas fa-percentage text-purple-600 text-lg"></i></div>
+                        <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-medium">Rate</span>
+                    </div>
+                    <div id="kpiPersen" class="text-2xl md:text-3xl font-bold text-gray-800">0%</div>
+                    <p class="text-xs text-gray-500 mt-1">Persentase Capaian</p>
+                </div>
+            </div>
+
+            <!-- FILTER BAR -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5 mb-6">
+                <div class="flex flex-wrap gap-3 items-center justify-between">
+                    <div class="flex flex-wrap gap-3">
+                        <select id="filterBulan" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
+                            <option value="">Semua Bulan</option>
+                            <option value="Januari">Januari</option>
+                            <option value="Februari">Februari</option>
+                            <option value="Maret">Maret</option>
+                            <option value="April">April</option>
+                            <option value="Mei">Mei</option>
+                            <option value="Juni">Juni</option>
+                            <option value="Juli">Juli</option>
+                            <option value="Agustus">Agustus</option>
+                            <option value="September">September</option>
+                            <option value="Oktober">Oktober</option>
+                            <option value="November">November</option>
+                            <option value="Desember">Desember</option>
+                        </select>
+                        <select id="filterKelompok" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
+                            <option value="">Semua Kelompok</option>
+                            <option value="Kelompok A">Kelompok A</option>
+                            <option value="Kelompok B">Kelompok B</option>
+                            <option value="Kelompok C">Kelompok C</option>
+                            <option value="Kelompok D">Kelompok D</option>
+                        </select>
+                        <select id="filterStatus" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
+                            <option value="">Semua Status</option>
+                            <option value="Baik">Baik</option>
+                            <option value="Perlu Evaluasi">Perlu Evaluasi</option>
+                            <option value="Kritis">Kritis</option>
+                        </select>
+                    </div>
+                    <button onclick="resetFilters()" class="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition">
+                        <i class="fas fa-undo text-xs"></i> Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- CHART + SUMMARY GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                <!-- BAR CHART -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-chart-bar text-blue-600"></i> Grafik Perkembangan LUPG <span id="chartTahun"></span></h3>
+                        <span class="text-xs text-gray-400">Capaian peserta per bulan</span>
+                    </div>
+                    <div id="lupgChart" class="flex items-end gap-3 h-48"></div>
+                </div>
+
+                <!-- PROGRESS PER KELOMPOK -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-layer-group text-purple-600"></i> Progress Per Kelompok <span id="progressPeriode" class="text-xs font-normal text-gray-400"></span></h3>
+                    <div id="progressKelompok" class="space-y-4"></div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
+                    <h3 class="font-semibold text-gray-800">Rekap LUPG Per Kelompok</h3>
+                    <span id="tableCount" class="text-xs text-gray-400"></span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
+                            <tr>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kelompok</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Bulan</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Target</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tercapai</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Persentase</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
+                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM NAV MOBILE -->
+        <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 shadow-lg">
+            <div class="flex items-center justify-around px-2 py-2">
+                <a href="dashboard.html" class="bottom-nav-link flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"><i class="fas fa-home text-lg"></i><span class="text-[10px] font-medium">Beranda</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+                <a href="database_generus.html" class="bottom-nav-link flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"><i class="fas fa-users text-lg"></i><span class="text-[10px] font-medium">Database</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+                <a href="absensi.html" class="bottom-nav-link flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"><i class="fas fa-clipboard-check text-lg"></i><span class="text-[10px] font-medium">Absensi</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+                <a href="program_kerja.html" class="bottom-nav-link flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"><i class="fas fa-tasks text-lg"></i><span class="text-[10px] font-medium">Proker</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+                <a href="laporan.html" class="bottom-nav-link active flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-blue-600"><i class="fas fa-chart-bar text-lg"></i><span class="text-[10px] font-medium">Laporan</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+                <a href="pengaturan.html" class="bottom-nav-link flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl text-gray-400"><i class="fas fa-cog text-lg"></i><span class="text-[10px] font-medium">Atur</span><span class="nav-dot w-1 h-1 bg-blue-600 rounded-full"></span></a>
+            </div>
+        </nav>
+    </main>
+</div>
+
+<!-- MODAL INPUT LAPORAN LUPG -->
+<div id="modalInputLupg" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
+    <div class="modal-box bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+            <h3 class="text-lg font-bold text-slate-800">Input Laporan LUPG</h3>
+            <button onclick="closeModal('modalInputLupg')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
+        </div>
+        <form id="formInputLupg" onsubmit="simpanLupg(event)" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Kelompok *</label>
+                    <select id="inputKelompokLupg" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                        <option value="Kelompok A">Kelompok A</option>
+                        <option value="Kelompok B">Kelompok B</option>
+                        <option value="Kelompok C">Kelompok C</option>
+                        <option value="Kelompok D">Kelompok D</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Bulan *</label>
+                    <select id="inputBulanLupg" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                        <option value="Januari">Januari 2026</option>
+                        <option value="Februari">Februari 2026</option>
+                        <option value="Maret">Maret 2026</option>
+                        <option value="April">April 2026</option>
+                        <option value="Mei">Mei 2026</option>
+                        <option value="Juni">Juni 2026</option>
+                        <option value="Juli">Juli 2026</option>
+                        <option value="Agustus" selected>Agustus 2026</option>
+                        <option value="September">September 2026</option>
+                        <option value="Oktober">Oktober 2026</option>
+                        <option value="November">November 2026</option>
+                        <option value="Desember">Desember 2026</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Target Santri *</label>
+                    <input type="number" id="inputTargetLupg" min="1" value="100" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tercapai (Kehadiran) *</label>
+                    <input type="number" id="inputTercapaiLupg" min="0" value="90" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 mb-1.5 font-medium">Status Pembinaan</label>
+                <select id="inputStatusLupg" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                    <option value="Baik">Baik (>= 85%)</option>
+                    <option value="Perlu Evaluasi">Perlu Evaluasi (70% - 84%)</option>
+                    <option value="Kritis">Kritis (< 70%)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs text-slate-500 mb-1.5 font-medium">Catatan Evaluasi / Kendala</label>
+                <textarea id="inputCatatanLupg" rows="2" placeholder="Catatan kegiatan pembinaan bulan ini..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-none"></textarea>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button type="button" onclick="closeModal('modalInputLupg')" class="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 transition">Batal</button>
+                <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fas fa-save"></i> Simpan Laporan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL DETAIL LUPG -->
+<div id="modalDetailLupg" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
+    <div class="modal-box bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+            <div>
+                <span id="detailLupgBulan" class="text-xs text-blue-600 font-bold uppercase tracking-wider"></span>
+                <h3 id="detailLupgKelompok" class="text-lg font-extrabold text-slate-800"></h3>
+            </div>
+            <button onclick="closeModal('modalDetailLupg')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
+        </div>
+        <div class="space-y-3">
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
+                <span class="text-xs text-slate-500 font-medium">Status Capaian:</span>
+                <span id="detailLupgStatus" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+            </div>
+            <div class="grid grid-cols-3 gap-2 text-center">
+                <div class="p-3 bg-blue-50/60 rounded-xl border border-blue-100">
+                    <p class="text-[10px] text-blue-600 uppercase font-semibold">Target</p>
+                    <p id="detailLupgTarget" class="text-base font-bold text-slate-800 mt-0.5"></p>
+                </div>
+                <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100">
+                    <p class="text-[10px] text-emerald-600 uppercase font-semibold">Tercapai</p>
+                    <p id="detailLupgTercapai" class="text-base font-bold text-slate-800 mt-0.5"></p>
+                </div>
+                <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-100">
+                    <p class="text-[10px] text-purple-600 uppercase font-semibold">Persentase</p>
+                    <p id="detailLupgPct" class="text-base font-bold text-purple-700 mt-0.5"></p>
+                </div>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400 font-medium mb-1">Catatan Evaluasi:</p>
+                <p id="detailLupgCatatan" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed"></p>
+            </div>
+        </div>
+        <div class="flex gap-2 mt-5 pt-3 border-t border-slate-100">
+            <button id="btnEditLupg" class="text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl font-semibold transition"><i class="fas fa-edit"></i> Edit</button>
+            <button id="btnHapusLupg" class="text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2.5 rounded-xl font-semibold transition flex items-center gap-1.5">
+                <i class="fas fa-trash-alt"></i> Hapus
+            </button>
+            <button onclick="closeModal('modalDetailLupg')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-xl text-xs font-semibold transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+<script src="assets/config.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/demo-seed.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script src="assets/sidebar.js"></script>
+<script>
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const statusMap = {
+    'Baik': 'bg-emerald-100 text-emerald-700',
+    'Perlu Evaluasi': 'bg-amber-100 text-amber-700',
+    'Kritis': 'bg-red-100 text-red-700',
+};
+
+let rawData = [];
+let selectedLupgId = null;
+
+const tahunOf = r => Number(r.tahun) || new Date().getFullYear();
+const persen = (tercapai, target) => Number(target) > 0 ? Math.round(Number(tercapai) / Number(target) * 100) : 0;
+const periodeKey = r => tahunOf(r) * 12 + BULAN.indexOf(r.bulan);
+
+async function loadLupgData() {
+    try {
+        rawData = await window.PPG_DB.lupg.list();
+    } catch (error) {
+        rawData = [];
+        showToast(`Laporan gagal dimuat: ${error.message}`, 'error');
+    }
+    renderAll();
+}
+
+function renderAll() { renderSummary(); renderTable(); }
+
+// KPI, grafik bulanan, dan progress per kelompok dihitung dari laporan periode terbaru.
+function renderSummary() {
+    const latest = rawData.reduce((best, r) => (best === null || periodeKey(r) > periodeKey(best)) ? r : best, null);
+    const periodRows = latest ? rawData.filter(r => r.bulan === latest.bulan && tahunOf(r) === tahunOf(latest)) : [];
+    const sum = (rows, field) => rows.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
+    const target = sum(periodRows, 'target'), tercapai = sum(periodRows, 'tercapai');
+    document.getElementById('kpiPeriode').textContent = latest ? `${latest.bulan} ${tahunOf(latest)}` : 'Belum ada';
+    document.getElementById('kpiTarget').textContent = target;
+    document.getElementById('kpiTercapai').textContent = tercapai;
+    document.getElementById('kpiBelum').textContent = Math.max(target - tercapai, 0);
+    document.getElementById('kpiPersen').textContent = `${persen(tercapai, target)}%`;
+
+    const tahun = latest ? tahunOf(latest) : new Date().getFullYear();
+    const bulanan = BULAN.map(bulan => {
+        const rows = rawData.filter(r => r.bulan === bulan && tahunOf(r) === tahun);
+        return { bulan, rows: rows.length, tercapai: sum(rows, 'tercapai'), pct: persen(sum(rows, 'tercapai'), sum(rows, 'target')) };
+    }).filter(m => m.rows);
+    const prev = bulanan.length > 1 ? bulanan[bulanan.length - 2] : null;
+    const trend = prev ? persen(tercapai, target) - prev.pct : null;
+    document.getElementById('kpiTrend').textContent = trend === null ? 'Periode pertama' : `${trend >= 0 ? '+' : ''}${trend}% vs ${prev.bulan}`;
+
+    document.getElementById('chartTahun').textContent = tahun;
+    const chart = document.getElementById('lupgChart');
+    chart.innerHTML = bulanan.length ? bulanan.map((m, i) => {
+        const last = i === bulanan.length - 1;
+        const color = last ? 'from-blue-700 to-blue-500 ring-2 ring-blue-300' : m.pct >= 90 ? 'from-emerald-500 to-emerald-400' : 'from-blue-600 to-blue-400';
+        return `<div class="flex-1 flex flex-col items-center justify-end gap-1 h-full" title="${m.bulan}: ${m.tercapai} peserta (${m.pct}%)">
+            <span class="text-xs ${last ? 'font-bold text-blue-600' : 'text-gray-500'}">${m.pct}%</span>
+            <div class="w-full bg-gradient-to-t ${color} rounded-t-lg bar-item" style="height:${Math.max(m.pct, 4)}%"></div>
+            <span class="text-xs ${last ? 'font-bold text-blue-600' : 'text-gray-400'}">${m.bulan.slice(0, 3)}</span>
+        </div>`;
+    }).join('') : '<p class="text-sm text-gray-400 m-auto">Belum ada laporan untuk ditampilkan.</p>';
+
+    document.getElementById('progressPeriode').textContent = latest ? `· ${latest.bulan} ${tahunOf(latest)}` : '';
+    const progress = document.getElementById('progressKelompok');
+    progress.innerHTML = periodRows.length ? [...periodRows].sort((a, b) => String(a.kelompok).localeCompare(String(b.kelompok))).map(raw => {
+        const r = window.PPG_DB.escapeRow(raw); const pct = persen(r.tercapai, r.target);
+        const tone = pct >= 90 ? ['text-emerald-600', 'bg-emerald-500'] : pct >= 75 ? ['text-amber-600', 'bg-amber-500'] : ['text-red-500', 'bg-red-400'];
+        return `<div>
+            <div class="flex justify-between text-sm mb-1.5"><span class="font-medium text-gray-700">${r.kelompok}</span><span class="font-bold ${tone[0]}">${pct}%</span></div>
+            <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full ${tone[1]} rounded-full progress-bar" style="width:${Math.min(pct, 100)}%"></div></div>
+            <p class="text-xs text-gray-400 mt-1">${Number(r.tercapai) || 0} / ${Number(r.target) || 0} anggota</p>
+        </div>`;
+    }).join('') : '<p class="text-sm text-gray-400">Belum ada laporan.</p>';
+}
+
+function getFiltered() {
+    const b=document.getElementById('filterBulan').value;
+    const k=document.getElementById('filterKelompok').value;
+    const s=document.getElementById('filterStatus').value;
+    return rawData.filter(r=>(!b||r.bulan===b)&&(!k||r.kelompok===k)&&(!s||r.status===s))
+        .sort((a,b)=>periodeKey(b)-periodeKey(a) || String(a.kelompok).localeCompare(String(b.kelompok)));
+}
+
+function renderTable() {
+    const data=getFiltered();
+    const countEl = document.getElementById('tableCount');
+    const bodyEl = document.getElementById('tableBody');
+
+    if (countEl) countEl.textContent=`${data.length} baris`;
+
+    if (!data || data.length === 0) {
+        bodyEl.innerHTML = `
+            <tr>
+                <td colspan="7" class="p-8 text-center">
+                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2 text-xl">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-slate-700">${rawData.length ? 'Tidak ada data laporan yang cocok' : 'Belum ada laporan LUPG'}</p>
+                    <p class="text-xs text-slate-400 mt-0.5">${rawData.length ? 'Coba ubah atau reset filter pencarian di atas.' : 'Klik "Input Laporan" untuk menambahkan laporan pertama.'}</p>
+                    ${rawData.length ? '<button onclick="resetFilters()" class="mt-3 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium">Reset Filter</button>' : ''}
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    bodyEl.innerHTML=data.map((raw,i)=>{
+        const r=window.PPG_DB.escapeRow(raw);
+        const pct=persen(r.tercapai,r.target);
+        const sc=statusMap[raw.status]||statusMap['Baik'];
+        const bg=i%2===0?'':'bg-gray-50/50';
+        return `<tr class="border-t border-gray-100 hover:bg-blue-50/30 ${bg}">
+            <td class="p-4 font-medium text-gray-800 text-sm">${r.kelompok}</td>
+            <td class="p-4 text-gray-600 text-sm hidden md:table-cell">${r.bulan} ${tahunOf(r)}</td>
+            <td class="p-4 text-gray-600 text-sm">${Number(r.target) || 0}</td>
+            <td class="p-4 text-gray-600 text-sm font-semibold">${Number(r.tercapai) || 0}</td>
+            <td class="p-4 hidden md:table-cell">
+                <div class="flex items-center gap-2">
+                    <div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div class="h-full ${pct>=90?'bg-emerald-500':pct>=75?'bg-blue-500':'bg-red-400'} rounded-full" style="width:${Math.min(pct,100)}%"></div>
+                    </div>
+                    <span class="text-sm font-bold ${pct>=90?'text-emerald-600':pct>=75?'text-blue-600':'text-red-500'}">${pct}%</span>
+                </div>
+            </td>
+            <td class="p-4"><span class="text-xs px-2.5 py-1 rounded-full font-medium ${sc}">${r.status}</span></td>
+            <td class="p-4">
+                <button class="text-xs text-blue-600 hover:text-blue-800 font-semibold px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 transition" onclick="bukaDetailLupg(${Number(raw.id)})" aria-label="Detail laporan ${r.kelompok} ${r.bulan}">
+                    <i class="fas fa-eye md:mr-1"></i><span class="hidden md:inline"> Detail</span>
+                </button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function bukaDetailLupg(id) {
+    const item = rawData.find(r => String(r.id) === String(id));
+    if (!item) return;
+
+    selectedLupgId = item.id;
+    const pct = persen(item.tercapai, item.target);
+
+    document.getElementById('detailLupgBulan').textContent = `Laporan ${item.bulan} ${tahunOf(item)}`;
+    document.getElementById('detailLupgKelompok').textContent = item.kelompok;
+    document.getElementById('detailLupgStatus').textContent = item.status;
+    document.getElementById('detailLupgStatus').className = `text-xs px-2.5 py-1 rounded-full font-bold ${statusMap[item.status] || statusMap['Baik']}`;
+    document.getElementById('detailLupgTarget').textContent = item.target;
+    document.getElementById('detailLupgTercapai').textContent = item.tercapai;
+    document.getElementById('detailLupgPct').textContent = `${pct}%`;
+    document.getElementById('detailLupgCatatan').textContent = item.catatan || 'Tidak ada catatan khusus untuk periode ini.';
+
+    document.getElementById('btnHapusLupg').onclick = async function() {
+        if (confirm(`Hapus laporan ${item.kelompok} bulan ${item.bulan}?`)) {
+            try {
+                await window.PPG_DB.lupg.delete(item.id);
+                rawData = rawData.filter(r => String(r.id) !== String(item.id));
+                selectedLupgId = null;
+                renderAll(); closeModal('modalDetailLupg'); showToast('Laporan LUPG berhasil dihapus', 'info');
+            } catch(error) { showToast(`Laporan gagal dihapus: ${error.message}`, 'error'); }
+        }
+    };
+    document.getElementById('btnEditLupg').onclick=()=>{
+        document.getElementById('inputKelompokLupg').value=item.kelompok;document.getElementById('inputBulanLupg').value=item.bulan;document.getElementById('inputTargetLupg').value=item.target;document.getElementById('inputTercapaiLupg').value=item.tercapai;document.getElementById('inputStatusLupg').value=item.status;document.getElementById('inputCatatanLupg').value=item.catatan||'';
+        closeModal('modalDetailLupg');openModal('modalInputLupg');
+    };
+
+    openModal('modalDetailLupg');
+}
+
+async function simpanLupg(e) {
+    e.preventDefault();
+    const kelompok = document.getElementById('inputKelompokLupg').value;
+    const bulan = document.getElementById('inputBulanLupg').value;
+    const target = parseInt(document.getElementById('inputTargetLupg').value) || 100;
+    const tercapai = parseInt(document.getElementById('inputTercapaiLupg').value) || 0;
+    const status = document.getElementById('inputStatusLupg').value;
+    const catatan = document.getElementById('inputCatatanLupg').value.trim();
+
+    const newItem = {
+        kelompok,
+        bulan,
+        target,
+        tercapai,
+        status,
+        catatan: catatan || 'Laporan berhasil dicatat.'
+    };
+
+    try {
+        const current = selectedLupgId !== null ? rawData.find(r => String(r.id) === String(selectedLupgId)) : null;
+        if (current) {
+            const saved = await window.PPG_DB.lupg.update(current.id, { ...newItem, tahun: tahunOf(current) });
+            rawData = rawData.map(r => String(r.id) === String(current.id) ? saved : r);
+        } else {
+            const saved = await window.PPG_DB.lupg.insert({ ...newItem, tahun: new Date().getFullYear() });
+            rawData.unshift(saved);
+        }
+        renderAll();
+        closeModal('modalInputLupg'); document.getElementById('formInputLupg').reset(); showToast(`Laporan ${kelompok} (${bulan}) berhasil disimpan!`, 'success');
+        selectedLupgId=null;
+    } catch(error) { showToast(`Laporan gagal disimpan: ${error.message}`, 'error'); }
+}
+
+function resetFilters() {
+    ['filterBulan','filterKelompok','filterStatus'].forEach(id=>document.getElementById(id).value='');
+    renderTable();
+}
+
+function bukaTambahLupg(){selectedLupgId=null;document.getElementById('formInputLupg').reset();openModal('modalInputLupg');}
+
+function exportCSV() {
+    const data=getFiltered();
+    if (!data.length) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
+    window.PPG_DB.downloadCsv('laporan_lupg.csv', ['Kelompok','Bulan','Tahun','Target','Tercapai','Persentase','Status','Catatan'],
+        data.map(r=>[r.kelompok,r.bulan,tahunOf(r),r.target,r.tercapai,persen(r.tercapai,r.target)+'%',r.status,r.catatan]));
+    showToast('File CSV berhasil diunduh','success');
+}
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+});
+
+function openMobileDrawer() {
+    const drawer = document.getElementById('mobileSidebarDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    if (drawer) drawer.classList.add('drawer-open');
+    if (overlay) overlay.classList.add('overlay-visible');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeMobileDrawer() {
+    const drawer = document.getElementById('mobileSidebarDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+    if (drawer) drawer.classList.remove('drawer-open');
+    if (overlay) overlay.classList.remove('overlay-visible');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeMobileDrawer();
+        closeModal('modalInputLupg');
+        closeModal('modalDetailLupg');
+    }
+});
+
+function showToast(msg,type='success') {
+    const container=document.getElementById('toastContainer');
+    const t=document.createElement('div');
+    const colors={success:'bg-emerald-600',error:'bg-red-600',info:'bg-blue-600'};
+    t.className=`toast ${colors[type]||colors.success} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium pointer-events-auto`;
+    t.innerHTML=`<i class="fas ${type==='success'?'fa-check-circle':type==='error'?'fa-times-circle':'fa-info-circle'}"></i> `;
+    t.append(document.createTextNode(msg));
+    container.appendChild(t);
+    setTimeout(()=>{t.classList.add('hide');setTimeout(()=>t.remove(),300);},3000);
+}
+
+function updateClock() {
+    const el=document.getElementById('liveClock');
+    if(el) el.textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'2-digit',month:'short',year:'numeric'});
+}
+
+updateClock(); setInterval(updateClock,60000);
+loadLupgData();
+</script>
+</body>
+</html>

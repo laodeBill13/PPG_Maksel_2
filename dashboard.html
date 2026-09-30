@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPG Maksel 2 - Dashboard Utama</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Subtle animations */
+        .card-hover {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08), 0 4px 8px -4px rgba(0, 0, 0, 0.03);
+        }
+
+        .chart-bar-anim {
+            transition: height 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Glassmorphism accents */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+        }
+
+        /* === MOBILE DRAWER SIDEBAR === */
+        #mobileSidebarDrawer {
+            transform: translateX(-100%);
+            transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #mobileSidebarDrawer.drawer-open {
+            transform: translateX(0);
+        }
+        #drawerOverlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #drawerOverlay.overlay-visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col antialiased">
+
+    <!-- ================= MOBILE DRAWER OVERLAY ================= -->
+    <div id="drawerOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ================= MOBILE DRAWER SIDEBAR ================= -->
+    <aside id="mobileSidebarDrawer" class="fixed top-0 left-0 h-full w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex flex-col justify-between shadow-2xl z-50 md:hidden overflow-y-auto">
+        <!-- Close Button -->
+        <div class="absolute top-4 right-4">
+            <button onclick="closeMobileDrawer()" class="w-9 h-9 rounded-xl bg-blue-600/50 hover:bg-blue-600 text-white flex items-center justify-center transition">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+        </div>
+        <!-- Brand Header -->
+        <div>
+            <div class="p-6 border-b border-blue-600/60 flex items-center gap-3 pr-14">
+                <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md shrink-0">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">PPG Maksel 2</h1>
+                    <div class="flex items-center gap-1.5 mt-0.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <p class="text-xs text-blue-200 font-medium">Sistem Generus Terpadu</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Navigation -->
+            <div class="px-4 py-3">
+                <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">Menu Utama</p>
+                <nav class="space-y-1.5">
+                    <a href="dashboard.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-chart-pie w-5 text-center text-base"></i><span>Dashboard</span></a>
+                    <a href="database_generus.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-user-graduate w-5 text-center text-base"></i><span>Database Generus</span></div><span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="absensi.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-clipboard-check w-5 text-center text-base"></i><span>Absensi & Presensi</span></div><span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="program_kerja.html" class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium"><div class="flex items-center gap-3.5"><i class="fas fa-tasks w-5 text-center text-base"></i><span>Program Kerja</span></div><span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span></a>
+                    <a href="laporan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i><span>Laporan LUPG</span></a>
+                    <a href="dokumentasi.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-photo-video w-5 text-center text-base"></i><span>Dokumentasi</span></a>
+                    <a href="arsip.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-folder-open w-5 text-center text-base"></i><span>Arsip Dokumen</span></a>
+                    <a href="pengaturan.html" class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium"><i class="fas fa-sliders-h w-5 text-center text-base"></i><span>Pengaturan</span></a>
+                </nav>
+            </div>
+        </div>
+        <!-- Footer -->
+        <div class="p-4 border-t border-blue-600/60 space-y-3">
+            <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                    <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                </div>
+            </div>
+            <a href="login.html" class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                <i class="fas fa-sign-out-alt text-xs"></i><span>Keluar Sistem</span>
+            </a>
+        </div>
+    </aside>
+
+    <div class="flex min-h-screen">
+
+        <!-- ================= DESKTOP SIDEBAR ================= -->
+        <aside class="hidden md:flex sticky top-0 h-screen overflow-hidden w-72 bg-gradient-to-b from-blue-700 to-blue-900 text-white flex-col shadow-xl z-20 shrink-0">
+            
+            <div class="flex-1 min-h-0 overflow-y-auto">
+                <!-- Brand Header -->
+                <div class="p-6 border-b border-blue-600/60 flex items-center gap-3">
+                    <div class="w-11 h-11 bg-white text-blue-700 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold tracking-tight text-white">
+                            PPG Maksel 2
+                        </h1>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                            <p class="text-xs text-blue-200 font-medium">
+                                Sistem Generus Terpadu
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links (Direct Screens) -->
+                <div class="px-4 py-3">
+                    <p class="px-3 text-[11px] font-semibold text-blue-300 uppercase tracking-wider mb-2">
+                        Menu Utama
+                    </p>
+                    <nav class="space-y-1.5" id="sidebarMenu">
+                        <a href="dashboard.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-chart-pie w-5 text-center text-base"></i>
+                            <span>Dashboard</span>
+                        </a>
+
+                        <a href="database_generus.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-user-graduate w-5 text-center text-base"></i>
+                                <span>Database Generus</span>
+                            </div>
+                            <span data-badge="generus" class="bg-blue-600/60 text-xs px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="absensi.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-clipboard-check w-5 text-center text-base"></i>
+                                <span>Absensi & Presensi</span>
+                            </div>
+                            <span data-badge="absensi" class="bg-emerald-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="program_kerja.html"
+                            class="sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <div class="flex items-center gap-3.5">
+                                <i class="fas fa-tasks w-5 text-center text-base"></i>
+                                <span>Program Kerja</span>
+                            </div>
+                            <span data-badge="proker" class="bg-amber-500/80 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold">–</span>
+                        </a>
+
+                        <a href="laporan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-file-invoice-dollar w-5 text-center text-base"></i>
+                            <span>Laporan LUPG</span>
+                        </a>
+
+                        <a href="dokumentasi.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-photo-video w-5 text-center text-base"></i>
+                            <span>Dokumentasi</span>
+                        </a>
+
+                        <a href="arsip.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-folder-open w-5 text-center text-base"></i>
+                            <span>Arsip Dokumen</span>
+                        </a>
+
+                        <a href="pengaturan.html"
+                            class="sidebar-link flex items-center gap-3.5 px-4 py-3 rounded-xl transition text-sm font-medium">
+                            <i class="fas fa-sliders-h w-5 text-center text-base"></i>
+                            <span>Pengaturan</span>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Footer / User & Logout -->
+            <div class="p-4 border-t border-blue-600/60 space-y-3">
+                <div class="bg-blue-800/60 rounded-xl p-3 flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-lg bg-blue-500 text-white flex items-center justify-center font-bold text-sm shadow">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p class="text-xs font-semibold text-white truncate">Wilayah Maksel 2</p>
+                        <p class="text-[11px] text-blue-200">Tahun 2026/2027</p>
+                    </div>
+                </div>
+
+                <a href="login.html"
+                    class="flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-red-500/90 hover:bg-red-600 text-white font-medium text-sm transition shadow-sm">
+                    <i class="fas fa-sign-out-alt text-xs"></i>
+                    <span>Keluar Sistem</span>
+                </a>
+            </div>
+
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+
+            <!-- MOBILE TOPBAR (visible only on mobile) -->
+            <header class="md:hidden bg-white border-b border-slate-200 px-4 py-3 sticky top-0 z-30 shadow-sm flex items-center justify-between gap-3">
+                <button onclick="openMobileDrawer()" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition shrink-0">
+                    <i class="fas fa-bars text-base"></i>
+                </button>
+                <div class="flex items-center gap-2 min-w-0">
+                    <div class="w-7 h-7 bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold text-xs shrink-0">
+                        <i class="fas fa-chart-pie text-[10px]"></i>
+                    </div>
+                    <span class="font-bold text-slate-800 text-sm truncate">Dashboard</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <button id="btnNotificationMobile" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center relative transition">
+                        <i class="fas fa-bell text-sm"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+                    </button>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                        A
+                    </div>
+                </div>
+            </header>
+
+            <!-- DESKTOP TOPBAR -->
+            <header class="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 sticky top-0 z-10 shadow-xs flex-wrap justify-between items-center gap-4">
+                
+                <!-- Breadcrumbs & Live Time -->
+                <div>
+                    <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+                        <span class="font-semibold text-blue-700">PPG Maksel 2</span>
+                        <i class="fas fa-chevron-right text-[10px] text-slate-400"></i>
+                        <span>Dashboard Overview</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 tracking-tight" id="greetingText">
+                        Selamat Datang di PPG Maksel 2
+                    </h2>
+                </div>
+
+                <!-- Action Controls & User -->
+                <div class="flex items-center gap-4">
+                    
+                    <!-- Real-Time Date & Clock Badge -->
+                    <div class="hidden md:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600">
+                        <i class="far fa-calendar-alt text-blue-600"></i>
+                        <span id="liveDateText">Kamis, 28 Agustus 2026</span>
+                        <span class="text-slate-300">|</span>
+                        <i class="far fa-clock text-blue-600"></i>
+                        <span id="liveTimeText" class="font-mono">16:40 WITA</span>
+                    </div>
+
+                    <!-- Quick Notification Dropdown Trigger -->
+                    <div class="relative">
+                        <button id="btnNotification" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center relative transition" title="Notifikasi">
+                            <i class="fas fa-bell text-sm"></i>
+                            <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
+                        </button>
+
+                        <!-- Notification Dropdown Menu -->
+                        <div id="dropdownNotification" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 z-50 animate-in fade-in">
+                            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                                <h4 class="font-bold text-sm text-slate-800">Notifikasi Terbaru</h4>
+                                <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-semibold">3 Baru</span>
+                            </div>
+                            <div class="space-y-3 mt-3 text-xs">
+                                <div class="p-2.5 bg-blue-50/60 rounded-xl border-l-3 border-blue-600">
+                                    <p class="font-semibold text-slate-800">LUPG Kelompok A Terupload</p>
+                                    <p class="text-slate-500 text-[11px] mt-0.5">10 menit yang lalu</p>
+                                </div>
+                                <div class="p-2.5 bg-emerald-50/60 rounded-xl border-l-3 border-emerald-600">
+                                    <p class="font-semibold text-slate-800">Musyawaroh Bulanan dijadwalkan</p>
+                                    <p class="text-slate-500 text-[11px] mt-0.5">Besok, pukul 08:30 WITA</p>
+                                </div>
+                                <div class="p-2.5 bg-amber-50/60 rounded-xl border-l-3 border-amber-600">
+                                    <p class="font-semibold text-slate-800">14 Generus Baru Belum Diverifikasi</p>
+                                    <p class="text-slate-500 text-[11px] mt-0.5">Kemarin di Database Generus</p>
+                                </div>
+                            </div>
+                            <a href="arsip.html" class="block text-center text-xs font-semibold text-blue-600 hover:text-blue-800 mt-3 pt-2 border-t border-slate-100">
+                                Lihat Semua Aktivitas
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- User Profile Dropdown / Pill -->
+                    <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+                            A
+                        </div>
+                        <div class="hidden sm:block">
+                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Super Admin
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- ================= DASHBOARD CONTENT BODY ================= -->
+            <div class="p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-8 flex-1">
+
+                <!-- 1. HERO BANNER + QUICK ACTIONS -->
+                <div class="bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900 rounded-2xl sm:rounded-3xl p-5 sm:p-8 text-white shadow-lg relative overflow-hidden">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 text-white text-[160px] pointer-events-none">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+
+                    <div class="relative z-1 max-w-2xl">
+                        <span class="bg-blue-500/40 border border-blue-400/30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-3">
+                            <i class="fas fa-bullhorn text-[10px]"></i> Pengumuman & Aksi Cepat
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                            Pusat Kendali Generus PPG Maksel 2
+                        </h2>
+                        <p class="text-blue-100 text-sm mt-2 leading-relaxed">
+                            Kelola data 528 generus, catat absensi rutin, pantau pelaksanaan program kerja, dan arsipkan laporan LUPG dengan cepat dan terstruktur.
+                        </p>
+
+                        <!-- Quick Actions Bar -->
+                        <div class="flex flex-wrap items-center gap-3 mt-6">
+                            <button onclick="openModal('modalQuickGenerus')" class="bg-white text-blue-800 hover:bg-blue-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i class="fas fa-user-plus text-blue-600"></i>
+                                + Tambah Generus
+                            </button>
+
+                            <button onclick="window.location.href='absensi.html?tambah=1'" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                                <i class="fas fa-clipboard-user"></i>
+                                + Input Absensi Cepat
+                            </button>
+
+                            <a href="laporan.html" class="bg-blue-600/80 hover:bg-blue-600 text-white font-medium px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 border border-blue-400/30 transition">
+                                <i class="fas fa-file-upload"></i>
+                                Upload LUPG
+                            </a>
+
+                            <button onclick="loadDashboardSummary()" class="bg-blue-900/60 hover:bg-blue-900 text-blue-200 hover:text-white font-medium px-3.5 py-2.5 rounded-xl text-xs flex items-center gap-2 transition" title="Refresh Ringkasan">
+                                <i class="fas fa-sync-alt"></i>
+                                Sinkron Data
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. DIRECT SCREEN SHORTCUTS / HUB MODUL UTAMA -->
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800">
+                                Pintasan Modul Utama (Direct Screens)
+                            </h3>
+                            <p class="text-xs text-slate-500">
+                                Akses langsung seluruh modul sub-sistem PPG Maksel 2
+                            </p>
+                        </div>
+                        <span class="text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">
+                            7 Modul Aktif
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+
+                        <!-- Direct Screen 1: Database Generus -->
+                        <a href="database_generus.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-700 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-blue-700 transition">
+                                    Database Generus
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Data PAUD s/d Pra Nikah
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-blue-600">
+                                <span>528 Generus</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                        <!-- Direct Screen 2: Absensi & Presensi -->
+                        <a href="absensi.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-emerald-600 transition">
+                                    Absensi Kehadiran
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Musyawaroh & Kegiatan
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-emerald-600">
+                                <span>92.8% Hadir</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                        <!-- Direct Screen 3: Program Kerja -->
+                        <a href="program_kerja.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 group-hover:bg-amber-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-amber-600 transition">
+                                    Program Kerja
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Manajemen & Timeline
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-amber-600">
+                                <span>21 Agenda</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                        <!-- Direct Screen 4: Laporan LUPG -->
+                        <a href="laporan.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-purple-600 transition">
+                                    Laporan LUPG
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Rekapitulasi Bulanan
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-purple-600">
+                                <span>91% Terisi</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                        <!-- Direct Screen 5: Dokumentasi -->
+                        <a href="dokumentasi.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 group-hover:bg-rose-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-images"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-rose-600 transition">
+                                    Dokumentasi
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Galeri Foto & Video
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-rose-600">
+                                <span>24 Album</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                        <!-- Direct Screen 6: Arsip Dokumen -->
+                        <a href="arsip.html" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between group">
+                            <div>
+                                <div class="w-12 h-12 rounded-2xl bg-cyan-50 text-cyan-700 group-hover:bg-cyan-600 group-hover:text-white flex items-center justify-center text-xl mb-4 transition duration-300">
+                                    <i class="fas fa-archive"></i>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 group-hover:text-cyan-700 transition">
+                                    Arsip & Surat
+                                </h4>
+                                <p class="text-xs text-slate-500 mt-1">
+                                    Penyimpanan Berkas
+                                </p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-cyan-700">
+                                <span>185 Berkas</span>
+                                <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+
+                <!-- 3. STATISTIK KPI UTAMA (4 CARD STATS DENGAN DRILLDOWN) -->
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <!-- Stat 1: Total Generus -->
+                    <div class="card-hover bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Generus</span>
+                            <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center text-sm">
+                                <i class="fas fa-user-graduate"></i>
+                            </span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mt-3">
+                            <h3 id="dashboardGenerusCount" class="text-3xl font-extrabold text-blue-700">—</h3>
+                            <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                                <i class="fas fa-check text-[10px]"></i> <span id="dashboardGenerusAktif">0 aktif</span>
+                            </span>
+                        </div>
+                        <p id="dashboardGenerusKelompok" class="text-xs text-slate-500 mt-1">0 Kelompok Terdaftar</p>
+                        <a href="database_generus.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:text-blue-800">
+                            <span>Buka Data Generus</span>
+                            <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Stat 2: Total Pengurus -->
+                    <div class="card-hover bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Pengurus</span>
+                            <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fas fa-user-tie"></i>
+                            </span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mt-3">
+                            <h3 class="text-3xl font-extrabold text-emerald-600">32</h3>
+                            <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
+                                <i class="fas fa-check text-[10px]"></i> 100% Aktif
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">6 Bidang Kepengurusan</p>
+                        <a href="pengaturan.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-800">
+                            <span>Struktur Pengurus</span>
+                            <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Stat 3: Kegiatan Tahun Ini -->
+                    <div class="card-hover bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Program Kerja</span>
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+                                <i class="fas fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mt-3">
+                            <h3 id="dashboardProkerCount" class="text-3xl font-extrabold text-amber-600">—</h3>
+                            <span id="dashboardProkerStatus" class="text-xs font-semibold text-blue-600">0 Selesai • 0 Berjalan</span>
+                        </div>
+                        <p id="dashboardProkerPersen" class="text-xs text-slate-500 mt-1">0% Terlaksana</p>
+                        <a href="program_kerja.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-amber-600 hover:text-amber-800">
+                            <span>Pantau Proker</span>
+                            <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                    <!-- Stat 4: Dokumen & Arsip -->
+                    <div class="card-hover bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs relative overflow-hidden">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Dokumen Arsip</span>
+                            <span class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fas fa-folder"></i>
+                            </span>
+                        </div>
+                        <div class="flex items-baseline gap-2 mt-3">
+                            <h3 id="dashboardArsipCount" class="text-3xl font-extrabold text-purple-600">—</h3>
+                            <span class="text-xs font-semibold text-purple-600 flex items-center gap-0.5">
+                                <i class="fas fa-arrow-up text-[10px]"></i> <span id="dashboardArsipBulanIni">+0 bln ini</span>
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">PDF, Excel, LUPG & SK</p>
+                        <a href="arsip.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-purple-600 hover:text-purple-800">
+                            <span>Buka Arsip Digital</span>
+                            <i class="fas fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+
+                </div>
+
+                <!-- 4. ANALYTICS CHART & UPCOMING SCHEDULE (2-COLUMN GRID) -->
+                <div class="grid lg:grid-cols-3 gap-8">
+
+                    <!-- ANALYTICS CHART INTERAKTIF (2 SPAN) -->
+                    <div class="lg:col-span-2 bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <!-- Chart Header & Interactive Switcher Tabs -->
+                            <div class="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800" id="chartTitle">
+                                        Distribusi Generus per Jenjang Usia
+                                    </h3>
+                                    <p class="text-xs text-slate-500" id="chartSubtitle">
+                                        Memuat data...
+                                    </p>
+                                </div>
+
+                                <!-- Tab Switcher Buttons (Logic Ringan) -->
+                                <div class="flex bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+                                    <button onclick="switchChart('kategori')" id="btnTabKategori" class="px-3 py-1.5 rounded-lg bg-white text-blue-700 shadow-xs transition">
+                                        Kategori Generus
+                                    </button>
+                                    <button onclick="switchChart('kehadiran')" id="btnTabKehadiran" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-blue-700 transition">
+                                        Tren Kehadiran
+                                    </button>
+                                    <button onclick="switchChart('lupg')" id="btnTabLupg" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-blue-700 transition">
+                                        Capaian LUPG
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Bar Chart Visualizer -->
+                            <div class="py-6">
+                                <div class="h-64 flex items-end justify-between gap-3 sm:gap-6 pt-6 px-2" id="chartBarsContainer">
+                                    <!-- Dynamic bars populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sub Breakdown Pills -->
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-4 border-t border-slate-100 text-center" id="chartBreakdownPills">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+
+                    <!-- KEGIATAN TERDEKAT (UPCOMING SCHEDULE) -->
+                    <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800">
+                                        Kegiatan Terdekat
+                                    </h3>
+                                    <p class="text-xs text-slate-500">
+                                        Jadwal agenda & musyawaroh
+                                    </p>
+                                </div>
+                                <a href="program_kerja.html" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                                    Kalender &rarr;
+                                </a>
+                            </div>
+
+                            <!-- List of Upcoming Events -->
+                            <div class="space-y-3 mt-4" id="upcomingEventsList">
+                                <p class="text-xs text-slate-400">Memuat agenda...</p>
+                            </div>
+                        </div>
+
+                        <!-- Button Create Event -->
+                        <button onclick="openModal('modalQuickEvent')" class="mt-4 w-full bg-slate-50 hover:bg-blue-50 text-blue-700 border border-slate-200 hover:border-blue-200 py-2.5 rounded-xl font-semibold text-xs transition flex items-center justify-center gap-2">
+                            <i class="fas fa-plus text-xs"></i>
+                            + Tambah Agenda Kegiatan
+                        </button>
+                    </div>
+
+                </div>
+
+                <!-- 5. RECENT DOCUMENTS TABLE WITH LIVE SEARCH & ACTIVITY FEED (2-COLUMN GRID) -->
+                <div class="grid lg:grid-cols-3 gap-8">
+
+                    <!-- DOKUMEN TERBARU DENGAN SEARCH & PREVIEW (2 SPAN) -->
+                    <div class="lg:col-span-2 bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                        
+                        <!-- Header & Live Search Bar -->
+                        <div class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">
+                                    Dokumen & Arsip Terbaru
+                                </h3>
+                                <p class="text-xs text-slate-500">
+                                    Daftar surat, laporan LUPG, dan berkas proker digital
+                                </p>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <!-- Search Input -->
+                                <div class="relative">
+                                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                                    <input type="text" id="inputSearchDocs" onkeyup="filterDocsTable()" placeholder="Cari file dokumen..." class="bg-slate-100 border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 w-48 sm:w-56 transition">
+                                </div>
+
+                                <a href="arsip.html" class="bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold px-4 py-2 rounded-xl transition flex items-center gap-1.5">
+                                    <span>Lihat Semua</span>
+                                    <i class="fas fa-arrow-right text-[10px]"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Documents Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs" id="tableDocs">
+                                <thead class="bg-slate-50/80 text-slate-600 font-semibold border-b border-slate-100">
+                                    <tr>
+                                        <th class="p-4">Nama Dokumen</th>
+                                        <th class="p-4">Kategori</th>
+                                        <th class="p-4">Format</th>
+                                        <th class="p-4">Tanggal Unggah</th>
+                                        <th class="p-4 text-right">Aksi Cepat</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentDocsBody" class="divide-y divide-slate-100 text-slate-700">
+                                    <tr><td colspan="5" class="p-4 text-center text-slate-400">Memuat dokumen...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- AKTIVITAS TERKINI (ACTIVITY FEED) -->
+                    <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800">
+                                        Aktivitas Terkini
+                                    </h3>
+                                    <p class="text-xs text-slate-500">
+                                        Entri terbaru dari setiap modul
+                                    </p>
+                                </div>
+                                
+                            </div>
+
+                            <!-- Activity Timeline -->
+                            <div id="activityFeed" class="space-y-4 mt-4 relative before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-100">
+                                <p class="text-xs text-slate-400 pl-10">Memuat aktivitas...</p>
+                            </div>
+                        </div>
+
+                        <a href="dokumentasi.html" class="mt-4 block text-center text-xs font-semibold text-blue-600 hover:text-blue-800 py-2 bg-slate-50 hover:bg-blue-50 rounded-xl transition">
+                            Lihat Log Lengkap &rarr;
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <footer class="bg-white border-t border-slate-200 px-8 py-4 text-center text-xs text-slate-500 flex flex-wrap justify-between items-center gap-2">
+                <span>&copy; 2026 PPG Makassar Selatan 2 (Maksel 2). Seluruh Hak Cipta Dilindungi.</span>
+                <span class="text-slate-400 font-mono text-[11px]">Versi Sistem 2.4.0-PROD</span>
+            </footer>
+
+        </main>
+
+    </div>
+
+    <!-- ================= MODALS & POPUPS ================= -->
+
+    <!-- 1. MODAL DETAIL KEGIATAN -->
+    <div id="modalEventDetail" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative">
+            <button onclick="closeModal('modalEventDetail')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <span class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg">
+                    <i class="fas fa-calendar-star"></i>
+                </span>
+                <div>
+                    <span id="modalEventStatus" class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wide">
+                        Aktif
+                    </span>
+                    <h3 id="modalEventTitle" class="text-lg font-bold text-slate-800 leading-tight mt-0.5">
+                        Nama Kegiatan
+                    </h3>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-4 space-y-2 text-xs text-slate-600 mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="far fa-calendar text-blue-600 w-4 text-center"></i>
+                    <span class="font-medium text-slate-800">Tanggal:</span>
+                    <span id="modalEventDate">-</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="far fa-clock text-blue-600 w-4 text-center"></i>
+                    <span class="font-medium text-slate-800">Prioritas:</span>
+                    <span id="modalEventTime">-</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-blue-600 w-4 text-center"></i>
+                    <span class="font-medium text-slate-800">Penanggung Jawab:</span>
+                    <span id="modalEventLocation">-</span>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-800 mb-1">Deskripsi & Catatan Kegiatan:</h4>
+                <p id="modalEventDesc" class="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                    -
+                </p>
+            </div>
+
+            <div class="mt-6 flex flex-wrap gap-3">
+                <a href="program_kerja.html" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold py-2.5 rounded-xl text-center transition">
+                    <i class="fas fa-external-link-alt mr-1.5"></i> Buka di Program Kerja
+                </a>
+                <a href="absensi.html" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2.5 rounded-xl text-center transition">
+                    <i class="fas fa-clipboard-check mr-1.5"></i> Catat Absensi
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MODAL QUICK TAMBAH GENERUS -->
+    <div id="modalQuickGenerus" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative">
+            <button onclick="closeModal('modalQuickGenerus')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-base font-bold">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Tambah Generus Baru</h3>
+                    <p class="text-xs text-slate-500">Input ringkas data generus ke database</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleQuickGenerus(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri</label>
+                    <input type="text" id="genName" required placeholder="Contoh: Fathur Rahman" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jenis Kelamin</label>
+                        <select id="genGender" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="L">Laki-laki</option><option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori</label>
+                        <select id="genCategory" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="PAUD">PAUD</option>
+                            <option value="Caberawit">Caberawit</option>
+                            <option value="Pra Remaja">Pra Remaja</option>
+                            <option value="Remaja" selected>Remaja</option>
+                            <option value="Pra Nikah">Pra Nikah</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Kelompok</label>
+                        <select id="genGroup" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="Kelompok A">Kelompok A</option>
+                            <option value="Kelompok B">Kelompok B</option>
+                            <option value="Kelompok C">Kelompok C</option>
+                            <option value="Kelompok D">Kelompok D</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Desa / Wilayah</label>
+                    <select id="genVillage" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <option value="Barabaraya">Barabaraya</option>
+                        <option value="Manggala">Manggala</option>
+                        <option value="Panakkukang">Panakkukang</option>
+                        <option value="Tamalanrea">Tamalanrea</option>
+                        <option value="Biringkanaya">Biringkanaya</option>
+                    </select>
+                </div>
+
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeModal('modalQuickGenerus')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2.5 rounded-xl shadow-sm transition">
+                        Simpan Data
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. MODAL QUICK TAMBAH AGENDA -->
+    <div id="modalQuickEvent" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative">
+            <button onclick="closeModal('modalQuickEvent')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-base font-bold">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Tambah Agenda Kegiatan</h3>
+                    <p class="text-xs text-slate-500">Jadwalkan kegiatan baru di kalender PPG</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleQuickEvent(event)" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Kegiatan</label>
+                    <input type="text" id="eventTitle" required placeholder="Contoh: Halaqah Tahsin Rutin" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Tanggal</label>
+                        <input type="date" id="eventDate" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Jam Pelaksanaan</label>
+                        <input type="time" id="eventTime" required value="08:30" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Lokasi Tempat</label>
+                    <input type="text" id="eventLocation" required placeholder="Contoh: Masjid Barabaraya" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                </div>
+
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeModal('modalQuickEvent')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition">
+                        Simpan Agenda
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 5. MODAL PREVIEW DOKUMEN -->
+    <div id="modalDocPreview" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative">
+            <button onclick="closeModal('modalDocPreview')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <span class="w-11 h-11 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl">
+                    <i class="fas fa-file-alt"></i>
+                </span>
+                <div>
+                    <span id="previewDocFormat" class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">
+                        PDF
+                    </span>
+                    <h3 id="previewDocName" class="text-base font-bold text-slate-800 leading-tight mt-0.5">
+                        Nama Dokumen.pdf
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Preview Simulated Box -->
+            <div class="bg-slate-100 border border-slate-200 rounded-2xl p-6 text-center my-4 space-y-3">
+                <div class="w-16 h-16 rounded-2xl bg-white text-blue-600 shadow-xs mx-auto flex items-center justify-center text-3xl">
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-800">Tinjauan Berkas Resmi PPG Maksel 2</p>
+                    <p class="text-[11px] text-slate-500" id="previewDocMeta">Ukuran: 2.4 MB • Diunggah: 12 Jan 2026</p>
+                    <p class="text-[11px] text-slate-500" id="previewDocAuthor">Pengunggah: Bidang Kurikulum</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-slate-200 text-left text-[11px] text-slate-600 font-mono">
+                    ✓ Status: Dokumen Terverifikasi & Ditandatangani Digital
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <a href="arsip.html" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl text-center transition">
+                    Buka Halaman Arsip
+                </a>
+                <button onclick="downloadPreviewDoc()" class="flex-1 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold py-2.5 rounded-xl text-center shadow-sm transition">
+                    <i class="fas fa-download mr-1"></i> Unduh Berkas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-50 space-y-3 pointer-events-none">
+        <!-- Toast items appended dynamically -->
+    </div>
+
+    <!-- ================= JAVASCRIPT LIGHTWEIGHT LOGIC ================= -->
+    <script src="assets/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/demo-seed.js"></script>
+    <script src="assets/supabase-client.js"></script>
+    <script src="assets/sidebar.js"></script>
+
+    <script>
+        // --- 1. Dynamic Greeting & Live Clock ---
+        function updateLiveGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = "Selamat Datang";
+
+            if (hours >= 4 && hours < 11) {
+                greeting = "Selamat Pagi";
+            } else if (hours >= 11 && hours < 15) {
+                greeting = "Selamat Siang";
+            } else if (hours >= 15 && hours < 18) {
+                greeting = "Selamat Sore";
+            } else {
+                greeting = "Selamat Malam";
+            }
+
+            const greetingEl = document.getElementById("greetingText");
+            if (greetingEl) {
+                greetingEl.innerText = `${greeting}, Administrator! 👋`;
+            }
+
+            // Real-time time formatting in WITA (Makassar)
+            const timeEl = document.getElementById("liveTimeText");
+            if (timeEl) {
+                const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                timeEl.innerText = `${timeString} WITA`;
+            }
+        }
+        updateLiveGreeting();
+        setInterval(updateLiveGreeting, 30000);
+
+        const esc = value => window.PPG_DB.escapeHtml(value);
+        const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+        const fmtTanggal = (value, opts = { day: 'numeric', month: 'short', year: 'numeric' }) => value ? new Date(value).toLocaleDateString('id-ID', opts) : '-';
+        const pct = (part, total) => total ? Math.round(part / total * 1000) / 10 : 0;
+        let dashboardData = { generus: [], absensi: [], proker: [], lupg: [], arsip: [], dokumentasi: [] };
+        let previewDocId = null;
+
+        async function loadDashboardSummary() {
+            const names = Object.keys(dashboardData);
+            const results = await Promise.allSettled(names.map(name => window.PPG_DB[name].list()));
+            const failed = [];
+            results.forEach((result, i) => {
+                if (result.status === 'fulfilled') dashboardData[names[i]] = result.value;
+                else failed.push(names[i]);
+            });
+            if (failed.length) triggerToast('Sebagian Data Gagal Dimuat', `Modul: ${failed.join(', ')}. ${results.find(r => r.status === 'rejected').reason?.message || ''}`, 'warning');
+            renderStatCards();
+            buildChartDatasets();
+            switchChart(currentChart);
+            renderUpcomingEvents();
+            renderRecentDocs();
+            renderActivityFeed();
+        }
+
+        function renderStatCards() {
+            const { generus, proker, arsip } = dashboardData;
+            const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+            setText('dashboardGenerusCount', generus.length);
+            setText('dashboardGenerusAktif', `${generus.filter(g => g.status === 'Aktif').length} aktif`);
+            setText('dashboardGenerusKelompok', `${new Set(generus.map(g => g.group).filter(Boolean)).size} Kelompok Terdaftar`);
+            const selesai = proker.filter(p => p.status === 'Selesai').length;
+            setText('dashboardProkerCount', proker.length);
+            setText('dashboardProkerStatus', `${selesai} Selesai • ${proker.filter(p => p.status === 'Aktif').length} Berjalan`);
+            setText('dashboardProkerPersen', `${pct(selesai, proker.length)}% Terlaksana`);
+            const bulanIni = new Date().toISOString().slice(0, 7);
+            setText('dashboardArsipCount', arsip.length);
+            setText('dashboardArsipBulanIni', `+${arsip.filter(a => String(a.tanggal || '').startsWith(bulanIni)).length} bln ini`);
+        }
+
+        // --- 2. Notification Dropdown Toggle ---
+        const btnNotification = document.getElementById("btnNotification");
+        const dropdownNotification = document.getElementById("dropdownNotification");
+
+        if (btnNotification && dropdownNotification) {
+            btnNotification.addEventListener("click", (e) => {
+                e.stopPropagation();
+                dropdownNotification.classList.toggle("hidden");
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!dropdownNotification.contains(e.target) && e.target !== btnNotification) {
+                    dropdownNotification.classList.add("hidden");
+                }
+            });
+        }
+
+        // --- 3. Dynamic Interactive Chart Data & Switcher (dihitung dari data modul) ---
+        let chartDatasets = {};
+        let currentChart = 'kategori';
+
+        function buildChartDatasets() {
+            const { generus, absensi, lupg } = dashboardData;
+            const kategoriList = [
+                { label: 'PAUD', color: 'from-blue-600 to-blue-500', pill: 'text-blue-700 bg-blue-50' },
+                { label: 'Caberawit', color: 'from-emerald-600 to-emerald-500', pill: 'text-emerald-700 bg-emerald-50' },
+                { label: 'Pra Remaja', color: 'from-amber-600 to-amber-500', pill: 'text-amber-700 bg-amber-50' },
+                { label: 'Remaja', color: 'from-purple-600 to-purple-500', pill: 'text-purple-700 bg-purple-50' },
+                { label: 'Pra Nikah', color: 'from-rose-600 to-rose-500', pill: 'text-rose-700 bg-rose-50' }
+            ].map(k => ({ ...k, value: generus.filter(g => g.category === k.label).length }));
+            const maxKategori = Math.max(1, ...kategoriList.map(k => k.value));
+
+            // Kehadiran per bulan: 6 bulan terakhir yang memiliki data absensi.
+            const perBulan = new Map();
+            absensi.forEach(a => {
+                const key = String(a.date || '').slice(0, 7); if (!key) return;
+                const m = perBulan.get(key) || { total: 0, hadir: 0 }; m.total++; if (a.status === 'Hadir') m.hadir++; perBulan.set(key, m);
+            });
+            const bulanKehadiran = [...perBulan.entries()].sort(([a], [b]) => a.localeCompare(b)).slice(-6);
+            const totalAbsen = absensi.length;
+            const countStatus = status => absensi.filter(a => status.includes(a.status)).length;
+
+            // LUPG: periode terbaru, per kelompok.
+            const periodeKey = r => (Number(r.tahun) || 0) * 12 + BULAN.indexOf(r.bulan);
+            const latest = lupg.reduce((best, r) => (!best || periodeKey(r) > periodeKey(best)) ? r : best, null);
+            const lupgRows = latest ? lupg.filter(r => r.bulan === latest.bulan && Number(r.tahun) === Number(latest.tahun)).sort((a, b) => String(a.kelompok).localeCompare(String(b.kelompok))) : [];
+            const lupgPct = r => Number(r.target) > 0 ? Math.round(Number(r.tercapai) / Number(r.target) * 100) : 0;
+            const sumTarget = lupgRows.reduce((s, r) => s + (Number(r.target) || 0), 0);
+            const sumTercapai = lupgRows.reduce((s, r) => s + (Number(r.tercapai) || 0), 0);
+            const sortedLupg = [...lupgRows].sort((a, b) => lupgPct(b) - lupgPct(a));
+
+            chartDatasets = {
+                kategori: {
+                    title: 'Distribusi Generus per Jenjang Usia',
+                    subtitle: `Total ${generus.length} santri terbagi dalam 5 kategori jenjang pembinaan`,
+                    bars: kategoriList.map(k => ({ label: k.label, value: k.value, total: maxKategori, color: k.color, percent: `${pct(k.value, generus.length)}%` })),
+                    pills: kategoriList.map(k => ({ label: k.label, val: `${k.value} Santri`, color: k.pill }))
+                },
+                kehadiran: {
+                    title: 'Tren Kehadiran Santri (Bulan ke Bulan)',
+                    subtitle: bulanKehadiran.length ? `Persentase status Hadir dari ${totalAbsen} catatan presensi` : 'Belum ada data presensi',
+                    bars: bulanKehadiran.map(([key, m]) => ({ label: BULAN[Number(key.slice(5)) - 1].slice(0, 3), value: pct(m.hadir, m.total), total: 100, color: 'from-blue-500 to-cyan-500', percent: `${pct(m.hadir, m.total)}%` })),
+                    pills: [
+                        { label: 'Hadir', val: `${pct(countStatus(['Hadir']), totalAbsen)}%`, color: 'text-blue-700 bg-blue-50' },
+                        { label: 'Izin / Sakit', val: `${pct(countStatus(['Izin', 'Sakit']), totalAbsen)}%`, color: 'text-amber-700 bg-amber-50' },
+                        { label: 'Alpha', val: `${pct(countStatus(['Alpha']), totalAbsen)}%`, color: 'text-rose-700 bg-rose-50' },
+                        { label: 'Total Catatan', val: `${totalAbsen}`, color: 'text-slate-700 bg-slate-50' }
+                    ]
+                },
+                lupg: {
+                    title: 'Capaian LUPG per Kelompok',
+                    subtitle: latest ? `Periode ${latest.bulan} ${latest.tahun || ''}` : 'Belum ada laporan LUPG',
+                    bars: lupgRows.map(r => ({ label: String(r.kelompok).replace('Kelompok', 'Kel.'), value: lupgPct(r), total: 100, color: lupgPct(r) >= 90 ? 'from-emerald-600 to-teal-500' : lupgPct(r) >= 75 ? 'from-amber-500 to-yellow-500' : 'from-rose-500 to-red-500', percent: `${lupgPct(r)}%` })),
+                    pills: [
+                        { label: 'Tercapai', val: `${sumTercapai} / ${sumTarget}`, color: 'text-blue-700 bg-blue-50' },
+                        { label: 'Capaian Total', val: `${pct(sumTercapai, sumTarget)}%`, color: 'text-emerald-700 bg-emerald-50' },
+                        { label: 'Kelompok Terbaik', val: sortedLupg[0]?.kelompok || '-', color: 'text-purple-700 bg-purple-50' },
+                        { label: 'Perlu Perhatian', val: sortedLupg.length > 1 ? sortedLupg[sortedLupg.length - 1].kelompok : '-', color: 'text-amber-700 bg-amber-50' }
+                    ]
+                }
+            };
+        }
+
+        function switchChart(type) {
+            const data = chartDatasets[type];
+            if (!data) return;
+            currentChart = type;
+
+            // Update Titles
+            document.getElementById("chartTitle").innerText = data.title;
+            document.getElementById("chartSubtitle").innerText = data.subtitle;
+
+            // Update Tab Active Style
+            const tabs = ['kategori', 'kehadiran', 'lupg'];
+            tabs.forEach(t => {
+                const btn = document.getElementById("btnTab" + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) {
+                    if (t === type) {
+                        btn.className = "px-3 py-1.5 rounded-lg bg-white text-blue-700 shadow-xs transition";
+                    } else {
+                        btn.className = "px-3 py-1.5 rounded-lg text-slate-600 hover:text-blue-700 transition";
+                    }
+                }
+            });
+
+            // Render Chart Bars
+            const container = document.getElementById("chartBarsContainer");
+            container.innerHTML = data.bars.length ? "" : '<p class="m-auto text-xs text-slate-400">Belum ada data untuk grafik ini.</p>';
+
+            data.bars.forEach(bar => {
+                const heightPercent = bar.value ? Math.max(6, (bar.value / bar.total) * 100) : 2;
+                const barWrapper = document.createElement("div");
+                barWrapper.className = "flex-1 flex flex-col items-center h-full justify-end group cursor-pointer";
+                
+                barWrapper.innerHTML = `
+                    <div class="text-[11px] font-bold text-slate-700 mb-1.5 opacity-0 group-hover:opacity-100 transition duration-200">
+                        ${esc(bar.value)} <span class="text-[10px] text-slate-400 font-normal">(${esc(bar.percent)})</span>
+                    </div>
+                    <div class="w-full max-w-[54px] bg-gradient-to-t ${bar.color} rounded-t-xl chart-bar-anim shadow-sm relative group-hover:brightness-110" style="height: ${heightPercent}%;">
+                        <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 rounded-t-xl transition"></div>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-600 mt-2 text-center group-hover:text-blue-700 transition truncate max-w-full">
+                        ${esc(bar.label)}
+                    </span>
+                `;
+                container.appendChild(barWrapper);
+            });
+
+            // Render Breakdown Pills
+            const pillsContainer = document.getElementById("chartBreakdownPills");
+            pillsContainer.innerHTML = "";
+            data.pills.forEach(pill => {
+                const pillDiv = document.createElement("div");
+                pillDiv.className = `p-2.5 rounded-xl border border-slate-100 ${pill.color}`;
+                pillDiv.innerHTML = `
+                    <p class="text-[10px] font-medium opacity-80 uppercase">${esc(pill.label)}</p>
+                    <p class="text-xs font-bold mt-0.5">${esc(pill.val)}</p>
+                `;
+                pillsContainer.appendChild(pillDiv);
+            });
+        }
+
+
+        // --- 4. Live Search Filter for Documents Table ---
+        function filterDocsTable() {
+            const input = document.getElementById("inputSearchDocs");
+            const filter = input.value.toLowerCase();
+            const rows = document.querySelectorAll(".doc-row");
+
+            rows.forEach(row => {
+                const title = row.querySelector(".doc-title").innerText.toLowerCase();
+                if (title.includes(filter)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        // --- 5. Modal Controllers ---
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove("hidden");
+                modal.classList.add("flex");
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add("hidden");
+                modal.classList.remove("flex");
+            }
+        }
+
+        // Close on backdrop click
+        window.addEventListener("click", (e) => {
+            const modals = ['modalEventDetail', 'modalQuickGenerus', 'modalQuickEvent', 'modalDocPreview'];
+            modals.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && e.target === el) {
+                    closeModal(id);
+                }
+            });
+        });
+
+        // --- 6. Kegiatan Terdekat (dari Program Kerja) ---
+        function renderUpcomingEvents() {
+            const container = document.getElementById('upcomingEventsList');
+            const today = new Date().toISOString().slice(0, 10);
+            const upcoming = dashboardData.proker
+                .filter(p => p.status !== 'Selesai' && p.tanggalMulai && p.tanggalMulai >= today)
+                .sort((a, b) => String(a.tanggalMulai).localeCompare(String(b.tanggalMulai)))
+                .slice(0, 3);
+            if (!upcoming.length) { container.innerHTML = '<p class="text-xs text-slate-400 py-6 text-center">Belum ada agenda mendatang. Tambahkan agenda baru di bawah.</p>'; return; }
+            const tones = [['bg-blue-100 text-blue-700', 'group-hover:text-blue-700'], ['bg-amber-100 text-amber-700', 'group-hover:text-amber-700'], ['bg-purple-100 text-purple-700', 'group-hover:text-purple-700']];
+            container.innerHTML = upcoming.map((p, i) => {
+                const start = p.tanggalMulai;
+                const days = start ? Math.round((new Date(start) - new Date(today)) / 86400000) : null;
+                const badge = days === 0 ? 'Hari Ini' : days === 1 ? 'Besok' : `${days} Hari Lagi`;
+                const d = start ? new Date(start) : null;
+                return `<div onclick="showEventDetail(${Number(p.id)})" class="p-3.5 rounded-2xl border border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer transition flex items-start gap-3.5 group">
+                    <div class="w-11 h-11 rounded-xl ${tones[i][0]} flex flex-col items-center justify-center shrink-0">
+                        <span class="text-[10px] font-bold uppercase leading-none">${d ? d.toLocaleDateString('id-ID', { month: 'short' }) : '-'}</span>
+                        <span class="text-sm font-extrabold leading-none mt-0.5">${d ? d.getDate() : ''}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-1">
+                            <h4 class="font-bold text-xs text-slate-800 truncate ${tones[i][1]} transition">${esc(p.nama)}</h4>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold shrink-0">${badge}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1 truncate"><i class="fas fa-user-circle text-[10px]"></i> ${esc(p.pj || '-')} <span class="text-slate-300">•</span> ${esc(p.kategori || '')}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function showEventDetail(id) {
+            const p = dashboardData.proker.find(x => x.id == id); if (!p) return;
+            document.getElementById("modalEventTitle").innerText = p.nama || '-';
+            document.getElementById("modalEventDate").innerText = p.tanggalSelesai && p.tanggalSelesai !== p.tanggalMulai ? `${fmtTanggal(p.tanggalMulai, { day: 'numeric', month: 'long', year: 'numeric' })} – ${fmtTanggal(p.tanggalSelesai, { day: 'numeric', month: 'long', year: 'numeric' })}` : fmtTanggal(p.tanggalMulai, { day: 'numeric', month: 'long', year: 'numeric' });
+            document.getElementById("modalEventTime").innerText = p.prioritas || '-';
+            document.getElementById("modalEventLocation").innerText = p.pj || '-';
+            document.getElementById("modalEventDesc").innerText = p.deskripsi || 'Tidak ada deskripsi.';
+            document.getElementById("modalEventStatus").innerText = p.status || '-';
+            openModal('modalEventDetail');
+        }
+
+        // --- 7. Dokumen & Arsip Terbaru ---
+        function renderRecentDocs() {
+            const tbody = document.getElementById('recentDocsBody');
+            const docs = [...dashboardData.arsip].sort((a, b) => String(b.tanggal || '').localeCompare(String(a.tanggal || ''))).slice(0, 5);
+            if (!docs.length) { tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400">Belum ada dokumen arsip.</td></tr>'; return; }
+            const icon = { PDF: ['fa-file-pdf', 'bg-red-100 text-red-600'], Excel: ['fa-file-excel', 'bg-emerald-100 text-emerald-600'], Word: ['fa-file-word', 'bg-blue-100 text-blue-600'], Gambar: ['fa-file-image', 'bg-purple-100 text-purple-600'] };
+            tbody.innerHTML = docs.map(raw => {
+                const d = window.PPG_DB.escapeRow(raw); const [ic, bg] = icon[raw.tipe] || ['fa-file-alt', 'bg-slate-100 text-slate-600'];
+                return `<tr class="hover:bg-slate-50/60 transition doc-row">
+                    <td class="p-4 font-semibold text-slate-800 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-lg ${bg} flex items-center justify-center text-sm shrink-0"><i class="fas ${ic}"></i></span>
+                        <span class="doc-title">${d.nama}</span>
+                    </td>
+                    <td class="p-4"><span class="bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full font-medium text-[11px]">${d.kategori}</span></td>
+                    <td class="p-4 font-mono text-slate-500">${d.tipe || '-'} (${d.ukuran || '-'})</td>
+                    <td class="p-4 text-slate-500">${fmtTanggal(raw.tanggal)}</td>
+                    <td class="p-4 text-right space-x-2">
+                        <button onclick="previewDocument(${Number(raw.id)})" class="text-blue-600 hover:text-blue-800 font-semibold px-2.5 py-1 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Preview</button>
+                        <button onclick="downloadDoc(${Number(raw.id)})" class="text-slate-500 hover:text-slate-700 p-1" aria-label="Unduh ${d.nama}"><i class="fas fa-download"></i></button>
+                    </td>
+                </tr>`;
+            }).join('');
+            filterDocsTable();
+        }
+
+        function previewDocument(id) {
+            const d = dashboardData.arsip.find(x => x.id == id); if (!d) return;
+            previewDocId = d.id;
+            document.getElementById("previewDocName").innerText = d.nama || '-';
+            document.getElementById("previewDocFormat").innerText = d.tipe || '-';
+            document.getElementById("previewDocMeta").innerText = `Ukuran: ${d.ukuran || '-'} • Diunggah: ${fmtTanggal(d.tanggal)}`;
+            document.getElementById("previewDocAuthor").innerText = `Kategori: ${d.kategori || '-'}`;
+            openModal('modalDocPreview');
+        }
+
+        function downloadDoc(id) {
+            const d = dashboardData.arsip.find(x => x.id == id); if (!d) return;
+            const url = window.PPG_DB.safeUrl(d.fileUrl);
+            if (!url) { triggerToast('Berkas Tidak Tersedia', `"${d.nama}" hanya data contoh dan tidak memiliki file.`, 'warning'); return; }
+            const a = document.createElement('a'); a.href = url; a.download = d.nama; a.target = '_blank'; a.rel = 'noopener'; a.click();
+            triggerToast('Mengunduh Berkas', d.nama, 'success');
+        }
+        function downloadPreviewDoc() { downloadDoc(previewDocId); closeModal('modalDocPreview'); }
+
+        // --- 8. Aktivitas Terkini: entri terbaru dari tiap modul ---
+        function renderActivityFeed() {
+            const { generus, absensi, lupg, dokumentasi, arsip } = dashboardData;
+            const items = [
+                absensi[0] && { icon: 'fa-check', tone: 'bg-blue-100 text-blue-700', title: `Presensi ${absensi[0].name}: ${absensi[0].status}`, meta: `${absensi[0].event || '-'} • ${fmtTanggal(absensi[0].date)}` },
+                lupg[0] && { icon: 'fa-file-invoice', tone: 'bg-purple-100 text-purple-700', title: `LUPG ${lupg[0].kelompok} ${lupg[0].bulan} ${lupg[0].tahun || ''}`, meta: `${lupg[0].tercapai} / ${lupg[0].target} peserta • ${lupg[0].status}` },
+                generus[0] && { icon: 'fa-user-plus', tone: 'bg-emerald-100 text-emerald-700', title: `Generus: ${generus[0].name}`, meta: `${generus[0].category || '-'} • ${generus[0].group || '-'}` },
+                dokumentasi[0] && { icon: 'fa-camera', tone: 'bg-rose-100 text-rose-700', title: `Dokumentasi: ${dokumentasi[0].judul}`, meta: `${dokumentasi[0].fotoCount || 1} foto • ${fmtTanggal(dokumentasi[0].tanggal)}` },
+                arsip[0] && { icon: 'fa-cloud-upload-alt', tone: 'bg-cyan-100 text-cyan-700', title: `Arsip: ${arsip[0].nama}`, meta: `${arsip[0].kategori || '-'} • ${fmtTanggal(arsip[0].tanggal)}` }
+            ].filter(Boolean);
+            const feed = document.getElementById('activityFeed');
+            feed.innerHTML = items.length ? items.map(it => `<div class="flex items-start gap-3 relative">
+                <div class="w-7 h-7 rounded-full ${it.tone} flex items-center justify-center text-xs shrink-0 z-1 font-bold"><i class="fas ${it.icon} text-[10px]"></i></div>
+                <div class="min-w-0"><p class="text-xs font-semibold text-slate-800 truncate">${esc(it.title)}</p><p class="text-[11px] text-slate-500 mt-0.5 truncate">${esc(it.meta)}</p></div>
+            </div>`).join('') : '<p class="text-xs text-slate-400 pl-10">Belum ada aktivitas.</p>';
+        }
+
+        // --- 9. Quick Form Submissions Handlers with Toast Feedback ---
+        async function handleQuickGenerus(e) {
+            e.preventDefault();
+            const name = document.getElementById("genName").value.trim();
+            const cat = document.getElementById("genCategory").value;
+            const group = document.getElementById("genGroup").value;
+
+            try {
+                await window.PPG_DB.generus.insert({name,gender:document.getElementById('genGender').value,category:cat,group,village:document.getElementById('genVillage').value,status:'Aktif'});
+                closeModal('modalQuickGenerus'); triggerToast("Generus Ditambahkan!", `${name} (${cat} - ${group}) berhasil disimpan.`, "success"); e.target.reset();
+                loadDashboardSummary();
+            } catch(error) { triggerToast('Gagal Menyimpan',error.message,'warning'); }
+        }
+
+        async function handleQuickEvent(e) {
+            e.preventDefault();
+            const title = document.getElementById("eventTitle").value.trim();
+            const date = document.getElementById("eventDate").value;
+
+            try {
+                await window.PPG_DB.proker.insert({nama:title,kategori:'Organisasi',status:'Pending',tanggalMulai:date,tanggalSelesai:date,pj:'Pengurus',prioritas:'Sedang',progress:0,deskripsi:`Agenda pukul ${document.getElementById('eventTime').value} di ${document.getElementById('eventLocation').value}`,icon:'fas fa-calendar',color:'amber'});
+                closeModal('modalQuickEvent'); triggerToast("Agenda Dijadwalkan!", `Kegiatan "${title}" untuk ${date} berhasil disimpan.`, "success"); e.target.reset();
+                loadDashboardSummary();
+            } catch(error) { triggerToast('Gagal Menyimpan',error.message,'warning'); }
+        }
+
+        loadDashboardSummary();
+
+        // --- 10. Toast Notification System ---
+        function triggerToast(title, message, type = "info") {
+            const container = document.getElementById("toastContainer");
+            if (!container) return;
+
+            const toast = document.createElement("div");
+            toast.className = `pointer-events-auto flex items-start gap-3 p-4 rounded-2xl shadow-xl border text-xs max-w-sm w-full bg-white transition-all transform duration-300 translate-y-4 opacity-0`;
+
+            let iconColor = "text-blue-600 bg-blue-50";
+            let icon = "fa-info-circle";
+
+            if (type === "success") {
+                iconColor = "text-emerald-600 bg-emerald-50";
+                icon = "fa-check-circle";
+                toast.classList.add("border-emerald-200");
+            } else if (type === "warning") {
+                iconColor = "text-amber-600 bg-amber-50";
+                icon = "fa-exclamation-triangle";
+                toast.classList.add("border-amber-200");
+            } else {
+                toast.classList.add("border-blue-200");
+            }
+
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-xl ${iconColor} flex items-center justify-center text-sm shrink-0 font-bold">
+                    <i class="fas ${icon}"></i>
+                </div>
+                <div class="flex-1">
+                    <h5 class="font-bold text-slate-800" data-toast-title></h5>
+                    <p class="text-slate-600 mt-0.5 leading-tight text-[11px]" data-toast-message></p>
+                </div>
+            `;
+            toast.querySelector("[data-toast-title]").textContent = title;
+            toast.querySelector("[data-toast-message]").textContent = message;
+
+            container.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove("translate-y-4", "opacity-0");
+            }, 10);
+
+            // Animate out and remove
+            setTimeout(() => {
+                toast.classList.add("opacity-0", "translate-y-2");
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // === MOBILE DRAWER SIDEBAR ===
+        function openMobileDrawer() {
+            document.getElementById('mobileSidebarDrawer').classList.add('drawer-open');
+            document.getElementById('drawerOverlay').classList.add('overlay-visible');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMobileDrawer() {
+            document.getElementById('mobileSidebarDrawer').classList.remove('drawer-open');
+            document.getElementById('drawerOverlay').classList.remove('overlay-visible');
+            document.body.style.overflow = '';
+        }
+        // Close drawer on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeMobileDrawer();
+        });
+    </script>
+
+</body>
+
+</html>
