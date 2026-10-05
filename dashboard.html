@@ -311,7 +311,7 @@
                             </div>
                             <div class="space-y-3 mt-3 text-xs">
                                 <div class="p-2.5 bg-blue-50/60 rounded-xl border-l-3 border-blue-600">
-                                    <p class="font-semibold text-slate-800">LUPG Kelompok A Terupload</p>
+                                    <p class="font-semibold text-slate-800">LUPG Kelompok Sengka Terupload</p>
                                     <p class="text-slate-500 text-[11px] mt-0.5">10 menit yang lalu</p>
                                 </div>
                                 <div class="p-2.5 bg-emerald-50/60 rounded-xl border-l-3 border-emerald-600">
@@ -364,7 +364,7 @@
                             Pusat Kendali Generus PPG Maksel 2
                         </h2>
                         <p class="text-blue-100 text-sm mt-2 leading-relaxed">
-                            Kelola data 528 generus, catat absensi rutin, pantau pelaksanaan program kerja, dan arsipkan laporan LUPG dengan cepat dan terstruktur.
+                            Kelola data generus, catat kehadiran pengurus, pantau pelaksanaan program kerja, dan arsipkan laporan LUPG dengan cepat dan terstruktur.
                         </p>
 
                         <!-- Quick Actions Bar -->
@@ -420,7 +420,7 @@
                                     Database Generus
                                 </h4>
                                 <p class="text-xs text-slate-500 mt-1">
-                                    Data PAUD s/d Pra Nikah
+                                    Data PAUD s/d Usia Nikah
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-blue-600">
@@ -436,14 +436,14 @@
                                     <i class="fas fa-calendar-check"></i>
                                 </div>
                                 <h4 class="font-bold text-sm text-slate-800 group-hover:text-emerald-600 transition">
-                                    Absensi Kehadiran
+                                    Presensi Pengurus
                                 </h4>
                                 <p class="text-xs text-slate-500 mt-1">
-                                    Musyawaroh & Kegiatan
+                                    Musyawarah & Penyampaian PPG
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-emerald-600">
-                                <span>92.8% Hadir</span>
+                                <span id="dashboardAbsensiPersen">– Hadir</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -671,7 +671,7 @@
                                         Jadwal agenda & musyawaroh
                                     </p>
                                 </div>
-                                <a href="program_kerja.html" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
+                                <a href="program_kerja.html#kalender" class="text-xs font-semibold text-blue-600 hover:text-blue-800">
                                     Kalender &rarr;
                                 </a>
                             </div>
@@ -689,6 +689,29 @@
                         </button>
                     </div>
 
+                </div>
+
+                <!-- 4b. KEGIATAN BULAN INI (mengikuti bulan berjalan secara real-time) -->
+                <div class="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-xs">
+                    <div class="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-800">
+                                    Kegiatan Bulan Ini — <span id="bulanIniLabel">-</span>
+                                </h3>
+                                <p class="text-xs text-slate-500" id="bulanIniSummary">Memuat kegiatan...</p>
+                            </div>
+                        </div>
+                        <a href="program_kerja.html#kalender" class="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5">
+                            <i class="fas fa-calendar-week"></i> Lihat Kalender &rarr;
+                        </a>
+                    </div>
+                    <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 mt-4" id="bulanIniList">
+                        <p class="text-xs text-slate-400">Memuat kegiatan...</p>
+                    </div>
                 </div>
 
                 <!-- 5. RECENT DOCUMENTS TABLE WITH LIVE SEARCH & ACTIVITY FEED (2-COLUMN GRID) -->
@@ -859,7 +882,7 @@
 
             <form onsubmit="handleQuickGenerus(event)" class="space-y-3.5 text-xs">
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri</label>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Generus</label>
                     <input type="text" id="genName" required placeholder="Contoh: Fathur Rahman" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
@@ -877,29 +900,18 @@
                             <option value="Caberawit">Caberawit</option>
                             <option value="Pra Remaja">Pra Remaja</option>
                             <option value="Remaja" selected>Remaja</option>
-                            <option value="Pra Nikah">Pra Nikah</option>
+                            <option value="Usia Nikah">Usia Nikah</option>
                         </select>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Kelompok</label>
-                        <select id="genGroup" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Kelompok A">Kelompok A</option>
-                            <option value="Kelompok B">Kelompok B</option>
-                            <option value="Kelompok C">Kelompok C</option>
-                            <option value="Kelompok D">Kelompok D</option>
-                        </select>
+                        <select id="genGroup" data-wilayah="kelompok" data-desa-target="genVillage" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Desa / Wilayah</label>
-                    <select id="genVillage" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="Barabaraya">Barabaraya</option>
-                        <option value="Manggala">Manggala</option>
-                        <option value="Panakkukang">Panakkukang</option>
-                        <option value="Tamalanrea">Tamalanrea</option>
-                        <option value="Biringkanaya">Biringkanaya</option>
-                    </select>
+                    <select id="genVillage" data-wilayah="desa" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                 </div>
 
                 <div class="pt-3 flex gap-3">
@@ -950,7 +962,7 @@
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Lokasi Tempat</label>
-                    <input type="text" id="eventLocation" required placeholder="Contoh: Masjid Barabaraya" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <input type="text" id="eventLocation" required placeholder="Contoh: Masjid Sengka" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="pt-3 flex gap-3">
@@ -1021,6 +1033,7 @@
     <script src="assets/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="assets/demo-seed.js"></script>
+    <script src="assets/wilayah.js"></script>
     <script src="assets/supabase-client.js"></script>
     <script src="assets/sidebar.js"></script>
 
@@ -1076,21 +1089,23 @@
             buildChartDatasets();
             switchChart(currentChart);
             renderUpcomingEvents();
+            renderBulanIni();
             renderRecentDocs();
             renderActivityFeed();
         }
 
         function renderStatCards() {
-            const { generus, proker, arsip } = dashboardData;
+            const { generus, absensi, proker, arsip } = dashboardData;
             const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
             setText('dashboardGenerusCount', generus.length);
             setText('dashboardGenerusAktif', `${generus.filter(g => g.status === 'Aktif').length} aktif`);
+            setText('dashboardAbsensiPersen', absensi.length ? `${pct(absensi.filter(a => a.status === 'Hadir').length, absensi.length)}% Hadir` : 'Belum ada presensi');
             setText('dashboardGenerusKelompok', `${new Set(generus.map(g => g.group).filter(Boolean)).size} Kelompok Terdaftar`);
             const selesai = proker.filter(p => p.status === 'Selesai').length;
             setText('dashboardProkerCount', proker.length);
             setText('dashboardProkerStatus', `${selesai} Selesai • ${proker.filter(p => p.status === 'Aktif').length} Berjalan`);
             setText('dashboardProkerPersen', `${pct(selesai, proker.length)}% Terlaksana`);
-            const bulanIni = new Date().toISOString().slice(0, 7);
+            const bulanIni = window.PPG_DB.tanggalLokal().slice(0, 7);
             setText('dashboardArsipCount', arsip.length);
             setText('dashboardArsipBulanIni', `+${arsip.filter(a => String(a.tanggal || '').startsWith(bulanIni)).length} bln ini`);
         }
@@ -1123,7 +1138,7 @@
                 { label: 'Caberawit', color: 'from-emerald-600 to-emerald-500', pill: 'text-emerald-700 bg-emerald-50' },
                 { label: 'Pra Remaja', color: 'from-amber-600 to-amber-500', pill: 'text-amber-700 bg-amber-50' },
                 { label: 'Remaja', color: 'from-purple-600 to-purple-500', pill: 'text-purple-700 bg-purple-50' },
-                { label: 'Pra Nikah', color: 'from-rose-600 to-rose-500', pill: 'text-rose-700 bg-rose-50' }
+                { label: 'Usia Nikah', color: 'from-rose-600 to-rose-500', pill: 'text-rose-700 bg-rose-50' }
             ].map(k => ({ ...k, value: generus.filter(g => g.category === k.label).length }));
             const maxKategori = Math.max(1, ...kategoriList.map(k => k.value));
 
@@ -1137,25 +1152,25 @@
             const totalAbsen = absensi.length;
             const countStatus = status => absensi.filter(a => status.includes(a.status)).length;
 
-            // LUPG: periode terbaru, per kelompok.
+            // LUPG: periode terbaru. Nilai = rata-rata persentase seluruh jenjang yang dilaporkan.
             const periodeKey = r => (Number(r.tahun) || 0) * 12 + BULAN.indexOf(r.bulan);
             const latest = lupg.reduce((best, r) => (!best || periodeKey(r) > periodeKey(best)) ? r : best, null);
-            const lupgRows = latest ? lupg.filter(r => r.bulan === latest.bulan && Number(r.tahun) === Number(latest.tahun)).sort((a, b) => String(a.kelompok).localeCompare(String(b.kelompok))) : [];
-            const lupgPct = r => Number(r.target) > 0 ? Math.round(Number(r.tercapai) / Number(r.target) * 100) : 0;
-            const sumTarget = lupgRows.reduce((s, r) => s + (Number(r.target) || 0), 0);
-            const sumTercapai = lupgRows.reduce((s, r) => s + (Number(r.tercapai) || 0), 0);
-            const sortedLupg = [...lupgRows].sort((a, b) => lupgPct(b) - lupgPct(a));
+            const lupgRows = latest ? lupg.filter(r => r.bulan === latest.bulan && Number(r.tahun) === Number(latest.tahun)) : [];
+            const rataNilai = (rows, jenis) => { const v = rows.flatMap(r => Object.values(r[jenis] || {}).map(Number).filter(Number.isFinite)); return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : null; };
+            const perDesa = window.PPG_WILAYAH.struktur.map(d => { const r = lupgRows.filter(x => d.kelompok.includes(x.kelompok)); return { desa: d.desa, lapor: r.length, kehadiran: rataNilai(r, 'kehadiran') }; });
+            const perKelompok = lupgRows.map(r => ({ kelompok: r.kelompok, nilai: rataNilai([r], 'kehadiran') })).filter(x => x.nilai !== null).sort((a, b) => b.nilai - a.nilai);
+            const fmt = v => v === null ? '-' : `${v}%`;
 
             chartDatasets = {
                 kategori: {
                     title: 'Distribusi Generus per Jenjang Usia',
-                    subtitle: `Total ${generus.length} santri terbagi dalam 5 kategori jenjang pembinaan`,
+                    subtitle: `Total ${generus.length} generus terbagi dalam 5 kategori jenjang pembinaan`,
                     bars: kategoriList.map(k => ({ label: k.label, value: k.value, total: maxKategori, color: k.color, percent: `${pct(k.value, generus.length)}%` })),
-                    pills: kategoriList.map(k => ({ label: k.label, val: `${k.value} Santri`, color: k.pill }))
+                    pills: kategoriList.map(k => ({ label: k.label, val: `${k.value} Generus`, color: k.pill }))
                 },
                 kehadiran: {
-                    title: 'Tren Kehadiran Santri (Bulan ke Bulan)',
-                    subtitle: bulanKehadiran.length ? `Persentase status Hadir dari ${totalAbsen} catatan presensi` : 'Belum ada data presensi',
+                    title: 'Tren Kehadiran Pengurus (Bulan ke Bulan)',
+                    subtitle: bulanKehadiran.length ? `Musyawarah & penyampaian PPG · ${totalAbsen} catatan presensi` : 'Belum ada data presensi',
                     bars: bulanKehadiran.map(([key, m]) => ({ label: BULAN[Number(key.slice(5)) - 1].slice(0, 3), value: pct(m.hadir, m.total), total: 100, color: 'from-blue-500 to-cyan-500', percent: `${pct(m.hadir, m.total)}%` })),
                     pills: [
                         { label: 'Hadir', val: `${pct(countStatus(['Hadir']), totalAbsen)}%`, color: 'text-blue-700 bg-blue-50' },
@@ -1165,14 +1180,14 @@
                     ]
                 },
                 lupg: {
-                    title: 'Capaian LUPG per Kelompok',
-                    subtitle: latest ? `Periode ${latest.bulan} ${latest.tahun || ''}` : 'Belum ada laporan LUPG',
-                    bars: lupgRows.map(r => ({ label: String(r.kelompok).replace('Kelompok', 'Kel.'), value: lupgPct(r), total: 100, color: lupgPct(r) >= 90 ? 'from-emerald-600 to-teal-500' : lupgPct(r) >= 75 ? 'from-amber-500 to-yellow-500' : 'from-rose-500 to-red-500', percent: `${lupgPct(r)}%` })),
+                    title: 'Kehadiran LUPG per Desa',
+                    subtitle: latest ? `Rata-rata kehadiran semua jenjang · ${latest.bulan} ${latest.tahun || ''}` : 'Belum ada laporan LUPG',
+                    bars: perDesa.map(d => ({ label: d.desa, value: d.kehadiran || 0, total: 100, color: (d.kehadiran || 0) >= 80 ? 'from-emerald-600 to-teal-500' : (d.kehadiran || 0) >= 60 ? 'from-amber-500 to-yellow-500' : 'from-rose-500 to-red-500', percent: d.lapor ? fmt(d.kehadiran) : 'belum lapor' })),
                     pills: [
-                        { label: 'Tercapai', val: `${sumTercapai} / ${sumTarget}`, color: 'text-blue-700 bg-blue-50' },
-                        { label: 'Capaian Total', val: `${pct(sumTercapai, sumTarget)}%`, color: 'text-emerald-700 bg-emerald-50' },
-                        { label: 'Kelompok Terbaik', val: sortedLupg[0]?.kelompok || '-', color: 'text-purple-700 bg-purple-50' },
-                        { label: 'Perlu Perhatian', val: sortedLupg.length > 1 ? sortedLupg[sortedLupg.length - 1].kelompok : '-', color: 'text-amber-700 bg-amber-50' }
+                        { label: 'Kelompok Melapor', val: `${lupgRows.length} / ${window.PPG_WILAYAH.kelompok.length}`, color: 'text-blue-700 bg-blue-50' },
+                        { label: 'Rata-rata Kehadiran', val: fmt(rataNilai(lupgRows, 'kehadiran')), color: 'text-emerald-700 bg-emerald-50' },
+                        { label: 'Rata-rata Ketercapaian', val: fmt(rataNilai(lupgRows, 'ketercapaian')), color: 'text-orange-700 bg-orange-50' },
+                        { label: 'Kehadiran Tertinggi', val: perKelompok[0]?.kelompok || '-', color: 'text-purple-700 bg-purple-50' }
                     ]
                 }
             };
@@ -1285,7 +1300,7 @@
         // --- 6. Kegiatan Terdekat (dari Program Kerja) ---
         function renderUpcomingEvents() {
             const container = document.getElementById('upcomingEventsList');
-            const today = new Date().toISOString().slice(0, 10);
+            const today = window.PPG_DB.tanggalLokal();
             const upcoming = dashboardData.proker
                 .filter(p => p.status !== 'Selesai' && p.tanggalMulai && p.tanggalMulai >= today)
                 .sort((a, b) => String(a.tanggalMulai).localeCompare(String(b.tanggalMulai)))
@@ -1312,6 +1327,57 @@
                 </div>`;
             }).join('');
         }
+
+        // --- 6b. Kegiatan Bulan Ini: proker yang rentang tanggalnya beririsan dengan bulan berjalan (new Date()) ---
+        const pad2 = n => String(n).padStart(2, '0');
+        const localYmd = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+        const monthKey = (d = new Date()) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}`;
+        const fmtRp = n => Number(n) ? new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(Number(n)) : '-';
+        const STATUS_BADGE = { Aktif: 'bg-emerald-100 text-emerald-700', Pending: 'bg-amber-100 text-amber-700', Selesai: 'bg-blue-100 text-blue-700', Ditunda: 'bg-red-100 text-red-700' };
+        let bulanIniKey = monthKey();
+        function prokerRange(p) {
+            let s = String(p.tanggalMulai || '').slice(0, 10), e = String(p.tanggalSelesai || '').slice(0, 10);
+            if (!s) s = e; if (!e) e = s; if (!s) return null;
+            return e < s ? { s: e, e: s } : { s, e };
+        }
+        function renderBulanIni() {
+            const container = document.getElementById('bulanIniList');
+            if (!container) return;
+            const now = new Date();
+            bulanIniKey = monthKey(now);
+            const monthStart = localYmd(new Date(now.getFullYear(), now.getMonth(), 1));
+            const monthEnd = localYmd(new Date(now.getFullYear(), now.getMonth() + 1, 0));
+            document.getElementById('bulanIniLabel').textContent = `${BULAN[now.getMonth()]} ${now.getFullYear()}`;
+            const items = dashboardData.proker.map(p => ({ p, r: prokerRange(p) }))
+                .filter(x => x.r && x.r.s <= monthEnd && x.r.e >= monthStart)
+                // Kegiatan yang dimulai bulan ini didahulukan, lalu program lanjutan dari bulan sebelumnya.
+                .sort((a, b) => (a.r.s < monthStart) - (b.r.s < monthStart) || a.r.s.localeCompare(b.r.s));
+            const totalRab = items.reduce((sum, x) => sum + (Number(x.p.anggaran) || 0), 0);
+            document.getElementById('bulanIniSummary').textContent = items.length
+                ? `${items.length} kegiatan berlangsung • ${items.filter(x => x.r.s >= monthStart).length} dimulai bulan ini${totalRab ? ` • Total RAB ${fmtRp(totalRab)}` : ''}`
+                : 'Belum ada kegiatan terjadwal bulan ini';
+            if (!items.length) { container.innerHTML = '<p class="text-xs text-slate-400 py-6 text-center sm:col-span-2 xl:col-span-3">Belum ada program kerja yang dijadwalkan pada bulan ini.</p>'; return; }
+            const tglLokal = (v, opts) => fmtTanggal(`${v}T00:00:00`, opts);
+            const tgl = v => tglLokal(v, { day: 'numeric', month: 'short' });
+            container.innerHTML = items.map(({ p, r }) => {
+                const range = r.s <= monthStart && r.e >= monthEnd ? `Sepanjang bulan (${tgl(r.s)} – ${tglLokal(r.e)})` : r.s === r.e ? tglLokal(r.s, { weekday: 'short', day: 'numeric', month: 'short' }) : `${tgl(r.s)} – ${tgl(r.e)}`;
+                const lanjut = r.s < monthStart ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-semibold">Lanjutan</span>' : '';
+                const rab = p.rabUrl || p.rabPath ? ' <i class="fas fa-file-excel text-green-600" title="Ada file RAB"></i>' : '';
+                return `<div onclick="showEventDetail(${JSON.stringify(String(p.id)).replace(/"/g, '&quot;')})" class="p-3.5 rounded-2xl border border-slate-200/80 hover:border-blue-300 hover:bg-blue-50/40 cursor-pointer transition group min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                        <h4 class="font-bold text-xs text-slate-800 group-hover:text-blue-700 transition leading-snug">${esc(p.nama)}</h4>
+                        <span class="text-[10px] ${STATUS_BADGE[p.status] || 'bg-slate-100 text-slate-600'} px-2 py-0.5 rounded-full font-semibold shrink-0">${esc(p.status || '-')}</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1.5 flex items-center gap-1.5 flex-wrap"><i class="far fa-calendar text-[10px]"></i> ${esc(range)} ${lanjut}</p>
+                    <p class="text-[11px] text-slate-500 mt-1 truncate"><i class="fas fa-layer-group text-[10px]"></i> ${esc(p.kategori || '-')} <span class="text-slate-300">•</span> <i class="fas fa-user-circle text-[10px]"></i> ${esc(p.pj || '-')}</p>
+                    <p class="text-[11px] text-slate-600 mt-1 font-semibold"><i class="fas fa-wallet text-[10px] text-slate-400"></i> RAB ${fmtRp(p.anggaran)}${rab}</p>
+                </div>`;
+            }).join('');
+        }
+        // Halaman yang dibiarkan terbuka melewati pergantian bulan: cek ringan tiap 5 menit & saat tab aktif kembali.
+        function checkMonthRollover() { if (monthKey() !== bulanIniKey) { bulanIniKey = monthKey(); loadDashboardSummary(); } }
+        setInterval(checkMonthRollover, 5 * 60 * 1000);
+        document.addEventListener('visibilitychange', () => { if (!document.hidden) checkMonthRollover(); });
 
         function showEventDetail(id) {
             const p = dashboardData.proker.find(x => x.id == id); if (!p) return;
@@ -1371,9 +1437,11 @@
         // --- 8. Aktivitas Terkini: entri terbaru dari tiap modul ---
         function renderActivityFeed() {
             const { generus, absensi, lupg, dokumentasi, arsip } = dashboardData;
+            const lupgTerbaru = lupg.reduce((best, r) => (!best || (Number(r.tahun) * 12 + BULAN.indexOf(r.bulan)) > (Number(best.tahun) * 12 + BULAN.indexOf(best.bulan))) ? r : best, null);
+            const rataObj = obj => { const v = Object.values(obj || {}).map(Number).filter(Number.isFinite); return v.length ? `${Math.round(v.reduce((x, y) => x + y, 0) / v.length)}%` : '-'; };
             const items = [
                 absensi[0] && { icon: 'fa-check', tone: 'bg-blue-100 text-blue-700', title: `Presensi ${absensi[0].name}: ${absensi[0].status}`, meta: `${absensi[0].event || '-'} • ${fmtTanggal(absensi[0].date)}` },
-                lupg[0] && { icon: 'fa-file-invoice', tone: 'bg-purple-100 text-purple-700', title: `LUPG ${lupg[0].kelompok} ${lupg[0].bulan} ${lupg[0].tahun || ''}`, meta: `${lupg[0].tercapai} / ${lupg[0].target} peserta • ${lupg[0].status}` },
+                lupgTerbaru && { icon: 'fa-file-invoice', tone: 'bg-purple-100 text-purple-700', title: `LUPG ${lupgTerbaru.kelompok} ${lupgTerbaru.bulan} ${lupgTerbaru.tahun || ''}`, meta: `Kehadiran ${rataObj(lupgTerbaru.kehadiran)} • Ketercapaian ${rataObj(lupgTerbaru.ketercapaian)}` },
                 generus[0] && { icon: 'fa-user-plus', tone: 'bg-emerald-100 text-emerald-700', title: `Generus: ${generus[0].name}`, meta: `${generus[0].category || '-'} • ${generus[0].group || '-'}` },
                 dokumentasi[0] && { icon: 'fa-camera', tone: 'bg-rose-100 text-rose-700', title: `Dokumentasi: ${dokumentasi[0].judul}`, meta: `${dokumentasi[0].fotoCount || 1} foto • ${fmtTanggal(dokumentasi[0].tanggal)}` },
                 arsip[0] && { icon: 'fa-cloud-upload-alt', tone: 'bg-cyan-100 text-cyan-700', title: `Arsip: ${arsip[0].nama}`, meta: `${arsip[0].kategori || '-'} • ${fmtTanggal(arsip[0].tanggal)}` }

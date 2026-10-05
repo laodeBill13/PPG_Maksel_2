@@ -304,9 +304,10 @@
                                 <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
                             </div>
                         </div>
-                        <button onclick="openUserManagement()" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
-                            <i class="fas fa-user-plus"></i> Tambah Pengguna
-                        </button>
+                        <a href="pengguna.html" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                            <i class="fas fa-user-check"></i> Persetujuan &amp; Hak Akses User
+                        </a>
+                        <p class="text-[11px] text-slate-400 text-center mt-2">User baru mendaftar lewat halaman <b>Daftar</b> di login, lalu disetujui Ketua/Wakil/Sekretaris.</p>
                     </div>
 
                     <!-- Notifikasi -->
@@ -320,7 +321,7 @@
                         </div>
                         <div class="space-y-4 mb-5">
                             <div class="flex items-center justify-between">
-                                <div><p class="text-sm font-medium text-slate-700">Notifikasi Absensi</p><p class="text-xs text-slate-400">Alert saat santri alpha</p></div>
+                                <div><p class="text-sm font-medium text-slate-700">Notifikasi Absensi</p><p class="text-xs text-slate-400">Alert saat pengurus alpha</p></div>
                                 <button onclick="toggleSwitch(this)" class="toggle-switch relative w-12 h-6 bg-blue-600 rounded-full" data-on="true">
                                     <span class="toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></span>
                                 </button>
@@ -541,17 +542,12 @@
         showToast('Pengaturan diperbarui', 'success');
     }
 
-    function openUserManagement(){
-        const {url}=window.PPG_DB.getConfig();const match=url.match(/https:\/\/([^.]+)\.supabase\.co/);
-        if(!match){showToast('Hubungkan Supabase terlebih dahulu untuk mengelola pengguna.','error');return;}
-        window.open(`https://supabase.com/dashboard/project/${match[1]}/auth/users`,'_blank','noopener');
-    }
     function backupLocalData(){
-        const keys=['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_pengaturan_data','ppg_notification_settings'];const backup={version:1,createdAt:new Date().toISOString(),data:{}};keys.forEach(key=>{if(localStorage.getItem(key)!==null)backup.data[key]=localStorage.getItem(key);});
-        const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));a.download=`backup-ppg-maksel2-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);showToast('Backup lokal berhasil diunduh','success');
+        const keys=['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_struktur_data','ppg_pengaturan_data','ppg_notification_settings'];const backup={version:1,createdAt:new Date().toISOString(),data:{}};keys.forEach(key=>{if(localStorage.getItem(key)!==null)backup.data[key]=localStorage.getItem(key);});
+        const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(backup,null,2)],{type:'application/json'}));a.download=`backup-ppg-maksel2-${window.PPG_DB.tanggalLokal()}.json`;a.click();URL.revokeObjectURL(a.href);showToast('Backup lokal berhasil diunduh','success');
     }
     function restoreLocalData(){
-        const input=document.createElement('input');input.type='file';input.accept='application/json';input.onchange=async()=>{try{const parsed=JSON.parse(await input.files[0].text());if(parsed.version!==1||!parsed.data)throw new Error('Format backup tidak valid');const allowed=new Set(['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_pengaturan_data','ppg_notification_settings']);Object.entries(parsed.data).forEach(([key,value])=>{if(allowed.has(key)&&typeof value==='string')localStorage.setItem(key,value);});showToast('Backup berhasil dipulihkan. Halaman akan dimuat ulang.','success');setTimeout(()=>location.reload(),900);}catch(error){showToast(`Restore gagal: ${error.message}`,'error');}};input.click();
+        const input=document.createElement('input');input.type='file';input.accept='application/json';input.onchange=async()=>{try{const parsed=JSON.parse(await input.files[0].text());if(parsed.version!==1||!parsed.data)throw new Error('Format backup tidak valid');const allowed=new Set(['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_struktur_data','ppg_pengaturan_data','ppg_notification_settings']);Object.entries(parsed.data).forEach(([key,value])=>{if(allowed.has(key)&&typeof value==='string')localStorage.setItem(key,value);});showToast('Backup berhasil dipulihkan. Halaman akan dimuat ulang.','success');setTimeout(()=>location.reload(),900);}catch(error){showToast(`Restore gagal: ${error.message}`,'error');}};input.click();
     }
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -559,7 +555,7 @@
 
     function doReset() {
         // Disimpan sebagai array kosong (bukan dihapus) agar data contoh tidak muncul lagi setelah reload.
-        ['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data'].forEach(k => localStorage.setItem(k, '[]'));
+        ['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_struktur_data'].forEach(k => localStorage.setItem(k, '[]'));
         localStorage.removeItem('ppg_pengaturan_data');
         closeModal('modalReset');
         showToast('Semua data lokal berhasil direset', 'success');

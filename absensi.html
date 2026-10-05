@@ -277,7 +277,7 @@
                         <span>Absensi & Presensi</span>
                     </div>
                     <h2 class="text-2xl font-bold text-slate-800 tracking-tight">
-                        Absensi & Presensi Kehadiran Generus
+                        Presensi Kehadiran Pengurus
                     </h2>
                 </div>
 
@@ -326,13 +326,13 @@
                     <div class="relative z-1 flex flex-wrap items-center justify-between gap-6">
                         <div class="max-w-xl">
                             <span class="bg-blue-500/40 border border-blue-400/30 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
-                                <i class="fas fa-clipboard-check text-[10px]"></i> Manajemen Presensi Santri
+                                <i class="fas fa-clipboard-check text-[10px]"></i> Presensi Pengurus
                             </span>
                             <h2 class="text-2xl font-extrabold tracking-tight">
-                                Rekap Kehadiran Kegiatan & Musyawaroh
+                                Presensi Musyawarah & Penyampaian PPG
                             </h2>
                             <p class="text-blue-100 text-xs sm:text-sm mt-1 leading-relaxed">
-                                Catat dan pantau tingkat kehadiran generus pada pengajian rutin, musyawaroh daerah, asrama, dan festival pembinaan.
+                                Catat dan pantau kehadiran pengurus pada Musyawarah Pengurus, Penyampaian PPG Pusat, dan Penyampaian PPG Daerah.
                             </p>
                         </div>
 
@@ -378,7 +378,7 @@
                                 </span>
                             </div>
                             <h3 class="text-3xl font-extrabold text-blue-700 mt-2" id="countTotal">0</h3>
-                            <p class="text-[11px] text-slate-400 mt-1">Total data santri tercatat</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Total catatan kehadiran</p>
                         </div>
 
                         <!-- Stat 2: Hadir -->
@@ -408,7 +408,7 @@
                                 <h3 class="text-3xl font-extrabold text-amber-600" id="countIzin">20</h3>
                                 <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full" id="pctIzin">3.8%</span>
                             </div>
-                            <p class="text-[11px] text-slate-400 mt-1">Konfirmasi keterangan wali</p>
+                            <p class="text-[11px] text-slate-400 mt-1">Berhalangan dengan keterangan</p>
                         </div>
 
                         <!-- Stat 4: Alpha -->
@@ -447,10 +447,10 @@
                         
                         <!-- Search Input -->
                         <div class="relative lg:col-span-2">
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cari Nama Santri / Catatan</label>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Cari Nama Pengurus / Catatan</label>
                             <div class="relative">
                                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                                <input type="text" id="filterSearch" onkeyup="applyFilters()" placeholder="Ketik nama santri..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
+                                <input type="text" id="filterSearch" onkeyup="applyFilters()" placeholder="Ketik nama pengurus..." class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                             </div>
                         </div>
 
@@ -459,24 +459,16 @@
                             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Kegiatan</label>
                             <select id="filterEvent" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
                                 <option value="">Semua Kegiatan</option>
-                                <option value="Pengajian Rutin Generus">Pengajian Rutin</option>
-                                <option value="Musyawaroh Bulanan">Musyawaroh Bulanan</option>
-                                <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian</option>
-                                <option value="Festival Generus Maksel 2">Festival Generus</option>
-                                <option value="Asrama Al-Quran Liburan">Asrama Al-Quran</option>
+                                <option value="Musyawarah Pengurus">Musyawarah Pengurus</option>
+                                <option value="Penyampaian PPG Pusat">Penyampaian PPG Pusat</option>
+                                <option value="Penyampaian PPG Daerah">Penyampaian PPG Daerah</option>
                             </select>
                         </div>
 
                         <!-- Kelompok Dropdown -->
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kelompok</label>
-                            <select id="filterGroup" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
-                                <option value="">Semua Kelompok</option>
-                                <option value="Kelompok A">Kelompok A</option>
-                                <option value="Kelompok B">Kelompok B</option>
-                                <option value="Kelompok C">Kelompok C</option>
-                                <option value="Kelompok D">Kelompok D</option>
-                            </select>
+                            <select id="filterGroup" data-wilayah="kelompok" data-semua="Semua Kelompok" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></select>
                         </div>
 
                         <!-- Status Dropdown -->
@@ -506,7 +498,7 @@
                     <!-- Table Header & Counter -->
                     <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-sm text-slate-800">Log Kehadiran Santri</span>
+                            <span class="font-bold text-sm text-slate-800">Log Kehadiran Pengurus</span>
                             <span id="filteredCountBadge" class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                                 Memuat data...
                             </span>
@@ -527,7 +519,7 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100 uppercase tracking-wider text-[11px]">
                                 <tr>
-                                    <th class="p-4">Nama Santri</th>
+                                    <th class="p-4">Nama Pengurus</th>
                                     <th class="p-4 hidden md:table-cell">Kelompok & Desa</th>
                                     <th class="p-4 hidden sm:table-cell">Kegiatan</th>
                                     <th class="p-4 hidden lg:table-cell">Tanggal & Waktu</th>
@@ -594,48 +586,39 @@
                     <i class="fas fa-user-check"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-slate-800">Catat Presensi Santri</h3>
-                    <p class="text-xs text-slate-500">Input kehadiran peserta kegiatan musyawaroh / pembinaan</p>
+                    <h3 class="text-base font-bold text-slate-800">Catat Presensi Pengurus</h3>
+                    <p class="text-xs text-slate-500">Musyawarah Pengurus, Penyampaian PPG Pusat, atau Penyampaian PPG Daerah</p>
                 </div>
             </div>
 
+            <datalist id="daftarJabatan">
+                <option value="Ketua"></option><option value="Wakil Ketua"></option><option value="Sekretaris"></option><option value="Bendahara"></option>
+                <option value="Ketua Kelompok"></option><option value="Pengurus Desa"></option><option value="Muballigh"></option><option value="Muballighot"></option>
+            </datalist>
             <form onsubmit="handleCreateAbsensi(event)" class="space-y-4 text-xs">
                 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri <span class="text-red-500">*</span></label>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Pengurus <span class="text-red-500">*</span></label>
                     <input type="text" id="addName" required placeholder="Contoh: Ahmad Fauzi" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori <span class="text-red-500">*</span></label>
-                        <select id="addCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="PAUD">PAUD</option>
-                            <option value="Caberawit">Caberawit</option>
-                            <option value="Pra Remaja">Pra Remaja</option>
-                            <option value="Remaja" selected>Remaja</option>
-                            <option value="Pra Nikah">Pra Nikah</option>
-                        </select>
+                        <label for="addJabatan" class="block font-semibold text-slate-700 mb-1">Jabatan / Unsur</label>
+                        <input type="text" id="addJabatan" list="daftarJabatan" placeholder="Contoh: Ketua, Sekretaris, Bendahara" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Kelompok & Desa <span class="text-red-500">*</span></label>
-                        <select id="addGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Kelompok A">Kelompok A - Barabaraya</option>
-                            <option value="Kelompok B">Kelompok B - Manggala</option>
-                            <option value="Kelompok C">Kelompok C - Panakkukang</option>
-                            <option value="Kelompok D">Kelompok D - Tamalanrea</option>
-                        </select>
+                        <label class="block font-semibold text-slate-700 mb-1">Asal Kelompok <span class="text-red-500">*</span></label>
+                        <select id="addGroup" data-wilayah="kelompok" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Nama Agenda / Kegiatan <span class="text-red-500">*</span></label>
                     <select id="addEvent" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="Pengajian Rutin Generus">Pengajian Rutin Generus</option>
-                        <option value="Musyawaroh Bulanan">Musyawaroh Bulanan Pengurus</option>
-                        <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian Santri</option>
-                        <option value="Festival Generus Maksel 2">Festival Generus Maksel 2</option>
-                        <option value="Asrama Al-Quran Liburan">Asrama Al-Quran Liburan</option>
+                        <option value="Musyawarah Pengurus">Musyawarah Pengurus</option>
+                        <option value="Penyampaian PPG Pusat">Penyampaian PPG Pusat</option>
+                        <option value="Penyampaian PPG Daerah">Penyampaian PPG Daerah</option>
                     </select>
                 </div>
 
@@ -702,7 +685,7 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-slate-800">Edit Data Presensi</h3>
-                    <p class="text-xs text-slate-500">Perbarui rekaman kehadiran santri</p>
+                    <p class="text-xs text-slate-500">Perbarui rekaman kehadiran pengurus</p>
                 </div>
             </div>
 
@@ -710,40 +693,27 @@
                 <input type="hidden" id="editId">
 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri</label>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Pengurus</label>
                     <input type="text" id="editName" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori</label>
-                        <select id="editCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="PAUD">PAUD</option>
-                            <option value="Caberawit">Caberawit</option>
-                            <option value="Pra Remaja">Pra Remaja</option>
-                            <option value="Remaja">Remaja</option>
-                            <option value="Pra Nikah">Pra Nikah</option>
-                        </select>
+                        <label for="editJabatan" class="block font-semibold text-slate-700 mb-1">Jabatan / Unsur</label>
+                        <input type="text" id="editJabatan" list="daftarJabatan" placeholder="Contoh: Ketua, Sekretaris, Bendahara" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Kelompok & Desa</label>
-                        <select id="editGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Kelompok A">Kelompok A - Barabaraya</option>
-                            <option value="Kelompok B">Kelompok B - Manggala</option>
-                            <option value="Kelompok C">Kelompok C - Panakkukang</option>
-                            <option value="Kelompok D">Kelompok D - Tamalanrea</option>
-                        </select>
+                        <label class="block font-semibold text-slate-700 mb-1">Asal Kelompok</label>
+                        <select id="editGroup" data-wilayah="kelompok" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-semibold text-slate-700 mb-1">Nama Agenda / Kegiatan</label>
                     <select id="editEvent" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <option value="Pengajian Rutin Generus">Pengajian Rutin Generus</option>
-                        <option value="Musyawaroh Bulanan">Musyawaroh Bulanan Pengurus</option>
-                        <option value="Evaluasi & Kemandirian">Evaluasi & Kemandirian Santri</option>
-                        <option value="Festival Generus Maksel 2">Festival Generus Maksel 2</option>
-                        <option value="Asrama Al-Quran Liburan">Asrama Al-Quran Liburan</option>
+                        <option value="Musyawarah Pengurus">Musyawarah Pengurus</option>
+                        <option value="Penyampaian PPG Pusat">Penyampaian PPG Pusat</option>
+                        <option value="Penyampaian PPG Daerah">Penyampaian PPG Daerah</option>
                     </select>
                 </div>
 
@@ -799,10 +769,10 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Santri</h3>
-                        <span id="detailCategoryBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Remaja</span>
+                        <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Pengurus</h3>
+                        <span id="detailCategoryBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">Pengurus</span>
                     </div>
-                    <p id="detailGroupVillage" class="text-xs text-slate-500 mt-1">Kelompok A • Barabaraya</p>
+                    <p id="detailGroupVillage" class="text-xs text-slate-500 mt-1">Kelompok • Desa</p>
                     <span id="detailStatusPill" class="inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
                         Hadir
                     </span>
@@ -813,7 +783,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-5 text-xs">
                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="text-slate-400 text-[10px] font-semibold uppercase">Agenda Kegiatan</span>
-                    <p id="detailEvent" class="font-bold text-slate-800 mt-0.5">Pengajian Rutin Generus</p>
+                    <p id="detailEvent" class="font-bold text-slate-800 mt-0.5">-</p>
                 </div>
                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="text-slate-400 text-[10px] font-semibold uppercase">Tanggal & Waktu</span>
@@ -831,10 +801,10 @@
                     Aksi Lintas Modul (Direct Screen Pathways)
                 </p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <a href="database_generus.html" class="flex items-center justify-center gap-2 p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl text-xs transition border border-blue-200">
-                        <i class="fas fa-user-graduate"></i>
-                        <span>Lihat Profil di Database</span>
-                    </a>
+                    <button type="button" id="btnDetailRiwayat" class="flex items-center justify-center gap-2 p-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-xl text-xs transition border border-blue-200">
+                        <i class="fas fa-history"></i>
+                        <span>Riwayat Presensi Pengurus Ini</span>
+                    </button>
                     <a href="program_kerja.html" class="flex items-center justify-center gap-2 p-2.5 bg-amber-50 hover:bg-amber-100 text-amber-700 font-semibold rounded-xl text-xs transition border border-amber-200">
                         <i class="fas fa-tasks"></i>
                         <span>Buka Detail di Proker</span>
@@ -862,7 +832,7 @@
             </div>
             <h3 class="text-base font-bold text-slate-800">Hapus Data Presensi?</h3>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                Apakah Anda yakin ingin membatalkan rekaman presensi santri <strong id="deleteTargetName" class="text-slate-800">...</strong>? Tindakan ini tidak dapat dibatalkan.
+                Apakah Anda yakin ingin membatalkan rekaman presensi pengurus <strong id="deleteTargetName" class="text-slate-800">...</strong>? Tindakan ini tidak dapat dibatalkan.
             </p>
             <div class="mt-6 flex gap-3">
                 <button onclick="closeModal('modalDeleteAbsensi')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl transition">
@@ -880,6 +850,7 @@
 
     <!-- ================= JAVASCRIPT & SUPABASE-READY SERVICE ================= -->
     <script src="assets/demo-seed.js"></script>
+    <script src="assets/wilayah.js"></script>
     <script src="assets/supabase-client.js"></script>
     <script src="assets/sidebar.js"></script>
 
@@ -1061,7 +1032,7 @@
                                 <div>
                                     <p class="font-bold text-slate-800">${item.name}</p>
                                     <span class="text-[10px] bg-slate-100 text-slate-600 font-semibold px-2 py-0.5 rounded-full mt-0.5 inline-block">
-                                        ${item.category}
+                                        ${item.jabatan || 'Pengurus'}
                                     </span>
                                 </div>
                             </div>
@@ -1069,7 +1040,7 @@
                         <td class="p-4 hidden md:table-cell">
                             <p class="font-semibold text-slate-800">${item.group}</p>
                             <p class="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1">
-                                <i class="fas fa-map-marker-alt text-blue-500 text-[10px]"></i> ${item.village || 'Makassar'}
+                                <i class="fas fa-map-marker-alt text-blue-500 text-[10px]"></i> ${item.village || '-'}
                             </p>
                         </td>
                         <td class="p-4 hidden sm:table-cell">
@@ -1186,9 +1157,9 @@
 
                 const newItem = {
                     name: document.getElementById("addName").value,
-                    category: document.getElementById("addCategory").value,
+                    jabatan: document.getElementById("addJabatan").value.trim(),
                     group: document.getElementById("addGroup").value,
-                    village: "Barabaraya",
+                    village: window.PPG_WILAYAH.desaOf(document.getElementById("addGroup").value),
                     event: document.getElementById("addEvent").value,
                     date: document.getElementById("addDate").value,
                     time: document.getElementById("addTime").value || "08:00",
@@ -1215,7 +1186,7 @@
 
             document.getElementById("editId").value = item.id;
             document.getElementById("editName").value = item.name;
-            document.getElementById("editCategory").value = item.category;
+            document.getElementById("editJabatan").value = item.jabatan || '';
             document.getElementById("editGroup").value = item.group;
             document.getElementById("editEvent").value = item.event;
             document.getElementById("editDate").value = item.date;
@@ -1232,8 +1203,9 @@
                 const id = document.getElementById("editId").value;
                 const updated = {
                     name: document.getElementById("editName").value,
-                    category: document.getElementById("editCategory").value,
+                    jabatan: document.getElementById("editJabatan").value.trim(),
                     group: document.getElementById("editGroup").value,
+                    village: window.PPG_WILAYAH.desaOf(document.getElementById("editGroup").value),
                     event: document.getElementById("editEvent").value,
                     date: document.getElementById("editDate").value,
                     time: document.getElementById("editTime").value || "-",
@@ -1260,7 +1232,7 @@
 
             document.getElementById("detailAvatar").innerText = item.name.charAt(0);
             document.getElementById("detailName").innerText = item.name;
-            document.getElementById("detailCategoryBadge").innerText = item.category;
+            document.getElementById("detailCategoryBadge").innerText = item.jabatan || 'Pengurus';
             document.getElementById("detailGroupVillage").innerText = `${item.group} • ${item.village || 'Maksel 2'}`;
             document.getElementById("detailEvent").innerText = item.event;
             document.getElementById("detailDateTime").innerText = `${item.date} • ${item.time || '08:00'} WITA`;
@@ -1273,6 +1245,12 @@
             else if (item.status === "Sakit") statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-blue-100 text-blue-700";
             else statusPill.className = "inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase bg-rose-100 text-rose-700";
 
+            document.getElementById("btnDetailRiwayat").onclick = () => {
+                closeModal('modalDetailAbsensi');
+                resetAllFilters();
+                document.getElementById("filterSearch").value = item.name;
+                applyFilters();
+            };
             document.getElementById("btnDetailEdit").onclick = () => {
                 closeModal('modalDetailAbsensi');
                 openEditModal(item.id);
@@ -1291,7 +1269,7 @@
             if (!deleteTargetId) return;
             try {
                 const target = absensiList.find(a => a.id == deleteTargetId);
-                const name = target ? target.name : 'Santri';
+                const name = target ? target.name : 'Pengurus';
 
                 await AbsensiService.delete(deleteTargetId);
                 absensiList = absensiList.filter(a => a.id != deleteTargetId);
@@ -1314,9 +1292,9 @@
                 return;
             }
 
-            window.PPG_DB.downloadCsv(`Rekap_Presensi_PPG_Maksel2_${new Date().toISOString().slice(0, 10)}.csv`,
-                ["ID", "Nama", "Kategori", "Kelompok", "Desa", "Kegiatan", "Tanggal", "Waktu", "Status", "Keterangan"],
-                filteredAbsensi.map(a => [a.id, a.name, a.category, a.group, a.village, a.event, a.date, a.time, a.status, a.notes]));
+            window.PPG_DB.downloadCsv(`Rekap_Presensi_PPG_Maksel2_${window.PPG_DB.tanggalLokal()}.csv`,
+                ["ID", "Nama", "Jabatan", "Kelompok", "Desa", "Kegiatan", "Tanggal", "Waktu", "Status", "Keterangan"],
+                filteredAbsensi.map(a => [a.id, a.name, a.jabatan, a.group, a.village, a.event, a.date, a.time, a.status, a.notes]));
 
             triggerToast("Export Berhasil!", `File CSV (${filteredAbsensi.length} presensi) berhasil diunduh.`, "success");
         }
@@ -1397,7 +1375,7 @@
 
         document.addEventListener("DOMContentLoaded", () => {
             // Default date to today
-            const today = new Date().toISOString().slice(0, 10);
+            const today = window.PPG_DB.tanggalLokal();
             const addDateEl = document.getElementById("addDate");
             if (addDateEl) addDateEl.value = today;
 

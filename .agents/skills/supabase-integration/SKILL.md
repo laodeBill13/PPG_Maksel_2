@@ -9,13 +9,13 @@ This skill defines the schema design, client configuration, and data synchroniza
 
 ## Database Entities & Architecture
 
-### 1. `generus` (Santri & Generasi Penerus)
+### 1. `generus` (Generasi Penerus)
 - Primary key: `id` (UUID or BigSerial)
 - Fields:
   - `nama`: VARCHAR NOT NULL
   - `gender`: CHAR(1) ('L' / 'P')
   - `tanggal_lahir`: DATE
-  - `kategori`: VARCHAR ('PAUD', 'Caberawit', 'Pra Remaja', 'Remaja', 'Pra Nikah')
+  - `kategori`: VARCHAR ('PAUD', 'Caberawit', 'Pra Remaja', 'Remaja', 'Usia Nikah')
   - `kelompok`: VARCHAR ('A', 'B', 'C', 'D')
   - `desa`: VARCHAR (default 'Maksel 2')
   - `nama_ortu`: VARCHAR
@@ -28,7 +28,7 @@ This skill defines the schema design, client configuration, and data synchroniza
 - Primary key: `id`
 - Foreign keys: `generus_id` references `generus(id)`
 - Fields:
-  - `kegiatan`: VARCHAR (e.g. 'Pengajian Rutin', 'Asrama Liburan', 'Kajian Mandiri')
+  - `kegiatan`: VARCHAR (e.g. 'Pengajian Rutin', 'Asrama Liburan', 'Ngaji Mandiri')
   - `tanggal`: DATE DEFAULT CURRENT_DATE
   - `kelompok`: VARCHAR
   - `status`: VARCHAR ('Hadir', 'Izin', 'Sakit', 'Alpha')

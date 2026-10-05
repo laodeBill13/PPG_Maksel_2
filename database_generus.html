@@ -17,6 +17,7 @@
 
     <!-- Supabase JS Client CDN (Ready for live integration) -->
     <script src="assets/config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -331,10 +332,10 @@
                                 <i class="fas fa-database text-[10px]"></i> Manajemen Data Master
                             </span>
                             <h2 class="text-2xl font-extrabold tracking-tight">
-                                Data Seluruh Santri & Generus
+                                Data Seluruh Generus
                             </h2>
                             <p class="text-blue-100 text-xs sm:text-sm mt-1 leading-relaxed">
-                                Kelola direktori generus dari jenjang PAUD hingga Pra Nikah di seluruh kelompok dan desa binaan Maksel 2.
+                                Kelola direktori generus dari jenjang PAUD hingga Usia Nikah di seluruh kelompok dan desa binaan Maksel 2.
                             </p>
                         </div>
 
@@ -345,7 +346,7 @@
                                 + Tambah Generus Baru
                             </button>
 
-                            <button onclick="exportToCSV()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <button onclick="exportToExcel()" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                                 <i class="fas fa-file-excel"></i>
                                 Export Excel
                             </button>
@@ -379,7 +380,7 @@
                                     <i class="fas fa-baby"></i>
                                 </span>
                             </div>
-                            <h3 class="text-3xl font-extrabold text-blue-700 mt-2" id="countPAUD">120</h3>
+                            <h3 class="text-3xl font-extrabold text-blue-700 mt-2" id="countPAUD">0</h3>
                             <p class="text-[11px] text-slate-400 mt-1">Usia 3 - 5 Tahun</p>
                         </div>
 
@@ -391,7 +392,7 @@
                                     <i class="fas fa-child"></i>
                                 </span>
                             </div>
-                            <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="countCaberawit">95</h3>
+                            <h3 class="text-3xl font-extrabold text-emerald-600 mt-2" id="countCaberawit">0</h3>
                             <p class="text-[11px] text-slate-400 mt-1">Usia 6 - 11 Tahun</p>
                         </div>
 
@@ -403,7 +404,7 @@
                                     <i class="fas fa-user"></i>
                                 </span>
                             </div>
-                            <h3 class="text-3xl font-extrabold text-amber-600 mt-2" id="countPraRemaja">110</h3>
+                            <h3 class="text-3xl font-extrabold text-amber-600 mt-2" id="countPraRemaja">0</h3>
                             <p class="text-[11px] text-slate-400 mt-1">Usia 12 - 14 Tahun</p>
                         </div>
 
@@ -415,19 +416,19 @@
                                     <i class="fas fa-user-graduate"></i>
                                 </span>
                             </div>
-                            <h3 class="text-3xl font-extrabold text-purple-600 mt-2" id="countRemaja">150</h3>
+                            <h3 class="text-3xl font-extrabold text-purple-600 mt-2" id="countRemaja">0</h3>
                             <p class="text-[11px] text-slate-400 mt-1">Usia 15 - 18 Tahun</p>
                         </div>
 
-                        <!-- Stat 5: Pra Nikah -->
-                        <div onclick="filterByCategory('Pra Nikah')" id="cardStatPraNikah" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
+                        <!-- Stat 5: Usia Nikah -->
+                        <div onclick="filterByCategory('Usia Nikah')" id="cardStatUsiaNikah" class="card-hover bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs cursor-pointer group">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-500 group-hover:text-rose-700 transition">Pra Nikah</span>
+                                <span class="text-xs font-bold text-slate-500 group-hover:text-rose-700 transition">Usia Nikah</span>
                                 <span class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xs">
                                     <i class="fas fa-user-tie"></i>
                                 </span>
                             </div>
-                            <h3 class="text-3xl font-extrabold text-rose-600 mt-2" id="countPraNikah">53</h3>
+                            <h3 class="text-3xl font-extrabold text-rose-600 mt-2" id="countUsiaNikah">0</h3>
                             <p class="text-[11px] text-slate-400 mt-1">Usia 19+ Tahun</p>
                         </div>
 
@@ -468,33 +469,20 @@
                                 <option value="Caberawit">Caberawit</option>
                                 <option value="Pra Remaja">Pra Remaja</option>
                                 <option value="Remaja">Remaja</option>
-                                <option value="Pra Nikah">Pra Nikah</option>
+                                <option value="Usia Nikah">Usia Nikah</option>
                             </select>
                         </div>
 
                         <!-- Kelompok Dropdown -->
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kelompok</label>
-                            <select id="filterGroup" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
-                                <option value="">Semua Kelompok</option>
-                                <option value="Kelompok A">Kelompok A</option>
-                                <option value="Kelompok B">Kelompok B</option>
-                                <option value="Kelompok C">Kelompok C</option>
-                                <option value="Kelompok D">Kelompok D</option>
-                            </select>
+                            <select id="filterGroup" data-wilayah="kelompok" data-semua="Semua Kelompok" onchange="onFilterKelompok()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></select>
                         </div>
 
                         <!-- Desa Dropdown -->
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-600 mb-1">Desa / Wilayah</label>
-                            <select id="filterVillage" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
-                                <option value="">Semua Desa</option>
-                                <option value="Barabaraya">Barabaraya</option>
-                                <option value="Manggala">Manggala</option>
-                                <option value="Panakkukang">Panakkukang</option>
-                                <option value="Tamalanrea">Tamalanrea</option>
-                                <option value="Biringkanaya">Biringkanaya</option>
-                            </select>
+                            <select id="filterVillage" data-wilayah="desa" data-semua="Semua Desa" onchange="onFilterDesa()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition"></select>
                         </div>
 
                         <!-- Status Dropdown -->
@@ -510,13 +498,46 @@
                     </div>
                 </div>
 
+                <!-- 3b. REKAP JUMLAH PER TINGKATAN -->
+                <div id="rekapSection" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
+                    <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <span class="font-bold text-sm text-slate-800">Rekap Jumlah per Tingkatan</span>
+                            <p id="rekapScope" class="text-xs text-slate-500 mt-0.5">Memuat data...</p>
+                        </div>
+                        <div class="flex items-center gap-2 no-print">
+                            <button id="rekapBack" onclick="rekapNaik()" class="hidden text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl transition"><i class="fas fa-arrow-left mr-1"></i> Semua Desa</button>
+                            <button onclick="exportToExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-xl text-xs flex items-center gap-2 transition"><i class="fas fa-file-excel"></i> Export Excel</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-slate-50 text-slate-600 uppercase tracking-wider text-[11px]">
+                                <tr>
+                                    <th id="rekapLabelCol" class="p-3 font-semibold text-left">Desa</th>
+                                    <th class="p-3 font-semibold text-center">PAUD</th>
+                                    <th class="p-3 font-semibold text-center">Caberawit</th>
+                                    <th class="p-3 font-semibold text-center">Pra Remaja</th>
+                                    <th class="p-3 font-semibold text-center">Remaja</th>
+                                    <th class="p-3 font-semibold text-center">Usia Nikah</th>
+                                    <th class="p-3 font-semibold text-center bg-blue-50 text-blue-800">Total</th>
+                                    <th class="p-3 font-semibold text-center">L</th>
+                                    <th class="p-3 font-semibold text-center">P</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rekapBody" class="divide-y divide-slate-100 text-slate-700"></tbody>
+                        </table>
+                    </div>
+                    <p class="px-6 py-3 text-[11px] text-slate-400 border-t border-slate-100 no-print">Pilih <strong>Desa</strong>, <strong>Kelompok</strong>, atau <strong>Status</strong> pada filter di atas, atau klik nama desa pada tabel, untuk melihat rekap lebih rinci.</p>
+                </div>
+
                 <!-- 4. DATA TABLE SECTION -->
                 <div id="tableContainer" class="bg-white rounded-3xl border border-slate-200/80 shadow-xs overflow-hidden">
                     
                     <!-- Table Header & Counter -->
                     <div class="px-6 py-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
                         <div class="flex items-center gap-2">
-                            <span class="font-bold text-sm text-slate-800">Daftar Santri & Generus</span>
+                            <span class="font-bold text-sm text-slate-800">Daftar Generus</span>
                             <span id="filteredCountBadge" class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">
                                 Memuat data...
                             </span>
@@ -537,7 +558,7 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100 uppercase tracking-wider text-[11px]">
                                 <tr>
-                                    <th class="p-4">Nama Santri</th>
+                                    <th class="p-4">Nama Generus</th>
                                     <th class="p-4 hidden sm:table-cell">Kategori</th>
                                     <th class="p-4 hidden md:table-cell">Kelompok & Desa</th>
                                     <th class="p-4 hidden lg:table-cell">Tgl Lahir / Usia</th>
@@ -559,7 +580,7 @@
                         </div>
                         <h4 class="font-bold text-sm text-slate-700">Data Generus Tidak Ditemukan</h4>
                         <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat seluruh data santri.
+                            Coba sesuaikan kata kunci pencarian atau reset filter untuk melihat seluruh data generus.
                         </p>
                         <button onclick="resetAllFilters()" class="mt-4 px-4 py-2 bg-blue-700 text-white rounded-xl text-xs font-semibold hover:bg-blue-800 transition">
                             Reset Filter
@@ -605,14 +626,14 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-slate-800">Tambah Generus Baru</h3>
-                    <p class="text-xs text-slate-500">Isi lengkap data santri untuk didaftarkan ke sistem</p>
+                    <p class="text-xs text-slate-500">Isi lengkap data generus untuk didaftarkan ke sistem</p>
                 </div>
             </div>
 
             <form onsubmit="handleCreateGenerus(event)" class="space-y-4 text-xs">
                 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri <span class="text-red-500">*</span></label>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Generus <span class="text-red-500">*</span></label>
                     <input type="text" id="addName" required placeholder="Contoh: Muhammad Fauzan" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
@@ -638,30 +659,19 @@
                             <option value="Caberawit">Caberawit (6-11 Thn)</option>
                             <option value="Pra Remaja">Pra Remaja (12-14 Thn)</option>
                             <option value="Remaja" selected>Remaja (15-18 Thn)</option>
-                            <option value="Pra Nikah">Pra Nikah (19+ Thn)</option>
+                            <option value="Usia Nikah">Usia Nikah (19+ Thn)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Kelompok <span class="text-red-500">*</span></label>
-                        <select id="addGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Kelompok A">Kelompok A</option>
-                            <option value="Kelompok B">Kelompok B</option>
-                            <option value="Kelompok C">Kelompok C</option>
-                            <option value="Kelompok D">Kelompok D</option>
-                        </select>
+                        <select id="addGroup" data-wilayah="kelompok" data-desa-target="addVillage" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Desa / Wilayah <span class="text-red-500">*</span></label>
-                        <select id="addVillage" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Barabaraya">Barabaraya</option>
-                            <option value="Manggala">Manggala</option>
-                            <option value="Panakkukang">Panakkukang</option>
-                            <option value="Tamalanrea">Tamalanrea</option>
-                            <option value="Biringkanaya">Biringkanaya</option>
-                        </select>
+                        <select id="addVillage" data-wilayah="desa" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Status Keaktifan</label>
@@ -674,7 +684,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">No HP / WhatsApp Santri</label>
+                        <label class="block font-semibold text-slate-700 mb-1">No HP / WhatsApp Generus</label>
                         <input type="text" id="addPhone" placeholder="0812xxxxxxxx" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
@@ -713,7 +723,7 @@
                 </div>
                 <div>
                     <h3 class="text-base font-bold text-slate-800">Perbarui Data Generus</h3>
-                    <p class="text-xs text-slate-500">Edit informasi santri yang sudah terdaftar</p>
+                    <p class="text-xs text-slate-500">Edit informasi generus yang sudah terdaftar</p>
                 </div>
             </div>
 
@@ -721,7 +731,7 @@
                 <input type="hidden" id="editId">
 
                 <div>
-                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Santri <span class="text-red-500">*</span></label>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Generus <span class="text-red-500">*</span></label>
                     <input type="text" id="editName" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 </div>
 
@@ -747,30 +757,19 @@
                             <option value="Caberawit">Caberawit (6-11 Thn)</option>
                             <option value="Pra Remaja">Pra Remaja (12-14 Thn)</option>
                             <option value="Remaja">Remaja (15-18 Thn)</option>
-                            <option value="Pra Nikah">Pra Nikah (19+ Thn)</option>
+                            <option value="Usia Nikah">Usia Nikah (19+ Thn)</option>
                         </select>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Kelompok <span class="text-red-500">*</span></label>
-                        <select id="editGroup" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Kelompok A">Kelompok A</option>
-                            <option value="Kelompok B">Kelompok B</option>
-                            <option value="Kelompok C">Kelompok C</option>
-                            <option value="Kelompok D">Kelompok D</option>
-                        </select>
+                        <select id="editGroup" data-wilayah="kelompok" data-desa-target="editVillage" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Desa / Wilayah <span class="text-red-500">*</span></label>
-                        <select id="editVillage" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                            <option value="Barabaraya">Barabaraya</option>
-                            <option value="Manggala">Manggala</option>
-                            <option value="Panakkukang">Panakkukang</option>
-                            <option value="Tamalanrea">Tamalanrea</option>
-                            <option value="Biringkanaya">Biringkanaya</option>
-                        </select>
+                        <select id="editVillage" data-wilayah="desa" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
                     </div>
                     <div>
                         <label class="block font-semibold text-slate-700 mb-1">Status Keaktifan</label>
@@ -783,7 +782,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">No HP / WhatsApp Santri</label>
+                        <label class="block font-semibold text-slate-700 mb-1">No HP / WhatsApp Generus</label>
                         <input type="text" id="editPhone" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
@@ -823,10 +822,10 @@
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
-                        <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Santri</h3>
+                        <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Generus</h3>
                         <span id="detailGenderBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">L</span>
                     </div>
-                    <p id="detailCategoryGroup" class="text-xs text-slate-500 mt-1">Remaja • Kelompok A</p>
+                    <p id="detailCategoryGroup" class="text-xs text-slate-500 mt-1">Kategori • Kelompok</p>
                     <span id="detailStatusPill" class="inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
                         Aktif
                     </span>
@@ -837,7 +836,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-5 text-xs">
                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="text-slate-400 text-[10px] font-semibold uppercase">Desa / Wilayah</span>
-                    <p id="detailVillage" class="font-bold text-slate-800 mt-0.5">Barabaraya</p>
+                    <p id="detailVillage" class="font-bold text-slate-800 mt-0.5">-</p>
                 </div>
                 <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="text-slate-400 text-[10px] font-semibold uppercase">Tanggal Lahir / Usia</span>
@@ -853,7 +852,7 @@
                 </div>
                 <div class="sm:col-span-2 p-3 bg-slate-50 rounded-xl border border-slate-100">
                     <span class="text-slate-400 text-[10px] font-semibold uppercase">Alamat Domisili</span>
-                    <p id="detailAddress" class="font-bold text-slate-800 mt-0.5 leading-relaxed">Jl. Barabaraya No. 45, Makassar</p>
+                    <p id="detailAddress" class="font-bold text-slate-800 mt-0.5 leading-relaxed">-</p>
                 </div>
             </div>
 
@@ -862,11 +861,7 @@
                 <p class="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2.5">
                     Aksi Lintas Modul (Direct Screen Pathways)
                 </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    <a id="linkDirectAbsensi" href="absensi.html" class="flex items-center justify-center gap-2 p-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-xl text-xs transition border border-emerald-200">
-                        <i class="fas fa-clipboard-check"></i>
-                        <span>Catat Presensi Santri</span>
-                    </a>
+                <div class="grid grid-cols-1 gap-2.5">
                     <a href="laporan.html" class="flex items-center justify-center gap-2 p-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold rounded-xl text-xs transition border border-purple-200">
                         <i class="fas fa-chart-line"></i>
                         <span>Lihat Rekap LUPG</span>
@@ -886,6 +881,54 @@
         </div>
     </div>
 
+    <!-- 3b. MODAL PILIH CAKUPAN EXPORT EXCEL -->
+    <div id="modalExportGenerus" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in no-print">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <button onclick="closeModal('modalExportGenerus')" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center">
+                <i class="fas fa-times text-sm"></i>
+            </button>
+            <div class="flex items-center gap-3 mb-5">
+                <div class="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-base"><i class="fas fa-file-excel"></i></div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Export Excel Generus</h3>
+                    <p class="text-xs text-slate-500">Pilih cakupan rekap jumlah per tingkatan</p>
+                </div>
+            </div>
+            <form onsubmit="event.preventDefault(); jalankanExportExcel()" class="space-y-3 text-xs">
+                <label class="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 hover:bg-slate-50 cursor-pointer">
+                    <input type="radio" name="exportScope" value="semua" onchange="onExportScope()" class="accent-emerald-600">
+                    <span><span class="font-semibold text-slate-800">Keseluruhan (semua desa)</span><span class="block text-[11px] text-slate-500">Ringkasan Maksel 2, per desa, dan rincian per kelompok</span></span>
+                </label>
+                <div class="p-3 rounded-xl border border-slate-200 space-y-2">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="radio" name="exportScope" value="desa" onchange="onExportScope()" class="accent-emerald-600">
+                        <span class="font-semibold text-slate-800">Per Desa</span>
+                    </label>
+                    <select id="exportDesa" data-wilayah="desa" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400"></select>
+                </div>
+                <div class="p-3 rounded-xl border border-slate-200 space-y-2">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="radio" name="exportScope" value="kelompok" onchange="onExportScope()" class="accent-emerald-600">
+                        <span class="font-semibold text-slate-800">Per Kelompok</span>
+                    </label>
+                    <select id="exportKelompok" data-wilayah="kelompok" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none disabled:bg-slate-50 disabled:text-slate-400"></select>
+                </div>
+                <div>
+                    <label for="exportStatus" class="block font-semibold text-slate-700 mb-1">Status Generus</label>
+                    <select id="exportStatus" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <option value="">Semua Status</option>
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                    </select>
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('modalExportGenerus')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl transition">Batal</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl shadow-sm transition"><i class="fas fa-download mr-1"></i> Unduh Excel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- 4. MODAL KONFIRMASI HAPUS -->
     <div id="modalDeleteGenerus" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 text-center shadow-2xl border border-slate-100 relative">
@@ -894,7 +937,7 @@
             </div>
             <h3 class="text-base font-bold text-slate-800">Hapus Data Generus?</h3>
             <p class="text-xs text-slate-500 mt-1 leading-relaxed">
-                Apakah Anda yakin ingin menghapus data santri <strong id="deleteTargetName" class="text-slate-800">...</strong>? Tindakan ini tidak dapat dibatalkan.
+                Apakah Anda yakin ingin menghapus data generus <strong id="deleteTargetName" class="text-slate-800">...</strong>? Tindakan ini tidak dapat dibatalkan.
             </p>
             <div class="mt-6 flex gap-3">
                 <button onclick="closeModal('modalDeleteGenerus')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold py-2.5 rounded-xl transition">
@@ -912,6 +955,7 @@
 
     <!-- ================= JAVASCRIPT & SUPABASE-READY SERVICE ================= -->
     <script src="assets/demo-seed.js"></script>
+    <script src="assets/wilayah.js"></script>
     <script src="assets/supabase-client.js"></script>
     <script src="assets/sidebar.js"></script>
 
@@ -975,14 +1019,14 @@
                 Caberawit: generusList.filter(g => g.category === "Caberawit").length,
                 "Pra Remaja": generusList.filter(g => g.category === "Pra Remaja").length,
                 Remaja: generusList.filter(g => g.category === "Remaja").length,
-                "Pra Nikah": generusList.filter(g => g.category === "Pra Nikah").length
+                "Usia Nikah": generusList.filter(g => g.category === "Usia Nikah").length
             };
 
             document.getElementById("countPAUD").innerText = counts.PAUD;
             document.getElementById("countCaberawit").innerText = counts.Caberawit;
             document.getElementById("countPraRemaja").innerText = counts["Pra Remaja"];
             document.getElementById("countRemaja").innerText = counts.Remaja;
-            document.getElementById("countPraNikah").innerText = counts["Pra Nikah"];
+            document.getElementById("countUsiaNikah").innerText = counts["Usia Nikah"];
 
             const totalCount = generusList.length;
             const sidebarBadge = document.getElementById("sidebarGenerusBadge");
@@ -1011,6 +1055,7 @@
 
             currentPage = 1;
             renderTable();
+            renderRekap();
         }
 
         // Quick Category Filter on KPI Card click
@@ -1019,7 +1064,7 @@
             applyFilters();
 
             // Highlight active card
-            const cards = ["PAUD", "Caberawit", "Pra Remaja", "Remaja", "Pra Nikah"];
+            const cards = ["PAUD", "Caberawit", "Pra Remaja", "Remaja", "Usia Nikah"];
             cards.forEach(c => {
                 const cardEl = document.getElementById("cardStat" + c.replace(/\s+/g, ''));
                 if (cardEl) {
@@ -1040,7 +1085,7 @@
             document.getElementById("filterVillage").value = "";
             document.getElementById("filterStatus").value = "";
 
-            const cards = ["PAUD", "Caberawit", "Pra Remaja", "Remaja", "Pra Nikah"];
+            const cards = ["PAUD", "Caberawit", "Pra Remaja", "Remaja", "Usia Nikah"];
             cards.forEach(c => {
                 const cardEl = document.getElementById("cardStat" + c.replace(/\s+/g, ''));
                 if (cardEl) cardEl.classList.remove("ring-2", "ring-blue-600", "bg-blue-50/50");
@@ -1056,7 +1101,7 @@
             const paginationControls = document.getElementById("paginationControls");
             const badge = document.getElementById("filteredCountBadge");
 
-            badge.innerText = `${filteredGenerus.length} Santri`;
+            badge.innerText = `${filteredGenerus.length} Generus`;
 
             if (filteredGenerus.length === 0) {
                 tbody.innerHTML = "";
@@ -1084,7 +1129,7 @@
                 if (item.category === "Caberawit") catBadgeColor = "bg-emerald-100 text-emerald-700";
                 else if (item.category === "Pra Remaja") catBadgeColor = "bg-amber-100 text-amber-700";
                 else if (item.category === "Remaja") catBadgeColor = "bg-purple-100 text-purple-700";
-                else if (item.category === "Pra Nikah") catBadgeColor = "bg-rose-100 text-rose-700";
+                else if (item.category === "Usia Nikah") catBadgeColor = "bg-rose-100 text-rose-700";
 
                 const statusColor = item.status === "Aktif" ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-600";
 
@@ -1348,7 +1393,7 @@
             if (!deleteTargetId) return;
             try {
                 const target = generusList.find(g => g.id == deleteTargetId);
-                const name = target ? target.name : 'Santri';
+                const name = target ? target.name : 'Generus';
 
                 await GenerusService.delete(deleteTargetId);
                 generusList = generusList.filter(g => g.id != deleteTargetId);
@@ -1363,19 +1408,174 @@
         }
 
         // =========================================================================
-        // 4. EXPORT TO CSV (EXCEL) & PDF PRINT
+        // 4. REKAP PER TINGKATAN, EXPORT EXCEL & CETAK PDF
         // =========================================================================
-        function exportToCSV() {
-            if (filteredGenerus.length === 0) {
-                triggerToast("Export Gagal", "Tidak ada data untuk diekspor.", "warning");
-                return;
+        const TINGKATAN = ["PAUD", "Caberawit", "Pra Remaja", "Remaja", "Usia Nikah"];
+        const desaGenerus = g => g.village || window.PPG_WILAYAH.desaOf(g.group) || "Lainnya";
+
+        // Filter Desa & Kelompok saling menyesuaikan.
+        function onFilterDesa() {
+            const desa = document.getElementById("filterVillage").value;
+            const kelompokSel = document.getElementById("filterGroup");
+            kelompokSel.querySelectorAll("optgroup").forEach(og => { og.hidden = Boolean(desa) && og.label !== `Desa ${desa}`; });
+            if (kelompokSel.value && desa && window.PPG_WILAYAH.desaOf(kelompokSel.value) !== desa) kelompokSel.value = "";
+            applyFilters();
+        }
+        function onFilterKelompok() {
+            const kelompok = document.getElementById("filterGroup").value;
+            if (kelompok) document.getElementById("filterVillage").value = window.PPG_WILAYAH.desaOf(kelompok);
+            onFilterDesa();
+        }
+        function rekapPilihDesa(desa) { document.getElementById("filterVillage").value = desa; onFilterDesa(); }
+        function rekapNaik() { document.getElementById("filterGroup").value = ""; document.getElementById("filterVillage").value = ""; onFilterDesa(); }
+
+        // Cakupan rekap mengikuti filter Desa, Kelompok, dan Status (bukan kategori/pencarian).
+        function cakupanRekap() {
+            const desa = document.getElementById("filterVillage").value;
+            const kelompok = document.getElementById("filterGroup").value;
+            const status = document.getElementById("filterStatus").value;
+            return { desa, kelompok, status, data: dataCakupan({ desa, kelompok, status }) };
+        }
+        function dataCakupan({ desa, kelompok, status }) {
+            return generusList.filter(g => (!desa || desaGenerus(g) === desa) && (!kelompok || g.group === kelompok) && (!status || g.status === status));
+        }
+        function hitung(list) {
+            const row = Object.fromEntries(TINGKATAN.map(t => [t, list.filter(g => g.category === t).length]));
+            return { ...row, total: list.length, L: list.filter(g => g.gender === "L").length, P: list.filter(g => g.gender === "P").length };
+        }
+        function labelCakupan({ desa, kelompok, status }) {
+            const wilayah = kelompok ? `Kelompok ${kelompok} (Desa ${desa || window.PPG_WILAYAH.desaOf(kelompok)})` : desa ? `Desa ${desa}` : "Seluruh Maksel 2";
+            return `${wilayah} · ${status ? `Status ${status}` : "Semua status"}`;
+        }
+        // Baris rekap: semua desa -> per desa; satu desa -> per kelompok; satu kelompok -> kelompok itu.
+        function barisRekap(c) {
+            if (c.kelompok) return [{ label: c.kelompok, ...hitung(c.data) }];
+            if (c.desa) {
+                const daftar = window.PPG_WILAYAH.struktur.find(d => d.desa === c.desa)?.kelompok || [];
+                const rows = daftar.map(k => ({ label: k, ...hitung(c.data.filter(g => g.group === k)) }));
+                const lain = c.data.filter(g => !daftar.includes(g.group));
+                if (lain.length) rows.push({ label: "Kelompok lain", ...hitung(lain) });
+                return rows;
+            }
+            const rows = window.PPG_WILAYAH.desa.map(d => ({ label: d, desa: d, ...hitung(c.data.filter(g => desaGenerus(g) === d)) }));
+            const lain = c.data.filter(g => !window.PPG_WILAYAH.desa.includes(desaGenerus(g)));
+            if (lain.length) rows.push({ label: "Lainnya", ...hitung(lain) });
+            return rows;
+        }
+
+        function renderRekap() {
+            const c = cakupanRekap();
+            const rows = barisRekap(c);
+            const total = hitung(c.data);
+            const esc = window.PPG_DB.escapeHtml;
+            document.getElementById("rekapScope").textContent = `${labelCakupan(c)} · ${total.total} generus`;
+            document.getElementById("rekapLabelCol").textContent = c.desa || c.kelompok ? "Kelompok" : "Desa";
+            document.getElementById("rekapBack").classList.toggle("hidden", !c.desa && !c.kelompok);
+            const angka = r => TINGKATAN.map(t => `<td class="p-3 text-center ${r[t] ? "" : "text-slate-300"}">${r[t]}</td>`).join("")
+                + `<td class="p-3 text-center font-bold bg-blue-50/60 text-blue-800">${r.total}</td><td class="p-3 text-center">${r.L}</td><td class="p-3 text-center">${r.P}</td>`;
+            const body = rows.map(r => {
+                const label = r.desa
+                    ? `<button onclick="rekapPilihDesa('${esc(r.desa)}')" class="font-semibold text-blue-700 hover:underline">${esc(r.label)} <i class="fas fa-chevron-right text-[9px]"></i></button>`
+                    : `<span class="font-semibold text-slate-800">${esc(r.label)}</span>`;
+                return `<tr class="hover:bg-slate-50/80"><td class="p-3">${label}</td>${angka(r)}</tr>`;
+            });
+            if (rows.length > 1) body.push(`<tr class="bg-slate-50 font-bold text-slate-800"><td class="p-3">Total ${esc(c.desa ? `Desa ${c.desa}` : "Maksel 2")}</td>${angka(total)}</tr>`);
+            document.getElementById("rekapBody").innerHTML = body.join("");
+        }
+
+        // Export Excel: pengguna memilih cakupan (keseluruhan / per desa / per kelompok) + status di modal.
+        function exportToExcel() {
+            const c = cakupanRekap();
+            const modal = document.getElementById("modalExportGenerus");
+            window.PPG_WILAYAH.fillSelects(modal);
+            const scope = c.kelompok ? "kelompok" : c.desa ? "desa" : "semua";
+            modal.querySelector(`input[name="exportScope"][value="${scope}"]`).checked = true;
+            if (c.desa) document.getElementById("exportDesa").value = c.desa;
+            if (c.kelompok) document.getElementById("exportKelompok").value = c.kelompok;
+            document.getElementById("exportStatus").value = c.status;
+            onExportScope();
+            openModal("modalExportGenerus");
+        }
+        function onExportScope() {
+            const scope = document.querySelector('input[name="exportScope"]:checked')?.value;
+            document.getElementById("exportDesa").disabled = scope !== "desa";
+            document.getElementById("exportKelompok").disabled = scope !== "kelompok";
+        }
+
+        // Excel (.xlsx) 2 sheet: "Rekap Tingkatan" (ringkasan + per desa/kelompok + total) dan "Data Generus" (baris dalam cakupan).
+        function jalankanExportExcel() {
+            const scope = document.querySelector('input[name="exportScope"]:checked')?.value || "semua";
+            const kelompok = scope === "kelompok" ? document.getElementById("exportKelompok").value : "";
+            const desa = scope === "desa" ? document.getElementById("exportDesa").value : "";
+            const status = document.getElementById("exportStatus").value;
+            if ((scope === "kelompok" && !kelompok) || (scope === "desa" && !desa)) { triggerToast("Pilih Cakupan", `Pilih ${scope} terlebih dahulu.`, "warning"); return; }
+            const c = { desa, kelompok, status, data: dataCakupan({ desa, kelompok, status }) };
+            if (!c.data.length) { triggerToast("Export Gagal", "Tidak ada data generus pada cakupan ini.", "warning"); return; }
+            closeModal("modalExportGenerus");
+
+            const wilayah = kelompok ? `Kelompok ${kelompok}` : desa ? `Desa ${desa}` : "Maksel 2";
+            const namaFile = ["Rekap_Generus", (kelompok ? `Kelompok_${kelompok}` : desa ? `Desa_${desa}` : "Maksel2_Keseluruhan"), status, window.PPG_DB.tanggalLokal()]
+                .filter(Boolean).join("_").replace(/[^A-Za-z0-9-]+/g, "_");
+            const header = ["No", "Desa", "Kelompok", ...TINGKATAN, "Total", "L", "P"];
+            const nilai = r => [...TINGKATAN.map(t => r[t]), r.total, r.L, r.P];
+            const rekap = [["REKAP GENERUS PER TINGKATAN"], [labelCakupan(c)], [`Dicetak: ${new Date().toLocaleString("id-ID")}`], []];
+            const judul = [0, 1, 2];
+            const bagian = teks => { judul.push(rekap.length); rekap.push([teks]); };
+
+            // Ringkasan per tingkatan (jumlah + L/P) agar total PAUD dkk. langsung terlihat.
+            bagian(`RINGKASAN PER TINGKATAN · ${wilayah.toUpperCase()}`);
+            rekap.push(["Tingkatan", "Jumlah", "L", "P"]);
+            TINGKATAN.forEach(t => { const r = hitung(c.data.filter(g => g.category === t)); rekap.push([t, r.total, r.L, r.P]); });
+            const semua = hitung(c.data);
+            rekap.push([`TOTAL ${wilayah.toUpperCase()}`, semua.total, semua.L, semua.P], []);
+
+            const terdaftar = window.PPG_WILAYAH.kelompok;
+            if (!desa && !kelompok) {
+                bagian("RINGKASAN PER DESA");
+                rekap.push(["No", "Desa", "Jml Kelompok", ...header.slice(3)]);
+                window.PPG_WILAYAH.struktur.forEach((d, i) => rekap.push([i + 1, d.desa, d.kelompok.length, ...nilai(hitung(c.data.filter(g => desaGenerus(g) === d.desa)))]));
+                const luarDesa = c.data.filter(g => !window.PPG_WILAYAH.desa.includes(desaGenerus(g)));
+                if (luarDesa.length) rekap.push(["", "Lainnya", "", ...nilai(hitung(luarDesa))]);
+                rekap.push(["", "TOTAL MAKSEL 2", terdaftar.length, ...nilai(semua)], []);
+            }
+            if (!kelompok) {
+                bagian(desa ? `RINCIAN KELOMPOK · DESA ${desa.toUpperCase()}` : "RINCIAN PER KELOMPOK");
+                rekap.push(header);
+                let no = 0;
+                window.PPG_WILAYAH.struktur.filter(d => !desa || d.desa === desa).forEach(d => {
+                    const dataDesa = c.data.filter(g => desaGenerus(g) === d.desa);
+                    d.kelompok.forEach(k => rekap.push([++no, d.desa, k, ...nilai(hitung(dataDesa.filter(g => g.group === k)))]));
+                    const lain = dataDesa.filter(g => !d.kelompok.includes(g.group));
+                    if (lain.length) rekap.push(["", d.desa, "(kelompok lain)", ...nilai(hitung(lain))]);
+                    rekap.push(["", `Total Desa ${d.desa}`, "", ...nilai(hitung(dataDesa))]);
+                });
+                const luarDesa = c.data.filter(g => !window.PPG_WILAYAH.desa.includes(desaGenerus(g)));
+                if (luarDesa.length) rekap.push(["", "Lainnya", "(desa tidak terdaftar)", ...nilai(hitung(luarDesa))]);
+                if (!desa) rekap.push(["", "TOTAL MAKSEL 2", "", ...nilai(semua)]);
             }
 
-            window.PPG_DB.downloadCsv(`Data_Generus_PPG_Maksel2_${new Date().toISOString().slice(0, 10)}.csv`,
-                ["ID", "Nama", "Jenis Kelamin", "Tanggal Lahir", "Kategori", "Kelompok", "Desa", "No HP", "Wali", "Alamat", "Status"],
-                filteredGenerus.map(g => [g.id, g.name, g.gender, g.birthDate, g.category, g.group, g.village, g.phone, g.parent, g.address, g.status]));
+            // Data generus dalam cakupan, urut desa -> kelompok -> tingkatan -> nama.
+            const urut = g => [window.PPG_WILAYAH.desa.indexOf(desaGenerus(g)) >>> 0, terdaftar.indexOf(g.group) >>> 0, TINGKATAN.indexOf(g.category) >>> 0];
+            const daftar = [...c.data].sort((a, b) => { const x = urut(a), y = urut(b); return x[0] - y[0] || x[1] - y[1] || x[2] - y[2] || String(a.name).localeCompare(String(b.name), "id"); });
+            const dataSheet = [["No", "Nama", "L/P", "Tanggal Lahir", "Umur", "Tingkatan", "Kelompok", "Desa", "No HP", "Wali", "Alamat", "Status"],
+                ...daftar.map((g, i) => [i + 1, g.name, g.gender, g.birthDate || "", calculateAge(g.birthDate) ?? "", g.category, g.group, desaGenerus(g), g.phone || "", g.parent || "", g.address || "", g.status])];
 
-            triggerToast("Export Berhasil!", `File CSV (${filteredGenerus.length} data) berhasil diunduh.`, "success");
+            if (!window.XLSX) {
+                // Cadangan bila library Excel gagal dimuat (mis. offline): unduh rekap sebagai CSV.
+                window.PPG_DB.downloadCsv(`${namaFile}.csv`, rekap[0], rekap.slice(1));
+                triggerToast("Export CSV", "Library Excel tidak termuat, rekap diunduh sebagai CSV.", "warning");
+                return;
+            }
+            const wb = XLSX.utils.book_new();
+            const wsRekap = XLSX.utils.aoa_to_sheet(rekap);
+            wsRekap["!cols"] = [{ wch: 16 }, { wch: 20 }, { wch: 18 }, ...TINGKATAN.map(() => ({ wch: 11 })), { wch: 8 }, { wch: 5 }, { wch: 5 }];
+            wsRekap["!merges"] = judul.map(r => ({ s: { r, c: 0 }, e: { r, c: header.length - 1 } }));
+            const wsData = XLSX.utils.aoa_to_sheet(dataSheet);
+            wsData["!cols"] = [{ wch: 5 }, { wch: 26 }, { wch: 5 }, { wch: 13 }, { wch: 6 }, { wch: 12 }, { wch: 16 }, { wch: 12 }, { wch: 16 }, { wch: 22 }, { wch: 32 }, { wch: 11 }];
+            XLSX.utils.book_append_sheet(wb, wsRekap, "Rekap Tingkatan");
+            XLSX.utils.book_append_sheet(wb, wsData, "Data Generus");
+            XLSX.writeFile(wb, `${namaFile}.xlsx`);
+            triggerToast("Export Berhasil!", `Rekap ${wilayah} (${c.data.length} generus) berhasil diunduh.`, "success");
         }
 
         function printGenerusPDF() {
@@ -1402,7 +1602,7 @@
         }
 
         window.addEventListener("click", (e) => {
-            const modals = ['modalAddGenerus', 'modalEditGenerus', 'modalDetailGenerus', 'modalDeleteGenerus'];
+            const modals = ['modalAddGenerus', 'modalEditGenerus', 'modalDetailGenerus', 'modalExportGenerus', 'modalDeleteGenerus'];
             modals.forEach(id => {
                 const el = document.getElementById(id);
                 if (el && e.target === el) closeModal(id);

@@ -227,10 +227,10 @@
                             Dokumentasi Kegiatan PPG
                         </h2>
                         <p class="text-rose-100 text-sm mt-2 leading-relaxed">
-                            Arsip foto dan video kegiatan rutin, kajian, bakti sosial, dan pelatihan generus PPG Maksel 2 sepanjang tahun 2026.
+                            Arsip foto dan video kegiatan rutin, ngaji, bakti sosial, dan pelatihan generus PPG Maksel 2 sepanjang tahun 2026.
                         </p>
                         <div class="flex flex-wrap items-center gap-3 mt-6">
-                            <button onclick="bukaTambahDok()" class="bg-white text-rose-700 hover:bg-rose-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <button id="btnTambahDok" onclick="bukaTambahDok()" class="hidden bg-white text-rose-700 hover:bg-rose-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                                 <i class="fas fa-plus-circle text-rose-600"></i>
                                 + Tambah Dokumentasi
                             </button>
@@ -243,25 +243,56 @@
                     </div>
                 </div>
 
-                <!-- FILTER BAR -->
-                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5">
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                        <div class="relative flex-1">
-                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
-                            <input type="text" id="filterSearchDok" oninput="applyDokFilters()" placeholder="Cari kegiatan atau lokasi..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                <!-- REKAP DOKUMENTASI KELOMPOK -->
+                <div id="rekapDokPanel" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-table-cells text-rose-600"></i> Rekap Dokumentasi Kelompok</h3>
+                            <p class="text-xs text-slate-500 mt-0.5">Target: minimal 1 dokumentasi per tingkatan pengajian di setiap kelompok tiap bulan. Klik sel untuk melihat dokumentasinya.</p>
                         </div>
-                        <select id="filterKategoriDok" onchange="applyDokFilters()" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label id="rekapHanyaSayaWrap" class="hidden items-center gap-1.5 text-xs text-slate-600 font-medium cursor-pointer">
+                                <input type="checkbox" id="rekapHanyaSaya" onchange="renderRekapDok()" class="rounded accent-rose-600"> Hanya kelompok saya
+                            </label>
+                            <input type="month" id="rekapBulanDok" onchange="renderRekapDok()" aria-label="Bulan rekap" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        </div>
+                    </div>
+                    <p id="rekapDokSummary" class="text-xs text-slate-600 mb-3"></p>
+                    <div class="overflow-x-auto custom-scrollbar -mx-4 sm:mx-0 px-4 sm:px-0">
+                        <table class="w-full min-w-[560px] text-xs border-separate border-spacing-0">
+                            <thead id="rekapDokHead"></thead>
+                            <tbody id="rekapDokBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-4 mt-3 text-[11px] text-slate-500">
+                        <span class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="fas fa-check text-[8px]"></i></span> Sudah ada</span>
+                        <span class="flex items-center gap-1.5"><span class="w-4 h-4 rounded bg-red-50 text-red-400 flex items-center justify-center"><i class="fas fa-times text-[8px]"></i></span> Belum ada</span>
+                    </div>
+                </div>
+
+                <!-- FILTER BAR -->
+                <div id="galeriDok" class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 sm:p-5 scroll-mt-24">
+                    <div class="flex flex-col lg:flex-row items-stretch lg:items-center gap-3">
+                        <div class="relative flex-1 min-w-0">
+                            <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                            <input type="text" id="filterSearchDok" oninput="applyDokFilters()" placeholder="Cari kegiatan, lokasi, atau kelompok..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                        </div>
+                        <div class="grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
+                        <select id="filterKelompokDok" data-wilayah="kelompok" data-semua="Semua Kelompok" onchange="applyDokFilters()" aria-label="Filter kelompok" class="min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300"></select>
+                        <select id="filterTingkatanDok" onchange="applyDokFilters()" aria-label="Filter tingkatan" class="min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300"></select>
+                        <select id="filterKategoriDok" onchange="applyDokFilters()" aria-label="Filter kategori" class="min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300">
                             <option value="">Semua Kategori</option>
-                            <option value="Kajian">Kajian</option>
+                            <option value="Ngaji">Ngaji</option>
                             <option value="Bakti Sosial">Bakti Sosial</option>
                             <option value="Pelatihan">Pelatihan</option>
                             <option value="Musyawaroh">Musyawaroh</option>
                             <option value="Outing">Outing</option>
                         </select>
-                        <input type="month" id="filterBulanDok" onchange="applyDokFilters()" class="border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300">
-                        <button onclick="resetDokFilters()" class="px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-sm font-medium transition flex items-center gap-1.5 shrink-0" title="Reset Filter">
+                        <input type="month" id="filterBulanDok" onchange="applyDokFilters()" aria-label="Filter bulan" class="min-w-0 border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-50 focus:outline-none focus:ring-2 focus:ring-rose-300">
+                        <button onclick="resetDokFilters()" class="col-span-2 sm:col-span-1 px-3.5 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 text-sm font-medium transition flex items-center justify-center gap-1.5 shrink-0" title="Reset Filter">
                             <i class="fas fa-redo-alt text-xs"></i> <span>Reset</span>
                         </button>
+                        </div>
                     </div>
                 </div>
 
@@ -288,25 +319,25 @@
 
     <!-- MODAL TAMBAH DOKUMENTASI -->
     <div id="modalTambah" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
-        <div class="modal-box bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+        <div class="modal-box bg-white w-full max-w-lg rounded-2xl shadow-2xl p-5 sm:p-6 max-h-[92vh] overflow-y-auto custom-scrollbar">
             <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-                <h3 class="text-lg font-bold text-slate-800">Tambah Dokumentasi Baru</h3>
+                <h3 id="modalTambahTitle" class="text-lg font-bold text-slate-800">Tambah Dokumentasi Baru</h3>
                 <button onclick="closeModal('modalTambah')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
             </div>
             <form id="formTambahDok" onsubmit="simpanDokumentasi(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs text-slate-500 mb-1.5 font-medium">Judul Kegiatan *</label>
-                    <input type="text" id="inputJudulDok" required placeholder="Contoh: Kajian Bulanan Generus" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                    <input type="text" id="inputJudulDok" required placeholder="Contoh: Ngaji Bulanan Generus" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tanggal *</label>
-                        <input type="date" id="inputTanggalDok" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                        <input type="date" id="inputTanggalDok" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-500 mb-1.5 font-medium">Kategori *</label>
-                        <select id="inputKategoriDok" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
-                            <option value="Kajian">Kajian</option>
+                        <select id="inputKategoriDok" required class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                            <option value="Ngaji">Ngaji</option>
                             <option value="Bakti Sosial">Bakti Sosial</option>
                             <option value="Pelatihan">Pelatihan</option>
                             <option value="Musyawaroh">Musyawaroh</option>
@@ -316,35 +347,59 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Kelompok</label>
+                        <select id="inputKelompokDok" data-wilayah="kelompok" data-semua="Umum (tanpa kelompok)" onchange="syncDesaDok()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50 disabled:opacity-70"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-500 mb-1.5 font-medium">Desa</label>
+                        <input type="text" id="inputDesaDok" readonly tabindex="-1" placeholder="Otomatis" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm bg-slate-100 text-slate-600">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tingkatan Pengajian</label>
+                    <select id="inputTingkatanDok" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50"></select>
+                    <p class="text-[11px] text-slate-400 mt-1">Pilih kelompok &amp; tingkatan agar terhitung di Rekap Dokumentasi Kelompok.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
                         <label class="block text-xs text-slate-500 mb-1.5 font-medium">Lokasi</label>
-                        <input type="text" id="inputLokasiDok" placeholder="Contoh: Makassar" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                        <input type="text" id="inputLokasiDok" placeholder="Contoh: Makassar" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-500 mb-1.5 font-medium">Jumlah Foto / File</label>
-                        <input type="number" id="inputJumlahFotoDok" min="1" value="1" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                        <input type="number" id="inputJumlahFotoDok" min="1" value="1" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
                     </div>
                 </div>
                 <div>
                     <label class="block text-xs text-slate-500 mb-1.5 font-medium">Deskripsi Kegiatan</label>
                     <textarea id="inputDeskripsiDok" rows="2" placeholder="Catatan atau deskripsi kegiatan..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50 resize-none"></textarea>
                 </div>
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-3 text-[11px] text-blue-800 leading-relaxed flex gap-2">
+                    <i class="fas fa-info-circle mt-0.5 shrink-0"></i>
+                    <span><b>Foto satuan</b>: unggah langsung di bawah. <b>Banyak foto</b>: kumpulkan dalam satu folder Google Drive, atur berbagi ke <i>"Siapa saja yang memiliki link"</i>, lalu tempel link foldernya. Isi minimal salah satu: foto atau link Drive.</span>
+                </div>
                 <div>
                     <label class="block text-xs text-slate-500 mb-1.5 font-medium">Foto Dokumentasi (Upload atau URL Gambar)</label>
                     <div class="flex gap-2 mb-2">
-                        <input type="url" id="inputUrlDok" placeholder="https://... (URL gambar)" class="flex-1 border border-slate-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
-                        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5">
+                        <input type="url" id="inputUrlDok" placeholder="https://... (URL gambar)" class="flex-1 min-w-0 border border-slate-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                        <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 shrink-0">
                             <i class="fas fa-camera text-rose-500"></i> Pilih File
                             <input type="file" id="inputFileDok" accept="image/*" class="hidden" onchange="handleFilePreview(this)">
                         </label>
                     </div>
                     <div id="previewDokContainer" class="hidden relative rounded-xl overflow-hidden h-32 border border-slate-200 bg-slate-100">
-                        <img id="previewDokImg" src="" class="w-full h-full object-cover">
+                        <img id="previewDokImg" src="" alt="Pratinjau foto" class="w-full h-full object-cover">
                         <button type="button" onclick="hapusPreviewDok()" class="absolute top-2 right-2 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs"><i class="fas fa-times"></i></button>
                     </div>
                 </div>
+                <div>
+                    <label for="inputDriveDok" class="block text-xs text-slate-500 mb-1.5 font-medium"><i class="fa-brands fa-google-drive text-emerald-600"></i> Link Google Drive (album)</label>
+                    <input type="url" id="inputDriveDok" oninput="cekDriveDok()" placeholder="https://drive.google.com/drive/folders/..." class="w-full border border-slate-200 rounded-xl px-4 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-rose-300 bg-slate-50">
+                    <p id="driveWarnDok" class="hidden text-[11px] text-amber-700 mt-1"><i class="fas fa-exclamation-triangle"></i> Link bukan dari Google Drive/Google Photos. Pastikan link benar dan dapat dibuka.</p>
+                </div>
                 <div class="flex gap-3 pt-2">
                     <button type="button" onclick="closeModal('modalTambah')" class="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 transition">Batal</button>
-                    <button type="submit" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                    <button type="submit" id="btnSimpanDok" class="flex-1 bg-rose-600 hover:bg-rose-700 disabled:opacity-60 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
                         <i class="fas fa-save"></i> Simpan Dokumentasi
                     </button>
                 </div>
@@ -354,9 +409,10 @@
 
     <!-- MODAL DETAIL DOKUMENTASI (LIGHTBOX) -->
     <div id="modalDetailDok" class="fixed inset-0 z-50 hidden modal-overlay bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="modal-box bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden">
-            <div class="relative h-64 sm:h-80 bg-slate-900">
+        <div class="modal-box bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto custom-scrollbar">
+            <div class="relative h-56 sm:h-80 bg-slate-900">
                 <img id="detailDokImg" src="" alt="Detail Dokumentasi" class="w-full h-full object-cover">
+                <div id="detailDokPlaceholder" class="hidden w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-500"></div>
                 <button onclick="closeModal('modalDetailDok')" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/50 hover:bg-black/75 text-white flex items-center justify-center transition">
                     <i class="fas fa-times"></i>
                 </button>
@@ -364,20 +420,25 @@
                     <span id="detailDokKategoriBadge" class="bg-rose-600 text-white text-xs font-semibold px-3 py-1 rounded-full shadow"></span>
                 </div>
             </div>
-            <div class="p-6">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
-                    <div>
-                        <h3 id="detailDokJudul" class="text-xl font-bold text-slate-800"></h3>
-                        <div class="flex items-center gap-4 text-xs text-slate-500 mt-1.5">
+            <div class="p-5 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-slate-100">
+                    <div class="min-w-0">
+                        <h3 id="detailDokJudul" class="text-xl font-bold text-slate-800 break-words"></h3>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 mt-1.5">
                             <span class="flex items-center gap-1.5"><i class="fas fa-calendar-alt text-rose-500"></i> <span id="detailDokTanggal"></span></span>
                             <span class="flex items-center gap-1.5"><i class="fas fa-map-marker-alt text-rose-500"></i> <span id="detailDokLokasi"></span></span>
                             <span class="flex items-center gap-1.5"><i class="fas fa-images text-rose-500"></i> <span id="detailDokFotoCount"></span></span>
                         </div>
+                        <div class="flex flex-wrap gap-1.5 mt-2">
+                            <span id="detailDokKelompok" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"></span>
+                            <span id="detailDokTingkatan" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700"></span>
+                        </div>
                     </div>
-                    <div class="flex gap-2"><button id="btnEditDok" class="self-start text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl font-medium transition"><i class="fas fa-edit"></i> Edit</button><button id="btnHapusDok" class="self-start text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl font-medium transition flex items-center gap-1.5"><i class="fas fa-trash-alt"></i> Hapus</button></div>
+                    <div class="flex gap-2 shrink-0"><button id="btnEditDok" class="self-start text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl font-medium transition"><i class="fas fa-edit"></i> Edit</button><button id="btnHapusDok" class="self-start text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl font-medium transition flex items-center gap-1.5"><i class="fas fa-trash-alt"></i> Hapus</button></div>
                 </div>
-                <p id="detailDokDeskripsi" class="text-sm text-slate-600 mt-4 leading-relaxed"></p>
-                <div class="flex justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
+                <p id="detailDokDeskripsi" class="text-sm text-slate-600 mt-4 leading-relaxed break-words"></p>
+                <div class="flex flex-wrap justify-end gap-2 mt-6 pt-4 border-t border-slate-100">
+                    <a id="detailDokDrive" href="#" target="_blank" rel="noopener noreferrer" class="hidden px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium transition items-center gap-2"><i class="fa-brands fa-google-drive"></i> Buka Google Drive</a>
                     <button onclick="closeModal('modalDetailDok')" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition">Tutup</button>
                 </div>
             </div>
@@ -393,33 +454,161 @@
     <script src="assets/demo-seed.js"></script>
     <script src="assets/supabase-client.js"></script>
     <script src="assets/sidebar.js"></script>
+    <script src="assets/wilayah.js"></script>
     <script>
     // =========================================================================
     // DOKUMENTASI DATA STORE (Hybrid LocalStorage & Supabase)
     // =========================================================================
+    const DB = window.PPG_DB;
+    const WIL = window.PPG_WILAYAH;
+    // Sama dengan kategori generus di database_generus.html.
+    const TINGKATAN = ['PAUD', 'Caberawit', 'Pra Remaja', 'Remaja', 'Usia Nikah'];
+    const UMUM = '__umum__'; // nilai filter untuk data tanpa kelompok/tingkatan
+    const DRIVE_HOSTS = /(^|\.)(drive\.google\.com|docs\.google\.com|photos\.google\.com|photos\.app\.goo\.gl)$/i;
     let currentDokList = [];
     let selectedDetailId = null;
+    let myProfile = null;
+
+    // ===== Hak akses =====
+    const canManageAll = () => DB.profile.canManage(myProfile);
+    const kelompokSaya = () => DB.profile.isKelompokUser(myProfile) ? (myProfile.kelompok || '') : '';
+    const canAdd = () => canManageAll() || Boolean(kelompokSaya());
+    const canEditItem = item => canManageAll() || (Boolean(kelompokSaya()) && item.kelompok === kelompokSaya());
+
+    function isiPilihanTingkatan(select, semuaLabel) {
+        select.replaceChildren();
+        const opt = (v, l) => { const o = document.createElement('option'); o.value = v; o.textContent = l; return o; };
+        select.append(opt('', semuaLabel));
+        if (select.id === 'filterTingkatanDok') select.append(opt(UMUM, 'Umum'));
+        TINGKATAN.forEach(t => select.append(opt(t, t)));
+    }
+
+    function bulanIni() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    }
+
+    async function initDok() {
+        isiPilihanTingkatan(document.getElementById('filterTingkatanDok'), 'Semua Tingkatan');
+        isiPilihanTingkatan(document.getElementById('inputTingkatanDok'), 'Umum (lintas tingkatan)');
+        const filterKel = document.getElementById('filterKelompokDok');
+        const umumOpt = document.createElement('option'); umumOpt.value = UMUM; umumOpt.textContent = 'Umum (tanpa kelompok)';
+        filterKel.options[0].after(umumOpt); // setelah "Semua Kelompok"; opsi lain ada di dalam optgroup
+        document.getElementById('rekapBulanDok').value = bulanIni();
+
+        try { myProfile = await DB.profile.me(); }
+        catch (error) { myProfile = null; showToast(`Profil gagal dimuat: ${error.message}`, 'error'); }
+        document.getElementById('btnTambahDok').classList.toggle('hidden', !canAdd());
+        if (kelompokSaya()) {
+            const wrap = document.getElementById('rekapHanyaSayaWrap');
+            wrap.classList.remove('hidden'); wrap.classList.add('flex');
+        }
+        await loadDokData();
+    }
 
     async function loadDokData() {
         try {
-            currentDokList = await window.PPG_DB.dokumentasi.list();
+            currentDokList = await DB.dokumentasi.list();
         } catch (error) {
             currentDokList = [];
             showToast(`Dokumentasi gagal dimuat: ${error.message}`, 'error');
         }
-        applyDokFilters();
+        refreshDok();
     }
+
+    function refreshDok() { applyDokFilters(); renderRekapDok(); }
 
     // Category badge color map
     function getKategoriBadgeColor(kat) {
         switch (kat) {
-            case 'Kajian': return 'bg-blue-600/90 text-white';
+            case 'Ngaji': return 'bg-blue-600/90 text-white';
             case 'Bakti Sosial': return 'bg-emerald-600/90 text-white';
             case 'Pelatihan': return 'bg-amber-600/90 text-white';
             case 'Musyawaroh': return 'bg-purple-600/90 text-white';
             case 'Outing': return 'bg-cyan-600/90 text-white';
             default: return 'bg-rose-600/90 text-white';
         }
+    }
+
+    const labelKelompok = item => item.kelompok ? `${item.kelompok}${item.desa ? ` · ${item.desa}` : ''}` : 'Umum';
+    const labelTingkatan = item => item.tingkatan || 'Umum';
+
+    // ===== Rekap: kelompok (baris, per desa) × tingkatan (kolom) untuk satu bulan =====
+    function renderRekapDok() {
+        const bulan = document.getElementById('rekapBulanDok').value || bulanIni();
+        const mine = kelompokSaya();
+        const hanyaSaya = mine && document.getElementById('rekapHanyaSaya').checked;
+        const counts = new Map();
+        currentDokList.forEach(item => {
+            if (!item.kelompok || !item.tingkatan || !String(item.tanggal || '').startsWith(bulan)) return;
+            const key = `${item.kelompok}|${item.tingkatan}`;
+            counts.set(key, (counts.get(key) || 0) + 1);
+        });
+        const esc = DB.escapeHtml;
+        const total = TINGKATAN.length;
+        const th = 'p-2 font-semibold text-slate-600 bg-slate-50 border-b border-slate-200';
+        document.getElementById('rekapDokHead').innerHTML = `<tr>
+            <th class="${th} text-left sticky left-0 z-10 min-w-[130px]">Kelompok</th>
+            ${TINGKATAN.map(t => `<th class="${th} text-center">${esc(t)}</th>`).join('')}
+            <th class="${th} text-center">Kelengkapan</th></tr>`;
+
+        let lengkap = 0, jumlahKelompok = 0, ringkasSaya = '';
+        const body = WIL.struktur.map(d => {
+            const kelompokList = d.kelompok.filter(k => !hanyaSaya || k === mine);
+            if (!kelompokList.length) return '';
+            let lengkapDesa = 0;
+            const rows = kelompokList.map(k => {
+                const isMine = k === mine;
+                const rowBg = isMine ? 'bg-amber-50' : 'bg-white';
+                let terisi = 0;
+                const cells = TINGKATAN.map(t => {
+                    const n = counts.get(`${k}|${t}`) || 0;
+                    if (n) terisi++;
+                    const inner = n
+                        ? `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 font-semibold"><i class="fas fa-check text-[9px]"></i>${n}</span>`
+                        : `<span class="inline-flex items-center justify-center w-7 h-6 rounded-lg bg-red-50 text-red-400"><i class="fas fa-times text-[9px]"></i></span>`;
+                    return `<td class="p-1.5 text-center border-b border-slate-100"><button type="button" data-k="${esc(k)}" data-t="${esc(t)}" class="rekap-cell hover:opacity-75 transition" title="${esc(k)} · ${esc(t)}: ${n} dokumentasi">${inner}</button></td>`;
+                }).join('');
+                jumlahKelompok++;
+                if (terisi === total) { lengkap++; lengkapDesa++; }
+                if (isMine) ringkasSaya = `${terisi}/${total}`;
+                const tone = terisi === total ? 'bg-emerald-600 text-white' : terisi ? 'bg-amber-100 text-amber-800' : 'bg-red-100 text-red-700';
+                return `<tr class="${rowBg}">
+                    <td class="p-2 font-medium text-slate-700 border-b border-slate-100 sticky left-0 z-10 ${rowBg} ${isMine ? 'border-l-4 border-l-amber-400' : ''}">${esc(k)}${isMine ? ' <span class="text-[10px] text-amber-700 font-semibold">(Anda)</span>' : ''}</td>
+                    ${cells}
+                    <td class="p-1.5 text-center border-b border-slate-100"><span class="inline-block min-w-[44px] px-2 py-1 rounded-lg font-bold ${tone}">${terisi}/${total}</span></td></tr>`;
+            }).join('');
+            return `<tr><td colspan="${total + 2}" class="px-2 pt-3 pb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500 border-b border-slate-200">
+                <span class="sticky left-2">Desa ${esc(d.desa)} <span class="normal-case font-medium text-slate-400">· ${lengkapDesa}/${kelompokList.length} kelompok lengkap</span></span></td></tr>${rows}`;
+        }).join('');
+        document.getElementById('rekapDokBody').innerHTML = body || `<tr><td colspan="${total + 2}" class="p-4 text-center text-slate-400">Tidak ada kelompok untuk ditampilkan.</td></tr>`;
+
+        const namaBulan = new Date(`${bulan}-01T00:00:00`).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+        const summary = document.getElementById('rekapDokSummary');
+        summary.textContent = mine
+            ? `${namaBulan}: kelompok ${mine} sudah ${ringkasSaya || `0/${total}`} tingkatan. Seluruh wilayah: ${lengkap}/${jumlahKelompok} kelompok lengkap.`
+            : `${namaBulan}: ${lengkap} dari ${jumlahKelompok} kelompok sudah lengkap (${total} tingkatan).`;
+        if (hanyaSaya) summary.textContent = `${namaBulan}: kelompok ${mine} sudah ${ringkasSaya || `0/${total}`} tingkatan.`;
+    }
+
+    // Klik sel rekap → saring galeri ke kelompok, tingkatan & bulan tersebut.
+    document.getElementById('rekapDokBody').addEventListener('click', e => {
+        const cell = e.target.closest('.rekap-cell');
+        if (!cell) return;
+        document.getElementById('filterSearchDok').value = '';
+        document.getElementById('filterKategoriDok').value = '';
+        document.getElementById('filterKelompokDok').value = cell.dataset.k;
+        document.getElementById('filterTingkatanDok').value = cell.dataset.t;
+        document.getElementById('filterBulanDok').value = document.getElementById('rekapBulanDok').value;
+        applyDokFilters();
+        document.getElementById('galeriDok').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Tile pengganti saat tidak ada foto (album di Drive atau data lama tanpa gambar).
+    function placeholderTile(raw) {
+        return DB.safeUrl(raw.driveUrl)
+            ? `<i class="fa-brands fa-google-drive text-4xl text-emerald-600"></i><span class="text-xs font-semibold text-slate-600">Album di Google Drive</span>`
+            : `<i class="fas fa-image text-4xl text-slate-300"></i><span class="text-xs font-medium text-slate-400">Belum ada foto</span>`;
     }
 
     // Render gallery
@@ -443,39 +632,51 @@
 
         emptyEl.classList.add('hidden');
         container.innerHTML = items.map(raw => {
-            const item = window.PPG_DB.escapeRow(raw);
-            const badgeClass = getKategoriBadgeColor(item.kategori);
-            const dateStr = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-            const img = window.PPG_DB.escapeHtml(window.PPG_DB.safeUrl(raw.imageUrl) || `https://picsum.photos/600/400?random=${Number(raw.id) % 1000}`);
+            const item = DB.escapeRow(raw);
+            const id = DB.escapeHtml(JSON.stringify(String(raw.id)));
+            const badgeClass = getKategoriBadgeColor(raw.kategori);
+            const dateStr = raw.tanggal ? new Date(raw.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+            const imgUrl = DB.safeUrl(raw.imageUrl);
+            const driveUrl = DB.safeUrl(raw.driveUrl);
+            const media = imgUrl
+                ? `<img src="${DB.escapeHtml(imgUrl)}" class="gallery-img w-full h-full object-cover" alt="${item.judul}" loading="lazy">`
+                : `<div class="w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-50 to-slate-200">${placeholderTile(raw)}</div>`;
+            const driveBtn = driveUrl
+                ? `<a href="${DB.escapeHtml(driveUrl)}" target="_blank" rel="noopener noreferrer" class="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition" title="Buka album di Google Drive"><i class="fa-brands fa-google-drive"></i> Buka Google Drive</a>`
+                : '';
 
             return `
             <div class="gallery-card card-hover bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-xs group flex flex-col justify-between">
                 <div>
-                    <div class="overflow-hidden relative h-48 bg-slate-100">
-                        <img src="${img}" class="gallery-img w-full h-full object-cover" alt="${item.judul}" loading="lazy">
+                    <div class="overflow-hidden relative h-48 bg-slate-100 cursor-pointer" onclick="bukaDetailDok(${id})">
+                        ${media}
                         <div class="absolute top-3 left-3">
                             <span class="${badgeClass} text-[10px] font-semibold px-2.5 py-1 rounded-lg backdrop-blur-sm shadow-sm">${item.kategori}</span>
-                        </div>
-                        <div class="absolute top-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition">
-                            <button onclick="bukaDetailDok(${item.id})" class="w-8 h-8 rounded-lg bg-white/90 text-slate-600 hover:bg-white flex items-center justify-center text-xs shadow-sm" title="Perbesar"><i class="fas fa-expand"></i></button>
                         </div>
                     </div>
                     <div class="p-5">
                         <h3 class="font-bold text-sm text-slate-800 group-hover:text-rose-600 transition line-clamp-1">${item.judul}</h3>
-                        <div class="flex items-center gap-3 text-xs text-slate-500 mt-2">
+                        <div class="flex flex-wrap gap-1.5 mt-2">
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600"><i class="fas fa-users text-[9px]"></i> ${DB.escapeHtml(labelKelompok(raw))}</span>
+                            <span class="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700"><i class="fas fa-layer-group text-[9px]"></i> ${DB.escapeHtml(labelTingkatan(raw))}</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 mt-2">
                             <span class="flex items-center gap-1"><i class="fas fa-calendar-alt text-rose-500"></i> ${dateStr}</span>
                             <span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-rose-500"></i> ${item.lokasi || 'Maksel 2'}</span>
                         </div>
                         <p class="text-xs text-slate-500 mt-2 line-clamp-2">${item.deskripsi || 'Dokumentasi kegiatan PPG Maksel 2.'}</p>
                     </div>
                 </div>
-                <div class="px-5 pb-5 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <div class="px-5 pb-5 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                     <div class="flex items-center gap-1.5 text-xs text-slate-400">
-                        <i class="fas fa-images"></i><span>${item.fotoCount || 1} Foto</span>
+                        <i class="fas fa-images"></i><span>${Number(raw.fotoCount) || 1} Foto</span>
                     </div>
-                    <button onclick="bukaDetailDok(${item.id})" class="text-xs font-semibold text-rose-600 hover:text-rose-800 flex items-center gap-1 transition">
-                        Lihat Detail <i class="fas fa-arrow-right text-[10px]"></i>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        ${driveBtn}
+                        <button onclick="bukaDetailDok(${id})" class="text-xs font-semibold text-rose-600 hover:text-rose-800 flex items-center gap-1 transition">
+                            Detail <i class="fas fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
                 </div>
             </div>`;
         }).join('');
@@ -485,25 +686,25 @@
     function applyDokFilters() {
         const query = (document.getElementById('filterSearchDok').value || '').toLowerCase().trim();
         const kat = document.getElementById('filterKategoriDok').value;
+        const kel = document.getElementById('filterKelompokDok').value;
+        const ting = document.getElementById('filterTingkatanDok').value;
         const bulan = document.getElementById('filterBulanDok').value; // Format: YYYY-MM
 
         const filtered = currentDokList.filter(item => {
-            const matchQuery = !query || (item.judul || '').toLowerCase().includes(query) || (item.lokasi && item.lokasi.toLowerCase().includes(query));
+            const teks = [item.judul, item.lokasi, item.kelompok, item.desa].filter(Boolean).join(' ').toLowerCase();
+            const matchQuery = !query || teks.includes(query);
             const matchKat = !kat || item.kategori === kat;
-            let matchBulan = true;
-            if (bulan && item.tanggal) {
-                matchBulan = item.tanggal.startsWith(bulan);
-            }
-            return matchQuery && matchKat && matchBulan;
+            const matchKel = !kel || (kel === UMUM ? !item.kelompok : item.kelompok === kel);
+            const matchTing = !ting || (ting === UMUM ? !item.tingkatan : item.tingkatan === ting);
+            const matchBulan = !bulan || String(item.tanggal || '').startsWith(bulan);
+            return matchQuery && matchKat && matchKel && matchTing && matchBulan;
         });
 
         renderGallery(filtered);
     }
 
     function resetDokFilters() {
-        document.getElementById('filterSearchDok').value = '';
-        document.getElementById('filterKategoriDok').value = '';
-        document.getElementById('filterBulanDok').value = '';
+        ['filterSearchDok', 'filterKategoriDok', 'filterKelompokDok', 'filterTingkatanDok', 'filterBulanDok'].forEach(id => { document.getElementById(id).value = ''; });
         applyDokFilters();
     }
 
@@ -526,54 +727,124 @@
         document.getElementById('inputFileDok').value = '';
     }
 
-    function bukaTambahDok(){selectedDetailId=null;document.getElementById('formTambahDok').reset();hapusPreviewDok();openModal('modalTambah');}
-    function editDokumentasi(item){
-        selectedDetailId=item.id; closeModal('modalDetailDok');
-        document.getElementById('inputJudulDok').value=item.judul||'';document.getElementById('inputTanggalDok').value=item.tanggal||'';document.getElementById('inputKategoriDok').value=item.kategori||'';document.getElementById('inputLokasiDok').value=item.lokasi||'';document.getElementById('inputJumlahFotoDok').value=item.fotoCount||1;document.getElementById('inputDeskripsiDok').value=item.deskripsi||'';document.getElementById('inputUrlDok').value=item.imageUrl||'';
-        document.getElementById('modalTambah').classList.remove('hidden');
+    function syncDesaDok() {
+        document.getElementById('inputDesaDok').value = WIL.desaOf(document.getElementById('inputKelompokDok').value);
     }
 
-    // Simpan Dokumentasi Baru
+    // Validasi link Drive: wajib http(s); host selain Google Drive/Photos hanya diberi peringatan.
+    function parseDriveUrl(value) {
+        const text = String(value || '').trim();
+        if (!text) return { url: '', valid: true, google: true };
+        let parsed = null;
+        try { parsed = new URL(text); } catch { /* tidak valid */ }
+        if (!parsed || !/^https?:$/.test(parsed.protocol)) return { url: text, valid: false, google: false };
+        return { url: parsed.href, valid: true, google: DRIVE_HOSTS.test(parsed.hostname) };
+    }
+    function cekDriveDok() {
+        const info = parseDriveUrl(document.getElementById('inputDriveDok').value);
+        document.getElementById('driveWarnDok').classList.toggle('hidden', !info.url || !info.valid || info.google);
+    }
+
+    // Kelompok user: kelompok terkunci ke kelompoknya sendiri.
+    function siapkanFieldKelompok(value) {
+        const select = document.getElementById('inputKelompokDok');
+        const mine = kelompokSaya();
+        const target = mine || value || '';
+        // Nama kelompok lama yang tidak ada di master wilayah tetap dipertahankan saat edit.
+        if (target && ![...select.options].some(o => o.value === target)) {
+            const o = document.createElement('option'); o.value = target; o.textContent = target; select.append(o);
+        }
+        select.value = target;
+        select.disabled = Boolean(mine) && !canManageAll();
+        syncDesaDok();
+    }
+
+    function bukaTambahDok() {
+        if (!canAdd()) { showToast('Akun Anda hanya dapat melihat dokumentasi.', 'error'); return; }
+        selectedDetailId = null;
+        document.getElementById('formTambahDok').reset(); hapusPreviewDok();
+        document.getElementById('modalTambahTitle').textContent = 'Tambah Dokumentasi Baru';
+        document.getElementById('inputTanggalDok').value = new Date().toLocaleDateString('en-CA');
+        siapkanFieldKelompok('');
+        cekDriveDok();
+        openModal('modalTambah');
+    }
+    function editDokumentasi(item) {
+        if (!canEditItem(item)) { showToast('Anda tidak memiliki izin mengubah dokumentasi ini.', 'error'); return; }
+        closeModal('modalDetailDok');
+        document.getElementById('formTambahDok').reset(); hapusPreviewDok();
+        selectedDetailId = item.id;
+        document.getElementById('modalTambahTitle').textContent = 'Edit Dokumentasi';
+        document.getElementById('inputJudulDok').value = item.judul || '';
+        document.getElementById('inputTanggalDok').value = item.tanggal || '';
+        document.getElementById('inputKategoriDok').value = item.kategori || '';
+        document.getElementById('inputLokasiDok').value = item.lokasi || '';
+        document.getElementById('inputJumlahFotoDok').value = item.fotoCount || 1;
+        document.getElementById('inputDeskripsiDok').value = item.deskripsi || '';
+        document.getElementById('inputUrlDok').value = item.imageUrl || '';
+        document.getElementById('inputDriveDok').value = item.driveUrl || '';
+        document.getElementById('inputTingkatanDok').value = TINGKATAN.includes(item.tingkatan) ? item.tingkatan : '';
+        siapkanFieldKelompok(item.kelompok);
+        cekDriveDok();
+        openModal('modalTambah');
+    }
+
+    // Simpan Dokumentasi (tambah/edit): upload → simpan baris → hapus file lama.
     async function simpanDokumentasi(e) {
         e.preventDefault();
-        const judul = document.getElementById('inputJudulDok').value.trim();
-        const tanggal = document.getElementById('inputTanggalDok').value;
-        const kategori = document.getElementById('inputKategoriDok').value;
-        const lokasi = document.getElementById('inputLokasiDok').value.trim() || 'Maksel 2';
-        const fotoCount = parseInt(document.getElementById('inputJumlahFotoDok').value) || 1;
-        const deskripsi = document.getElementById('inputDeskripsiDok').value.trim();
-        
-        let imageUrl = window.PPG_DB.safeUrl(document.getElementById('inputUrlDok').value);
-        if (!imageUrl) {
-            imageUrl = `https://picsum.photos/600/400?random=${Date.now() % 100}`;
-        }
+        const old = selectedDetailId ? currentDokList.find(x => x.id == selectedDetailId) : null;
+        if (old ? !canEditItem(old) : !canAdd()) { showToast('Anda tidak memiliki izin menyimpan dokumentasi ini.', 'error'); return; }
 
+        const urlInput = document.getElementById('inputUrlDok').value.trim();
+        const imageUrl = DB.safeUrl(urlInput);
+        if (urlInput && !imageUrl) { showToast('URL gambar harus diawali http:// atau https://', 'error'); return; }
+        const drive = parseDriveUrl(document.getElementById('inputDriveDok').value);
+        if (!drive.valid) { showToast('Link Google Drive tidak valid. Gunakan link yang diawali https://', 'error'); return; }
+        const file = document.getElementById('inputFileDok').files[0];
+        if (!file && !imageUrl && !drive.url) { showToast('Unggah minimal 1 foto atau isi link Google Drive album.', 'error'); return; }
+
+        const kelompok = kelompokSaya() && !canManageAll() ? kelompokSaya() : document.getElementById('inputKelompokDok').value;
         const newItem = {
-            judul,
-            tanggal,
-            kategori,
-            lokasi,
-            fotoCount,
-            deskripsi,
+            judul: document.getElementById('inputJudulDok').value.trim(),
+            tanggal: document.getElementById('inputTanggalDok').value,
+            kategori: document.getElementById('inputKategoriDok').value,
+            lokasi: document.getElementById('inputLokasiDok').value.trim() || 'Maksel 2',
+            fotoCount: parseInt(document.getElementById('inputJumlahFotoDok').value) || 1,
+            deskripsi: document.getElementById('inputDeskripsiDok').value.trim(),
+            kelompok: kelompok || null,
+            desa: WIL.desaOf(kelompok) || null,
+            tingkatan: document.getElementById('inputTingkatanDok').value || null,
+            driveUrl: drive.url || null,
             imageUrl
         };
 
+        const btn = document.getElementById('btnSimpanDok');
+        btn.disabled = true;
+        let uploadedPath = '';
         try {
-            const file=document.getElementById('inputFileDok').files[0];
-            const old=selectedDetailId ? currentDokList.find(x=>x.id==selectedDetailId) : null;
-            if(file){const uploaded=await window.PPG_DB.storage.uploadDokumentasi(file);newItem.imageUrl=uploaded.publicUrl;newItem.storagePath=uploaded.path;}
-            else if(old&&old.storagePath&&imageUrl===old.imageUrl){newItem.storagePath=old.storagePath;}
-            else {newItem.storagePath=null;}
-            if(old){
-                const saved=await window.PPG_DB.dokumentasi.update(old.id,newItem);
-                currentDokList=currentDokList.map(x=>x.id==old.id?saved:x);
+            if (file) {
+                const uploaded = await DB.storage.uploadDokumentasi(file);
+                uploadedPath = uploaded.path;
+                newItem.imageUrl = uploaded.publicUrl; newItem.storagePath = uploaded.path;
+            }
+            else if (old && old.storagePath && imageUrl === old.imageUrl) { newItem.storagePath = old.storagePath; }
+            else { newItem.storagePath = null; }
+            if (old) {
+                const saved = await DB.dokumentasi.update(old.id, newItem);
+                currentDokList = currentDokList.map(x => x.id == old.id ? saved : x);
                 // File lama dibersihkan setelah metadata baru tersimpan.
-                if(old.storagePath&&old.storagePath!==newItem.storagePath) await window.PPG_DB.storage.removeDokumentasi(old.storagePath);
-            } else {const saved=await window.PPG_DB.dokumentasi.insert(newItem);currentDokList.unshift(saved);}
-            applyDokFilters();
-            closeModal('modalTambah'); document.getElementById('formTambahDok').reset(); hapusPreviewDok(); showToast(old ? 'Dokumentasi berhasil diperbarui!' : 'Dokumentasi baru berhasil ditambahkan!', 'success');
-            selectedDetailId=null;
-        } catch(error) { showToast(`Dokumentasi gagal disimpan: ${error.message}`, 'error'); }
+                if (old.storagePath && old.storagePath !== newItem.storagePath) await DB.storage.removeDokumentasi(old.storagePath);
+            } else { const saved = await DB.dokumentasi.insert(newItem); currentDokList.unshift(saved); }
+            uploadedPath = '';
+            refreshDok();
+            closeModal('modalTambah'); document.getElementById('formTambahDok').reset(); hapusPreviewDok();
+            showToast(old ? 'Dokumentasi berhasil diperbarui!' : 'Dokumentasi baru berhasil ditambahkan!', 'success');
+            selectedDetailId = null;
+        } catch (error) {
+            // Baris gagal disimpan: buang file yang baru diunggah agar tidak yatim.
+            if (uploadedPath) await DB.storage.removeDokumentasi(uploadedPath);
+            showToast(`Dokumentasi gagal disimpan: ${error.message}`, 'error');
+        } finally { btn.disabled = false; }
     }
 
     // Buka Detail Modal Lightbox
@@ -581,27 +852,48 @@
         const item = currentDokList.find(x => x.id == id);
         if (!item) return;
 
-        selectedDetailId = id;
+        selectedDetailId = item.id;
         document.getElementById('detailDokJudul').textContent = item.judul;
         document.getElementById('detailDokTanggal').textContent = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) : '-';
         document.getElementById('detailDokLokasi').textContent = item.lokasi || 'Maksel 2';
         document.getElementById('detailDokFotoCount').textContent = `${item.fotoCount || 1} Foto`;
         document.getElementById('detailDokDeskripsi').textContent = item.deskripsi || 'Tidak ada deskripsi rinci untuk kegiatan ini.';
-        document.getElementById('detailDokImg').src = window.PPG_DB.safeUrl(item.imageUrl) || `https://picsum.photos/600/400?random=${Number(item.id) % 1000}`;
-        
+        document.getElementById('detailDokKelompok').textContent = `Kelompok: ${labelKelompok(item)}`;
+        document.getElementById('detailDokTingkatan').textContent = `Tingkatan: ${labelTingkatan(item)}`;
+
+        const img = document.getElementById('detailDokImg');
+        const placeholder = document.getElementById('detailDokPlaceholder');
+        const imgUrl = DB.safeUrl(item.imageUrl);
+        img.src = imgUrl;
+        img.classList.toggle('hidden', !imgUrl);
+        placeholder.classList.toggle('hidden', Boolean(imgUrl));
+        placeholder.innerHTML = imgUrl ? '' : placeholderTile(item);
+
+        const driveLink = document.getElementById('detailDokDrive');
+        const driveUrl = DB.safeUrl(item.driveUrl);
+        driveLink.href = driveUrl || '#';
+        driveLink.classList.toggle('hidden', !driveUrl);
+        driveLink.classList.toggle('inline-flex', Boolean(driveUrl));
+
         const badge = document.getElementById('detailDokKategoriBadge');
         badge.textContent = item.kategori;
         badge.className = `${getKategoriBadgeColor(item.kategori)} text-xs font-semibold px-3 py-1 rounded-full shadow`;
 
-        document.getElementById('btnHapusDok').onclick = async function() {
+        const bolehUbah = canEditItem(item);
+        const btnHapus = document.getElementById('btnHapusDok');
+        const btnEdit = document.getElementById('btnEditDok');
+        btnHapus.classList.toggle('hidden', !bolehUbah);
+        btnEdit.classList.toggle('hidden', !bolehUbah);
+        btnHapus.onclick = async function() {
+            if (!canEditItem(item)) return;
             if (confirm(`Hapus dokumentasi "${item.judul}"?`)) {
                 try {
-                    await window.PPG_DB.dokumentasi.delete(id); await window.PPG_DB.storage.removeDokumentasi(item.storagePath);
-                    currentDokList=currentDokList.filter(x=>x.id!=id); applyDokFilters(); closeModal('modalDetailDok'); showToast('Dokumentasi telah dihapus.', 'info');
-                } catch(error) { showToast(`Dokumentasi gagal dihapus: ${error.message}`, 'error'); }
+                    await DB.dokumentasi.delete(item.id); await DB.storage.removeDokumentasi(item.storagePath);
+                    currentDokList = currentDokList.filter(x => x.id != item.id); refreshDok(); closeModal('modalDetailDok'); showToast('Dokumentasi telah dihapus.', 'info');
+                } catch (error) { showToast(`Dokumentasi gagal dihapus: ${error.message}`, 'error'); }
             }
         };
-        document.getElementById('btnEditDok').onclick=()=>editDokumentasi(item);
+        btnEdit.onclick = () => editDokumentasi(item);
 
         openModal('modalDetailDok');
     }
@@ -619,7 +911,7 @@
         const colors = { success: 'bg-emerald-600', error: 'bg-red-600', info: 'bg-blue-600' };
         t.className = `toast ${colors[type] || colors.success} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 text-sm font-medium pointer-events-auto`;
         t.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-times-circle' : 'fa-info-circle'}"></i> `;
-    t.append(document.createTextNode(msg));
+        t.append(document.createTextNode(msg));
         container.appendChild(t);
         setTimeout(() => { t.classList.add('hide'); setTimeout(() => t.remove(), 300); }, 3000);
     }
@@ -635,7 +927,7 @@
     updateClock(); setInterval(updateClock, 30000);
 
     // Initial Load
-    document.addEventListener('DOMContentLoaded', loadDokData);
+    document.addEventListener('DOMContentLoaded', initDok);
     </script>
 </body>
 </html>

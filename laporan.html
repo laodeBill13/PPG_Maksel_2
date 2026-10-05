@@ -47,6 +47,13 @@
         .bar-item { transition: height 0.8s cubic-bezier(0.4,0,0.2,1); }
         .progress-bar { transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
         tr { transition: background 0.15s ease; }
+        .teks-ringkas { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        @media print {
+            aside, header button, nav, #drawerOverlay, .no-print { display: none !important; }
+            .teks-ringkas { display: block; -webkit-line-clamp: unset; overflow: visible; }
+            .overflow-x-auto { overflow: visible !important; }
+            table { font-size: 9px; }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-gray-800">
@@ -226,7 +233,7 @@
                     <span class="font-bold text-slate-800 text-sm truncate">Laporan LUPG</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="bukaTambahLupg()" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Laporan" aria-label="Input Laporan">
+                    <button data-edit-only onclick="bukaTambahLupg()" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Laporan" aria-label="Input Laporan">
                         <i class="fas fa-plus text-sm"></i>
                     </button>
                     <button onclick="exportCSV()" class="w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Export Excel" aria-label="Export Excel">
@@ -250,7 +257,7 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div id="liveClock" class="text-sm text-slate-500 font-medium"></div>
-                    <button onclick="bukaTambahLupg()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                    <button data-edit-only onclick="bukaTambahLupg()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
                         <i class="fas fa-plus-circle"></i> + Input Laporan
                     </button>
                     <button onclick="exportCSV()" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
@@ -274,117 +281,100 @@
 
         <div class="p-4 md:p-8 flex-1 pb-24 md:pb-8">
 
+            <!-- BANNER HAK AKSES (user kelompok / viewer) -->
+            <div id="aksesBanner" class="hidden mb-4 text-xs font-medium rounded-xl px-4 py-3 border flex items-center gap-2"></div>
+
+            <!-- PERIODE & TAMPILAN -->
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5 mb-6">
+                <div class="flex flex-wrap gap-3 items-end justify-between">
+                    <div class="flex flex-wrap gap-3">
+                        <div>
+                            <label for="filterBulan" class="block text-[11px] font-semibold text-gray-500 mb-1">Bulan</label>
+                            <select id="filterBulan" onchange="renderAll()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50"></select>
+                        </div>
+                        <div>
+                            <label for="filterTahun" class="block text-[11px] font-semibold text-gray-500 mb-1">Tahun</label>
+                            <select id="filterTahun" onchange="renderAll()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50"></select>
+                        </div>
+                        <div>
+                            <label for="filterDesa" class="block text-[11px] font-semibold text-gray-500 mb-1">Desa</label>
+                            <select id="filterDesa" data-wilayah="desa" data-semua="Semua Desa" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50"></select>
+                        </div>
+                    </div>
+                    <div class="flex bg-gray-100 p-1 rounded-xl text-xs font-semibold" role="tablist" aria-label="Jenis data">
+                        <button id="tabKehadiran" onclick="setView('kehadiran')" role="tab" class="px-4 py-2 rounded-lg transition">Kehadiran (%)</button>
+                        <button id="tabKetercapaian" onclick="setView('ketercapaian')" role="tab" class="px-4 py-2 rounded-lg transition">Ketercapaian Materi (%)</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- KPI CARDS -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
                         <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"><i class="fas fa-file-alt text-blue-600 text-lg"></i></div>
                         <span id="kpiPeriode" class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">-</span>
                     </div>
-                    <div id="kpiTarget" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
-                    <p class="text-xs text-gray-500 mt-1">Target Peserta</p>
+                    <div class="text-2xl md:text-3xl font-bold text-gray-800"><span id="kpiLapor">0</span><span id="kpiTotalKelompok" class="text-base text-gray-400 font-semibold">/16</span></div>
+                    <p class="text-xs text-gray-500 mt-1">Kelompok Melapor</p>
                 </div>
-                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-check-circle text-emerald-600 text-lg"></i></div>
-                        <span id="kpiTrend" class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-medium">-</span>
+                        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center"><i class="fas fa-user-check text-emerald-600 text-lg"></i></div>
+                        <span id="kpiTrendKehadiran" class="text-xs text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full font-medium">-</span>
                     </div>
-                    <div id="kpiTercapai" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
-                    <p class="text-xs text-gray-500 mt-1">Tercapai</p>
+                    <div id="kpiKehadiran" class="text-2xl md:text-3xl font-bold text-gray-800">-</div>
+                    <p class="text-xs text-gray-500 mt-1">Rata-rata Kehadiran</p>
                 </div>
-                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center"><i class="fas fa-book-open text-orange-600 text-lg"></i></div>
+                        <span id="kpiTrendKetercapaian" class="text-xs text-orange-600 bg-orange-50 px-2 py-1 rounded-full font-medium">-</span>
+                    </div>
+                    <div id="kpiKetercapaian" class="text-2xl md:text-3xl font-bold text-gray-800">-</div>
+                    <p class="text-xs text-gray-500 mt-1">Rata-rata Ketercapaian Materi</p>
+                </div>
+                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100">
                     <div class="flex items-center justify-between mb-3">
                         <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center"><i class="fas fa-hourglass-half text-amber-600 text-lg"></i></div>
-                        <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">Pending</span>
+                        <span class="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-full font-medium">Kelompok</span>
                     </div>
                     <div id="kpiBelum" class="text-2xl md:text-3xl font-bold text-gray-800">0</div>
-                    <p class="text-xs text-gray-500 mt-1">Belum Tercapai</p>
-                </div>
-                <div class="bg-white rounded-2xl p-4 md:p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between mb-3">
-                        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center"><i class="fas fa-percentage text-purple-600 text-lg"></i></div>
-                        <span class="text-xs text-purple-600 bg-purple-50 px-2 py-1 rounded-full font-medium">Rate</span>
-                    </div>
-                    <div id="kpiPersen" class="text-2xl md:text-3xl font-bold text-gray-800">0%</div>
-                    <p class="text-xs text-gray-500 mt-1">Persentase Capaian</p>
+                    <p class="text-xs text-gray-500 mt-1">Belum Melapor</p>
                 </div>
             </div>
 
-            <!-- FILTER BAR -->
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5 mb-6">
-                <div class="flex flex-wrap gap-3 items-center justify-between">
-                    <div class="flex flex-wrap gap-3">
-                        <select id="filterBulan" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
-                            <option value="">Semua Bulan</option>
-                            <option value="Januari">Januari</option>
-                            <option value="Februari">Februari</option>
-                            <option value="Maret">Maret</option>
-                            <option value="April">April</option>
-                            <option value="Mei">Mei</option>
-                            <option value="Juni">Juni</option>
-                            <option value="Juli">Juli</option>
-                            <option value="Agustus">Agustus</option>
-                            <option value="September">September</option>
-                            <option value="Oktober">Oktober</option>
-                            <option value="November">November</option>
-                            <option value="Desember">Desember</option>
-                        </select>
-                        <select id="filterKelompok" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
-                            <option value="">Semua Kelompok</option>
-                            <option value="Kelompok A">Kelompok A</option>
-                            <option value="Kelompok B">Kelompok B</option>
-                            <option value="Kelompok C">Kelompok C</option>
-                            <option value="Kelompok D">Kelompok D</option>
-                        </select>
-                        <select id="filterStatus" onchange="renderTable()" class="border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
-                            <option value="">Semua Status</option>
-                            <option value="Baik">Baik</option>
-                            <option value="Perlu Evaluasi">Perlu Evaluasi</option>
-                            <option value="Kritis">Kritis</option>
-                        </select>
-                    </div>
-                    <button onclick="resetFilters()" class="flex items-center gap-2 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition">
-                        <i class="fas fa-undo text-xs"></i> Reset
-                    </button>
-                </div>
-            </div>
-
-            <!-- CHART + SUMMARY GRID -->
+            <!-- GRAFIK & REKAP DESA -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                <!-- BAR CHART -->
                 <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-chart-bar text-blue-600"></i> Grafik Perkembangan LUPG <span id="chartTahun"></span></h3>
-                        <span class="text-xs text-gray-400">Capaian peserta per bulan</span>
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-6">
+                        <h3 class="font-semibold text-gray-800 flex items-center gap-2"><i class="fas fa-chart-bar text-blue-600"></i> Rata-rata per Bulan <span id="chartTahun"></span></h3>
+                        <div class="flex items-center gap-3 text-xs text-gray-500">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-500"></span>Kehadiran</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-orange-400"></span>Ketercapaian</span>
+                        </div>
                     </div>
-                    <div id="lupgChart" class="flex items-end gap-3 h-48"></div>
+                    <div id="lupgChart" class="flex items-end gap-2 sm:gap-4 h-48"></div>
                 </div>
-
-                <!-- PROGRESS PER KELOMPOK -->
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-layer-group text-purple-600"></i> Progress Per Kelompok <span id="progressPeriode" class="text-xs font-normal text-gray-400"></span></h3>
-                    <div id="progressKelompok" class="space-y-4"></div>
+                    <h3 class="font-semibold text-gray-800 mb-4 flex items-center gap-2"><i class="fas fa-map-marked-alt text-purple-600"></i> Rekap per Desa</h3>
+                    <div id="rekapDesa" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- TABLE -->
+            <!-- TABEL REKAP (format seperti Excel LUPG) -->
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-5 border-b border-gray-100 flex items-center justify-between">
-                    <h3 class="font-semibold text-gray-800">Rekap LUPG Per Kelompok</h3>
+                <div class="p-5 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <h3 id="tableTitle" class="font-semibold text-gray-800">Rekap LUPG</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Nilai dalam persen. <span class="text-emerald-600 font-semibold">≥ 80</span> · <span class="text-amber-600 font-semibold">60–79</span> · <span class="text-red-500 font-semibold">&lt; 60</span> · “–” tidak dilaporkan</p>
+                    </div>
                     <span id="tableCount" class="text-xs text-gray-400"></span>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gradient-to-r from-blue-50 to-indigo-50">
-                            <tr>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kelompok</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Bulan</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Target</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Tercapai</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Persentase</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Status</th>
-                                <th class="text-left p-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">Aksi</th>
-                            </tr>
+                    <table class="w-full text-sm">
+                        <thead class="bg-gradient-to-r from-blue-50 to-indigo-50 text-xs text-gray-500">
+                            <tr id="tableHead"></tr>
                         </thead>
                         <tbody id="tableBody"></tbody>
                     </table>
@@ -408,60 +398,56 @@
 
 <!-- MODAL INPUT LAPORAN LUPG -->
 <div id="modalInputLupg" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
-    <div class="modal-box bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6">
+    <div class="modal-box bg-white w-full max-w-xl rounded-2xl shadow-2xl p-6 max-h-[92vh] overflow-y-auto">
         <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
-            <h3 class="text-lg font-bold text-slate-800">Input Laporan LUPG</h3>
-            <button onclick="closeModal('modalInputLupg')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
+            <h3 id="inputLupgTitle" class="text-lg font-bold text-slate-800">Input Laporan LUPG</h3>
+            <button onclick="closeModal('modalInputLupg')" aria-label="Tutup" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
         </div>
         <form id="formInputLupg" onsubmit="simpanLupg(event)" class="space-y-4">
-            <div class="grid grid-cols-2 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Kelompok *</label>
-                    <select id="inputKelompokLupg" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
-                        <option value="Kelompok A">Kelompok A</option>
-                        <option value="Kelompok B">Kelompok B</option>
-                        <option value="Kelompok C">Kelompok C</option>
-                        <option value="Kelompok D">Kelompok D</option>
-                    </select>
+                    <label for="inputKelompokLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Kelompok *</label>
+                    <select id="inputKelompokLupg" data-wilayah="kelompok" required onchange="cekLaporanAda()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50"></select>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Bulan *</label>
-                    <select id="inputBulanLupg" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
-                        <option value="Januari">Januari 2026</option>
-                        <option value="Februari">Februari 2026</option>
-                        <option value="Maret">Maret 2026</option>
-                        <option value="April">April 2026</option>
-                        <option value="Mei">Mei 2026</option>
-                        <option value="Juni">Juni 2026</option>
-                        <option value="Juli">Juli 2026</option>
-                        <option value="Agustus" selected>Agustus 2026</option>
-                        <option value="September">September 2026</option>
-                        <option value="Oktober">Oktober 2026</option>
-                        <option value="November">November 2026</option>
-                        <option value="Desember">Desember 2026</option>
-                    </select>
+                    <label for="inputBulanLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Bulan *</label>
+                    <select id="inputBulanLupg" required onchange="cekLaporanAda()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50"></select>
+                </div>
+                <div>
+                    <label for="inputTahunLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Tahun *</label>
+                    <input type="number" id="inputTahunLupg" required min="2000" max="2100" onchange="cekLaporanAda()" class="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-3">
+            <p id="inputLupgInfo" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2"></p>
+            <div class="border border-slate-200 rounded-xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-50 text-xs text-slate-500">
+                        <tr>
+                            <th class="text-left px-3 py-2 font-semibold">Jenjang</th>
+                            <th class="px-3 py-2 font-semibold text-blue-700">Kehadiran (%)</th>
+                            <th class="px-3 py-2 font-semibold text-orange-600">Ketercapaian (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inputJenjangBody" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+            <p class="text-[11px] text-slate-400">Kosongkan jenjang yang tidak dilaporkan. Isi 0–100.</p>
+            <div>
+                <label for="inputMusyawarahLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Hasil Musyawarah 5 Unsur</label>
+                <textarea id="inputMusyawarahLupg" rows="3" placeholder="Poin-poin hasil musyawarah 5 unsur kelompok..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-y"></textarea>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Target Santri *</label>
-                    <input type="number" id="inputTargetLupg" min="1" value="100" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                    <label for="inputKendalaLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Kendala</label>
+                    <textarea id="inputKendalaLupg" rows="2" placeholder="Kendala pembinaan bulan ini..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-y"></textarea>
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-500 mb-1.5 font-medium">Tercapai (Kehadiran) *</label>
-                    <input type="number" id="inputTercapaiLupg" min="0" value="90" required class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
+                    <label for="inputKeteranganLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Keterangan</label>
+                    <textarea id="inputKeteranganLupg" rows="2" placeholder="Keterangan tambahan..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-y"></textarea>
                 </div>
             </div>
             <div>
-                <label class="block text-xs text-slate-500 mb-1.5 font-medium">Status Pembinaan</label>
-                <select id="inputStatusLupg" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
-                    <option value="Baik">Baik (>= 85%)</option>
-                    <option value="Perlu Evaluasi">Perlu Evaluasi (70% - 84%)</option>
-                    <option value="Kritis">Kritis (< 70%)</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-xs text-slate-500 mb-1.5 font-medium">Catatan Evaluasi / Kendala</label>
+                <label for="inputCatatanLupg" class="block text-xs text-slate-500 mb-1.5 font-medium">Catatan Evaluasi</label>
                 <textarea id="inputCatatanLupg" rows="2" placeholder="Catatan kegiatan pembinaan bulan ini..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-none"></textarea>
             </div>
             <div class="flex gap-3 pt-2">
@@ -476,38 +462,40 @@
 
 <!-- MODAL DETAIL LUPG -->
 <div id="modalDetailLupg" class="fixed inset-0 z-50 hidden modal-overlay bg-black/50 flex items-center justify-center p-4">
-    <div class="modal-box bg-white w-full max-w-md rounded-2xl shadow-2xl p-6">
+    <div class="modal-box bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 max-h-[92vh] overflow-y-auto">
         <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
             <div>
                 <span id="detailLupgBulan" class="text-xs text-blue-600 font-bold uppercase tracking-wider"></span>
                 <h3 id="detailLupgKelompok" class="text-lg font-extrabold text-slate-800"></h3>
             </div>
-            <button onclick="closeModal('modalDetailLupg')" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
+            <button onclick="closeModal('modalDetailLupg')" aria-label="Tutup" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition"><i class="fas fa-times text-sm text-slate-500"></i></button>
         </div>
-        <div class="space-y-3">
-            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl">
-                <span class="text-xs text-slate-500 font-medium">Status Capaian:</span>
-                <span id="detailLupgStatus" class="text-xs px-2.5 py-1 rounded-full font-bold"></span>
+        <div class="grid grid-cols-2 gap-2 text-center mb-3">
+            <div class="p-3 bg-blue-50/60 rounded-xl border border-blue-100">
+                <p class="text-[10px] text-blue-600 uppercase font-semibold">Rata-rata Kehadiran</p>
+                <p id="detailLupgKehadiran" class="text-lg font-bold text-slate-800 mt-0.5"></p>
             </div>
-            <div class="grid grid-cols-3 gap-2 text-center">
-                <div class="p-3 bg-blue-50/60 rounded-xl border border-blue-100">
-                    <p class="text-[10px] text-blue-600 uppercase font-semibold">Target</p>
-                    <p id="detailLupgTarget" class="text-base font-bold text-slate-800 mt-0.5"></p>
-                </div>
-                <div class="p-3 bg-emerald-50/60 rounded-xl border border-emerald-100">
-                    <p class="text-[10px] text-emerald-600 uppercase font-semibold">Tercapai</p>
-                    <p id="detailLupgTercapai" class="text-base font-bold text-slate-800 mt-0.5"></p>
-                </div>
-                <div class="p-3 bg-purple-50/60 rounded-xl border border-purple-100">
-                    <p class="text-[10px] text-purple-600 uppercase font-semibold">Persentase</p>
-                    <p id="detailLupgPct" class="text-base font-bold text-purple-700 mt-0.5"></p>
-                </div>
-            </div>
-            <div>
-                <p class="text-xs text-slate-400 font-medium mb-1">Catatan Evaluasi:</p>
-                <p id="detailLupgCatatan" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed"></p>
+            <div class="p-3 bg-orange-50/60 rounded-xl border border-orange-100">
+                <p class="text-[10px] text-orange-600 uppercase font-semibold">Rata-rata Ketercapaian</p>
+                <p id="detailLupgKetercapaian" class="text-lg font-bold text-slate-800 mt-0.5"></p>
             </div>
         </div>
+        <div class="border border-slate-200 rounded-xl overflow-hidden mb-3">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-xs text-slate-500">
+                    <tr><th class="text-left px-3 py-2">Jenjang</th><th class="px-3 py-2 text-blue-700">Kehadiran</th><th class="px-3 py-2 text-orange-600">Ketercapaian</th></tr>
+                </thead>
+                <tbody id="detailLupgBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+        </div>
+        <p class="text-xs text-slate-400 font-medium mb-1">Hasil Musyawarah 5 Unsur:</p>
+        <p id="detailLupgMusyawarah" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed whitespace-pre-line mb-3"></p>
+        <p class="text-xs text-slate-400 font-medium mb-1">Kendala:</p>
+        <p id="detailLupgKendala" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed whitespace-pre-line mb-3"></p>
+        <p class="text-xs text-slate-400 font-medium mb-1">Keterangan:</p>
+        <p id="detailLupgKeterangan" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed whitespace-pre-line mb-3"></p>
+        <p class="text-xs text-slate-400 font-medium mb-1">Catatan Evaluasi:</p>
+        <p id="detailLupgCatatan" class="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 leading-relaxed whitespace-pre-line"></p>
         <div class="flex gap-2 mt-5 pt-3 border-t border-slate-100">
             <button id="btnEditLupg" class="text-xs text-blue-700 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 rounded-xl font-semibold transition"><i class="fas fa-edit"></i> Edit</button>
             <button id="btnHapusLupg" class="text-xs text-red-600 hover:text-red-800 bg-red-50 hover:bg-red-100 px-4 py-2.5 rounded-xl font-semibold transition flex items-center gap-1.5">
@@ -527,220 +515,383 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="assets/demo-seed.js"></script>
+<script src="assets/wilayah.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script src="assets/sidebar.js"></script>
 <script>
 const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
-const statusMap = {
-    'Baik': 'bg-emerald-100 text-emerald-700',
-    'Perlu Evaluasi': 'bg-amber-100 text-amber-700',
-    'Kritis': 'bg-red-100 text-red-700',
-};
+const JENJANG = window.PPG_DB.LUPG_JENJANG;
+// Warna kolom desa mengikuti urutan desa di assets/wilayah.js (seperti pewarnaan lembar Excel LUPG).
+const WARNA_DESA = ['bg-green-100', 'bg-yellow-100', 'bg-pink-100', 'bg-sky-100', 'bg-purple-100', 'bg-orange-100', 'bg-teal-100', 'bg-rose-100'];
+const warnaDesa = desa => { const i = window.PPG_WILAYAH.desa.indexOf(desa); return i < 0 ? '' : WARNA_DESA[i % WARNA_DESA.length]; };
+const esc = value => window.PPG_DB.escapeHtml(value);
 
 let rawData = [];
+let currentView = 'kehadiran';
 let selectedLupgId = null;
+let modeEdit = false;
+// Hak akses: kelompok === null berarti semua kelompok (admin/pengurus/viewer); string berarti dibatasi ke kelompok itu.
+let akses = { canEdit: false, kelompok: null };
+const TEKS_LUPG = [
+    { key: 'hasilMusyawarah', label: 'Hasil Musyawarah 5 Unsur', input: 'inputMusyawarahLupg', detail: 'detailLupgMusyawarah' },
+    { key: 'kendala', label: 'Kendala', input: 'inputKendalaLupg', detail: 'detailLupgKendala' },
+    { key: 'keterangan', label: 'Keterangan', input: 'inputKeteranganLupg', detail: 'detailLupgKeterangan' },
+];
 
 const tahunOf = r => Number(r.tahun) || new Date().getFullYear();
-const persen = (tercapai, target) => Number(target) > 0 ? Math.round(Number(tercapai) / Number(target) * 100) : 0;
 const periodeKey = r => tahunOf(r) * 12 + BULAN.indexOf(r.bulan);
+const nilai = obj => JENJANG.map(j => obj?.[j.key]).filter(v => v !== undefined && v !== null && v !== '').map(Number);
+const rata = values => values.length ? Math.round(values.reduce((a, b) => a + b, 0) / values.length) : null;
+const rataLaporan = (r, jenis) => rata(nilai(r[jenis]));
+const rataBanyak = (rows, jenis) => rata(rows.flatMap(r => nilai(r[jenis])));
+const fmtPersen = v => v === null || v === undefined ? '–' : `${v}%`;
+const warnaNilai = v => v === null || v === undefined ? 'text-gray-300' : v >= 80 ? 'text-emerald-600' : v >= 60 ? 'text-amber-600' : 'text-red-500';
+const barColor = v => v >= 80 ? 'bg-emerald-500' : v >= 60 ? 'bg-amber-500' : 'bg-red-400';
+
+async function initAkses() {
+    const P = window.PPG_DB.profile;
+    let me = null;
+    try { me = await P.me(); } catch (error) { showToast(`Profil gagal dimuat: ${error.message}`, 'error'); }
+    if (P.isKelompokUser(me)) akses = { canEdit: !!me.kelompok, kelompok: me.kelompok || '' };
+    else akses = { canEdit: P.canManage(me), kelompok: null };
+
+    document.querySelectorAll('[data-edit-only]').forEach(el => el.classList.toggle('hidden', !akses.canEdit));
+    const banner = document.getElementById('aksesBanner');
+    const tampilBanner = (html, warna) => { banner.innerHTML = html; banner.className = `mb-4 text-xs font-medium rounded-xl px-4 py-3 border flex items-center gap-2 ${warna}`; };
+    if (akses.kelompok !== null) {
+        const desaSel = document.getElementById('filterDesa');
+        const kelSel = document.getElementById('inputKelompokLupg');
+        const desa = me.desa || window.PPG_WILAYAH.desaOf(akses.kelompok);
+        if (desa && ![...desaSel.options].some(o => o.value === desa)) desaSel.add(new Option(desa, desa));
+        desaSel.value = desa || '';
+        desaSel.disabled = true;
+        if (akses.kelompok && ![...kelSel.options].some(o => o.value === akses.kelompok)) kelSel.add(new Option(akses.kelompok, akses.kelompok));
+        kelSel.value = akses.kelompok;
+        kelSel.disabled = true;
+        tampilBanner(akses.kelompok
+            ? `<i class="fas fa-user-lock"></i><span>Anda masuk sebagai pengurus Kelompok <b>${esc(akses.kelompok)}</b> — hanya data kelompok ini yang ditampilkan.</span>`
+            : `<i class="fas fa-exclamation-triangle"></i><span>Akun Anda belum ditautkan ke kelompok. Hubungi admin untuk mengatur kelompok pada profil Anda.</span>`,
+            akses.kelompok ? 'bg-blue-50 border-blue-200 text-blue-800' : 'bg-amber-50 border-amber-200 text-amber-800');
+    } else if (!akses.canEdit) {
+        tampilBanner('<i class="fas fa-eye"></i><span>Mode lihat saja — Anda tidak memiliki akses untuk menambah atau mengubah laporan.</span>', 'bg-slate-50 border-slate-200 text-slate-600');
+    }
+}
+
+const bolehLihat = r => akses.kelompok === null || r.kelompok === akses.kelompok;
+// Struktur desa/kelompok yang boleh dilihat user (user kelompok hanya kelompoknya sendiri).
+function strukturTerlihat() {
+    if (akses.kelompok === null) return window.PPG_WILAYAH.struktur;
+    return window.PPG_WILAYAH.struktur.map(d => ({ desa: d.desa, kelompok: d.kelompok.filter(k => k === akses.kelompok) })).filter(d => d.kelompok.length);
+}
 
 async function loadLupgData() {
+    await initAkses();
     try {
-        rawData = await window.PPG_DB.lupg.list();
+        rawData = (await window.PPG_DB.lupg.list()).filter(bolehLihat);
     } catch (error) {
         rawData = [];
         showToast(`Laporan gagal dimuat: ${error.message}`, 'error');
     }
+    isiPilihanPeriode(true);
     renderAll();
+}
+
+// Dropdown bulan/tahun. Saat pertama dimuat, otomatis memilih periode terbaru yang punya laporan.
+function isiPilihanPeriode(pilihTerbaru) {
+    const bulanSel = document.getElementById('filterBulan');
+    const tahunSel = document.getElementById('filterTahun');
+    const tahunIni = new Date().getFullYear();
+    const tahunList = [...new Set([tahunIni, ...rawData.map(tahunOf)])].sort((a, b) => b - a);
+    const prevBulan = bulanSel.value, prevTahun = tahunSel.value;
+    bulanSel.innerHTML = BULAN.map(b => `<option value="${b}">${b}</option>`).join('');
+    tahunSel.innerHTML = tahunList.map(t => `<option value="${t}">${t}</option>`).join('');
+    document.getElementById('inputBulanLupg').innerHTML = bulanSel.innerHTML;
+    const latest = rawData.reduce((best, r) => (!best || periodeKey(r) > periodeKey(best)) ? r : best, null);
+    if (pilihTerbaru || !prevBulan) {
+        bulanSel.value = latest ? latest.bulan : BULAN[new Date().getMonth()];
+        tahunSel.value = String(latest ? tahunOf(latest) : tahunIni);
+    } else {
+        bulanSel.value = prevBulan;
+        tahunSel.value = tahunList.includes(Number(prevTahun)) ? prevTahun : String(tahunIni);
+    }
+}
+
+function periodeTerpilih() {
+    return { bulan: document.getElementById('filterBulan').value, tahun: Number(document.getElementById('filterTahun').value) };
+}
+const laporanPeriode = ({ bulan, tahun }) => rawData.filter(r => r.bulan === bulan && tahunOf(r) === tahun);
+
+function setView(view) {
+    currentView = view;
+    const aktif = 'px-4 py-2 rounded-lg transition bg-white text-blue-700 shadow-sm';
+    const pasif = 'px-4 py-2 rounded-lg transition text-gray-600 hover:text-blue-700';
+    document.getElementById('tabKehadiran').className = view === 'kehadiran' ? aktif : pasif;
+    document.getElementById('tabKetercapaian').className = view === 'ketercapaian' ? aktif : pasif;
+    document.getElementById('tabKehadiran').setAttribute('aria-selected', view === 'kehadiran');
+    document.getElementById('tabKetercapaian').setAttribute('aria-selected', view === 'ketercapaian');
+    renderTable();
 }
 
 function renderAll() { renderSummary(); renderTable(); }
 
-// KPI, grafik bulanan, dan progress per kelompok dihitung dari laporan periode terbaru.
 function renderSummary() {
-    const latest = rawData.reduce((best, r) => (best === null || periodeKey(r) > periodeKey(best)) ? r : best, null);
-    const periodRows = latest ? rawData.filter(r => r.bulan === latest.bulan && tahunOf(r) === tahunOf(latest)) : [];
-    const sum = (rows, field) => rows.reduce((acc, r) => acc + (Number(r[field]) || 0), 0);
-    const target = sum(periodRows, 'target'), tercapai = sum(periodRows, 'tercapai');
-    document.getElementById('kpiPeriode').textContent = latest ? `${latest.bulan} ${tahunOf(latest)}` : 'Belum ada';
-    document.getElementById('kpiTarget').textContent = target;
-    document.getElementById('kpiTercapai').textContent = tercapai;
-    document.getElementById('kpiBelum').textContent = Math.max(target - tercapai, 0);
-    document.getElementById('kpiPersen').textContent = `${persen(tercapai, target)}%`;
+    const periode = periodeTerpilih();
+    const rows = laporanPeriode(periode);
+    const struktur = strukturTerlihat();
+    const totalKelompok = struktur.reduce((n, d) => n + d.kelompok.length, 0);
+    const melapor = new Set(rows.map(r => r.kelompok)).size;
+    document.getElementById('kpiPeriode').textContent = `${periode.bulan} ${periode.tahun}`;
+    document.getElementById('kpiLapor').textContent = melapor;
+    document.getElementById('kpiTotalKelompok').textContent = `/${totalKelompok}`;
+    document.getElementById('kpiBelum').textContent = Math.max(totalKelompok - melapor, 0);
+    const kehadiran = rataBanyak(rows, 'kehadiran'), ketercapaian = rataBanyak(rows, 'ketercapaian');
+    document.getElementById('kpiKehadiran').textContent = fmtPersen(kehadiran);
+    document.getElementById('kpiKetercapaian').textContent = fmtPersen(ketercapaian);
 
-    const tahun = latest ? tahunOf(latest) : new Date().getFullYear();
+    // Perbandingan dengan periode sebelumnya yang punya laporan.
+    const key = periode.tahun * 12 + BULAN.indexOf(periode.bulan);
+    const sebelum = rawData.filter(r => periodeKey(r) < key).reduce((best, r) => (!best || periodeKey(r) > periodeKey(best)) ? r : best, null);
+    const prevRows = sebelum ? laporanPeriode({ bulan: sebelum.bulan, tahun: tahunOf(sebelum) }) : [];
+    const trend = (now, jenis, el) => {
+        const prev = rataBanyak(prevRows, jenis);
+        document.getElementById(el).textContent = now === null || prev === null ? (sebelum ? '-' : 'Periode pertama') : `${now - prev >= 0 ? '+' : ''}${now - prev}% vs ${sebelum.bulan.slice(0, 3)}`;
+    };
+    trend(kehadiran, 'kehadiran', 'kpiTrendKehadiran');
+    trend(ketercapaian, 'ketercapaian', 'kpiTrendKetercapaian');
+
+    // Grafik rata-rata per bulan pada tahun terpilih.
+    document.getElementById('chartTahun').textContent = periode.tahun;
     const bulanan = BULAN.map(bulan => {
-        const rows = rawData.filter(r => r.bulan === bulan && tahunOf(r) === tahun);
-        return { bulan, rows: rows.length, tercapai: sum(rows, 'tercapai'), pct: persen(sum(rows, 'tercapai'), sum(rows, 'target')) };
-    }).filter(m => m.rows);
-    const prev = bulanan.length > 1 ? bulanan[bulanan.length - 2] : null;
-    const trend = prev ? persen(tercapai, target) - prev.pct : null;
-    document.getElementById('kpiTrend').textContent = trend === null ? 'Periode pertama' : `${trend >= 0 ? '+' : ''}${trend}% vs ${prev.bulan}`;
-
-    document.getElementById('chartTahun').textContent = tahun;
+        const r = laporanPeriode({ bulan, tahun: periode.tahun });
+        return { bulan, ada: r.length > 0, k: rataBanyak(r, 'kehadiran'), t: rataBanyak(r, 'ketercapaian') };
+    }).filter(m => m.ada);
     const chart = document.getElementById('lupgChart');
-    chart.innerHTML = bulanan.length ? bulanan.map((m, i) => {
-        const last = i === bulanan.length - 1;
-        const color = last ? 'from-blue-700 to-blue-500 ring-2 ring-blue-300' : m.pct >= 90 ? 'from-emerald-500 to-emerald-400' : 'from-blue-600 to-blue-400';
-        return `<div class="flex-1 flex flex-col items-center justify-end gap-1 h-full" title="${m.bulan}: ${m.tercapai} peserta (${m.pct}%)">
-            <span class="text-xs ${last ? 'font-bold text-blue-600' : 'text-gray-500'}">${m.pct}%</span>
-            <div class="w-full bg-gradient-to-t ${color} rounded-t-lg bar-item" style="height:${Math.max(m.pct, 4)}%"></div>
-            <span class="text-xs ${last ? 'font-bold text-blue-600' : 'text-gray-400'}">${m.bulan.slice(0, 3)}</span>
-        </div>`;
-    }).join('') : '<p class="text-sm text-gray-400 m-auto">Belum ada laporan untuk ditampilkan.</p>';
+    chart.innerHTML = bulanan.length ? bulanan.map(m => {
+        const aktif = m.bulan === periode.bulan;
+        return `<button type="button" onclick="pilihBulan('${m.bulan}')" class="flex-1 flex flex-col items-center justify-end gap-1 h-full group" title="${m.bulan}: kehadiran ${fmtPersen(m.k)}, ketercapaian ${fmtPersen(m.t)}">
+            <div class="flex items-end justify-center gap-1 w-full h-full">
+                <div class="w-1/2 max-w-[22px] flex flex-col items-center justify-end h-full"><span class="text-[10px] text-gray-500 mb-0.5">${m.k ?? ''}</span><div class="w-full bg-blue-500 rounded-t-md" style="height:${Math.max(m.k || 0, 2)}%"></div></div>
+                <div class="w-1/2 max-w-[22px] flex flex-col items-center justify-end h-full"><span class="text-[10px] text-gray-500 mb-0.5">${m.t ?? ''}</span><div class="w-full bg-orange-400 rounded-t-md" style="height:${Math.max(m.t || 0, 2)}%"></div></div>
+            </div>
+            <span class="text-xs ${aktif ? 'font-bold text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}">${m.bulan.slice(0, 3)}</span>
+        </button>`;
+    }).join('') : `<p class="text-sm text-gray-400 m-auto">Belum ada laporan di tahun ${periode.tahun}.</p>`;
 
-    document.getElementById('progressPeriode').textContent = latest ? `· ${latest.bulan} ${tahunOf(latest)}` : '';
-    const progress = document.getElementById('progressKelompok');
-    progress.innerHTML = periodRows.length ? [...periodRows].sort((a, b) => String(a.kelompok).localeCompare(String(b.kelompok))).map(raw => {
-        const r = window.PPG_DB.escapeRow(raw); const pct = persen(r.tercapai, r.target);
-        const tone = pct >= 90 ? ['text-emerald-600', 'bg-emerald-500'] : pct >= 75 ? ['text-amber-600', 'bg-amber-500'] : ['text-red-500', 'bg-red-400'];
+    // Rekap per desa untuk periode terpilih.
+    document.getElementById('rekapDesa').innerHTML = struktur.map(d => {
+        const r = rows.filter(x => d.kelompok.includes(x.kelompok));
+        const k = rataBanyak(r, 'kehadiran'), t = rataBanyak(r, 'ketercapaian');
+        const bar = (v, warna) => `<div class="h-2 bg-gray-100 rounded-full overflow-hidden"><div class="h-full ${warna} rounded-full" style="width:${Math.min(v || 0, 100)}%"></div></div>`;
         return `<div>
-            <div class="flex justify-between text-sm mb-1.5"><span class="font-medium text-gray-700">${r.kelompok}</span><span class="font-bold ${tone[0]}">${pct}%</span></div>
-            <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden"><div class="h-full ${tone[1]} rounded-full progress-bar" style="width:${Math.min(pct, 100)}%"></div></div>
-            <p class="text-xs text-gray-400 mt-1">${Number(r.tercapai) || 0} / ${Number(r.target) || 0} anggota</p>
+            <div class="flex justify-between text-sm mb-1.5"><span class="font-semibold text-gray-700">${esc(d.desa)}</span><span class="text-xs text-gray-400">${new Set(r.map(x => x.kelompok)).size}/${d.kelompok.length} melapor</span></div>
+            <div class="grid grid-cols-[78px_1fr_38px] items-center gap-2 text-xs text-gray-500"><span>Kehadiran</span>${bar(k, 'bg-blue-500')}<span class="text-right font-semibold ${warnaNilai(k)}">${fmtPersen(k)}</span></div>
+            <div class="grid grid-cols-[78px_1fr_38px] items-center gap-2 text-xs text-gray-500 mt-1"><span>Ketercapaian</span>${bar(t, 'bg-orange-400')}<span class="text-right font-semibold ${warnaNilai(t)}">${fmtPersen(t)}</span></div>
         </div>`;
-    }).join('') : '<p class="text-sm text-gray-400">Belum ada laporan.</p>';
-}
-
-function getFiltered() {
-    const b=document.getElementById('filterBulan').value;
-    const k=document.getElementById('filterKelompok').value;
-    const s=document.getElementById('filterStatus').value;
-    return rawData.filter(r=>(!b||r.bulan===b)&&(!k||r.kelompok===k)&&(!s||r.status===s))
-        .sort((a,b)=>periodeKey(b)-periodeKey(a) || String(a.kelompok).localeCompare(String(b.kelompok)));
-}
-
-function renderTable() {
-    const data=getFiltered();
-    const countEl = document.getElementById('tableCount');
-    const bodyEl = document.getElementById('tableBody');
-
-    if (countEl) countEl.textContent=`${data.length} baris`;
-
-    if (!data || data.length === 0) {
-        bodyEl.innerHTML = `
-            <tr>
-                <td colspan="7" class="p-8 text-center">
-                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-2 text-xl">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <p class="text-sm font-semibold text-slate-700">${rawData.length ? 'Tidak ada data laporan yang cocok' : 'Belum ada laporan LUPG'}</p>
-                    <p class="text-xs text-slate-400 mt-0.5">${rawData.length ? 'Coba ubah atau reset filter pencarian di atas.' : 'Klik "Input Laporan" untuk menambahkan laporan pertama.'}</p>
-                    ${rawData.length ? '<button onclick="resetFilters()" class="mt-3 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium">Reset Filter</button>' : ''}
-                </td>
-            </tr>
-        `;
-        return;
-    }
-
-    bodyEl.innerHTML=data.map((raw,i)=>{
-        const r=window.PPG_DB.escapeRow(raw);
-        const pct=persen(r.tercapai,r.target);
-        const sc=statusMap[raw.status]||statusMap['Baik'];
-        const bg=i%2===0?'':'bg-gray-50/50';
-        return `<tr class="border-t border-gray-100 hover:bg-blue-50/30 ${bg}">
-            <td class="p-4 font-medium text-gray-800 text-sm">${r.kelompok}</td>
-            <td class="p-4 text-gray-600 text-sm hidden md:table-cell">${r.bulan} ${tahunOf(r)}</td>
-            <td class="p-4 text-gray-600 text-sm">${Number(r.target) || 0}</td>
-            <td class="p-4 text-gray-600 text-sm font-semibold">${Number(r.tercapai) || 0}</td>
-            <td class="p-4 hidden md:table-cell">
-                <div class="flex items-center gap-2">
-                    <div class="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div class="h-full ${pct>=90?'bg-emerald-500':pct>=75?'bg-blue-500':'bg-red-400'} rounded-full" style="width:${Math.min(pct,100)}%"></div>
-                    </div>
-                    <span class="text-sm font-bold ${pct>=90?'text-emerald-600':pct>=75?'text-blue-600':'text-red-500'}">${pct}%</span>
-                </div>
-            </td>
-            <td class="p-4"><span class="text-xs px-2.5 py-1 rounded-full font-medium ${sc}">${r.status}</span></td>
-            <td class="p-4">
-                <button class="text-xs text-blue-600 hover:text-blue-800 font-semibold px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 transition" onclick="bukaDetailLupg(${Number(raw.id)})" aria-label="Detail laporan ${r.kelompok} ${r.bulan}">
-                    <i class="fas fa-eye md:mr-1"></i><span class="hidden md:inline"> Detail</span>
-                </button>
-            </td>
-        </tr>`;
     }).join('');
 }
 
-function bukaDetailLupg(id) {
-    const item = rawData.find(r => String(r.id) === String(id));
-    if (!item) return;
+function pilihBulan(bulan) { document.getElementById('filterBulan').value = bulan; renderAll(); }
 
-    selectedLupgId = item.id;
-    const pct = persen(item.tercapai, item.target);
+// Tabel 16 kelompok x 10 jenjang, seperti lembar Excel LUPG.
+function renderTable() {
+    const periode = periodeTerpilih();
+    const desaFilter = document.getElementById('filterDesa').value;
+    const rows = laporanPeriode(periode);
+    const label = currentView === 'kehadiran' ? 'Kehadiran' : 'Ketercapaian Materi';
+    document.getElementById('tableTitle').textContent = `Rekap ${label} (%) — ${periode.bulan} ${periode.tahun}`;
+    const th = 'p-3 font-semibold uppercase tracking-wide';
+    document.getElementById('tableHead').innerHTML = `<th class="${th} text-left">No</th><th class="${th} text-left">Desa</th><th class="${th} text-left sticky left-0 bg-blue-50">Kelompok</th>`
+        + JENJANG.map(j => `<th class="${th} text-center whitespace-nowrap">${j.label}</th>`).join('')
+        + `<th class="${th} text-center">Rata-rata</th>`
+        + TEKS_LUPG.map(t => `<th class="${th} text-left min-w-[180px]">${t.label}</th>`).join('')
+        + `<th class="${th} text-center no-print">Aksi</th>`;
+    let no = 0, terisi = 0;
+    const body = strukturTerlihat().filter(d => !desaFilter || d.desa === desaFilter).flatMap(d => d.kelompok.map(kelompok => {
+        no++;
+        const lap = rows.find(r => r.kelompok === kelompok);
+        if (lap) terisi++;
+        const nilaiObj = lap?.[currentView] || {};
+        const cells = JENJANG.map(j => { const v = nilaiObj[j.key]; return `<td class="p-3 text-center font-semibold ${warnaNilai(v)}">${v ?? '–'}</td>`; }).join('');
+        const avg = lap ? rataLaporan(lap, currentView) : null;
+        const aksi = lap
+            ? `<button onclick="bukaDetailLupg(${Number(lap.id)})" class="text-xs text-blue-600 hover:text-blue-800 font-semibold px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 transition">Detail</button>`
+            : !akses.canEdit ? '<span class="text-gray-300">–</span>'
+            : `<button onclick="bukaTambahLupg('${esc(kelompok)}')" class="text-xs text-emerald-700 font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 transition whitespace-nowrap">+ Input</button>`;
+        return `<tr class="border-t border-gray-100 hover:bg-blue-50/30">
+            <td class="p-3 text-gray-400">${no}</td>
+            <td class="p-3 ${warnaDesa(d.desa)} text-gray-700 whitespace-nowrap">${esc(d.desa)}</td>
+            <td class="p-3 font-medium text-gray-800 whitespace-nowrap sticky left-0 bg-white">${esc(kelompok)}</td>
+            ${cells}
+            <td class="p-3 text-center font-bold ${lap ? warnaNilai(avg) : 'text-gray-400 font-normal text-xs'} whitespace-nowrap">${lap ? fmtPersen(avg) : 'Belum lapor'}</td>
+            ${TEKS_LUPG.map(t => {
+                const teks = lap?.[t.key];
+                return teks
+                    ? `<td class="p-3 text-xs text-gray-600 align-top max-w-[240px]"><button type="button" onclick="bukaDetailLupg(${Number(lap.id)})" title="${esc(teks)}" class="teks-ringkas text-left whitespace-pre-line hover:text-blue-700">${esc(teks)}</button></td>`
+                    : '<td class="p-3 text-xs text-gray-300">–</td>';
+            }).join('')}
+            <td class="p-3 text-center no-print">${aksi}</td>
+        </tr>`;
+    }));
+    document.getElementById('tableBody').innerHTML = body.join('');
+    document.getElementById('tableCount').textContent = `${terisi} dari ${no} kelompok melapor`;
+}
 
-    document.getElementById('detailLupgBulan').textContent = `Laporan ${item.bulan} ${tahunOf(item)}`;
-    document.getElementById('detailLupgKelompok').textContent = item.kelompok;
-    document.getElementById('detailLupgStatus').textContent = item.status;
-    document.getElementById('detailLupgStatus').className = `text-xs px-2.5 py-1 rounded-full font-bold ${statusMap[item.status] || statusMap['Baik']}`;
-    document.getElementById('detailLupgTarget').textContent = item.target;
-    document.getElementById('detailLupgTercapai').textContent = item.tercapai;
-    document.getElementById('detailLupgPct').textContent = `${pct}%`;
-    document.getElementById('detailLupgCatatan').textContent = item.catatan || 'Tidak ada catatan khusus untuk periode ini.';
+// Form input: grid jenjang x (kehadiran, ketercapaian).
+function isiFormJenjang(lap) {
+    const input = (id, v) => `<input type="number" id="${id}" min="0" max="100" step="1" inputmode="numeric" value="${v ?? ''}" class="w-full border border-slate-200 rounded-lg px-2 py-1.5 text-sm text-center focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">`;
+    document.getElementById('inputJenjangBody').innerHTML = JENJANG.map(j => `<tr>
+        <td class="px-3 py-1.5 text-slate-700 font-medium whitespace-nowrap">${j.label === 'PAUD' || isNaN(j.label) ? j.label : 'Kelas ' + j.label}</td>
+        <td class="px-3 py-1.5">${input('k_' + j.key, lap?.kehadiran?.[j.key])}</td>
+        <td class="px-3 py-1.5">${input('t_' + j.key, lap?.ketercapaian?.[j.key])}</td>
+    </tr>`).join('');
+    document.getElementById('inputCatatanLupg').value = lap?.catatan || '';
+    TEKS_LUPG.forEach(t => { document.getElementById(t.input).value = lap?.[t.key] || ''; });
+}
 
-    document.getElementById('btnHapusLupg').onclick = async function() {
-        if (confirm(`Hapus laporan ${item.kelompok} bulan ${item.bulan}?`)) {
-            try {
-                await window.PPG_DB.lupg.delete(item.id);
-                rawData = rawData.filter(r => String(r.id) !== String(item.id));
-                selectedLupgId = null;
-                renderAll(); closeModal('modalDetailLupg'); showToast('Laporan LUPG berhasil dihapus', 'info');
-            } catch(error) { showToast(`Laporan gagal dihapus: ${error.message}`, 'error'); }
-        }
-    };
-    document.getElementById('btnEditLupg').onclick=()=>{
-        document.getElementById('inputKelompokLupg').value=item.kelompok;document.getElementById('inputBulanLupg').value=item.bulan;document.getElementById('inputTargetLupg').value=item.target;document.getElementById('inputTercapaiLupg').value=item.tercapai;document.getElementById('inputStatusLupg').value=item.status;document.getElementById('inputCatatanLupg').value=item.catatan||'';
-        closeModal('modalDetailLupg');openModal('modalInputLupg');
-    };
+function bukaTambahLupg(kelompok) {
+    if (!akses.canEdit) return;
+    selectedLupgId = null;
+    modeEdit = false;
+    const periode = periodeTerpilih();
+    document.getElementById('formInputLupg').reset();
+    document.getElementById('inputLupgTitle').textContent = 'Input Laporan LUPG';
+    if (akses.kelompok !== null) kelompok = akses.kelompok;
+    if (kelompok) document.getElementById('inputKelompokLupg').value = kelompok;
+    document.getElementById('inputBulanLupg').value = periode.bulan;
+    document.getElementById('inputTahunLupg').value = periode.tahun;
+    isiFormJenjang(null);
+    cekLaporanAda();
+    openModal('modalInputLupg');
+}
 
-    openModal('modalDetailLupg');
+function bukaEditLupg(id) {
+    const lap = rawData.find(r => String(r.id) === String(id)); if (!lap || !akses.canEdit || !bolehLihat(lap)) return;
+    selectedLupgId = lap.id;
+    modeEdit = true;
+    document.getElementById('inputLupgTitle').textContent = 'Edit Laporan LUPG';
+    document.getElementById('inputKelompokLupg').value = lap.kelompok;
+    document.getElementById('inputBulanLupg').value = lap.bulan;
+    document.getElementById('inputTahunLupg').value = tahunOf(lap);
+    isiFormJenjang(lap);
+    document.getElementById('inputLupgInfo').classList.add('hidden');
+    openModal('modalInputLupg');
+}
+
+// Satu laporan per kelompok per bulan.
+// Mode tambah: jika kombinasi kelompok + periode sudah punya laporan, form memuatnya dan menyimpan sebagai pembaruan.
+// Mode edit: laporan boleh dipindah ke kelompok/periode lain selama belum ada laporan di sana.
+function cekLaporanAda() {
+    const info = document.getElementById('inputLupgInfo');
+    const kelompok = document.getElementById('inputKelompokLupg').value;
+    const bulan = document.getElementById('inputBulanLupg').value;
+    const tahun = Number(document.getElementById('inputTahunLupg').value);
+    const ada = rawData.find(r => r.kelompok === kelompok && r.bulan === bulan && tahunOf(r) === tahun);
+    const tampil = teks => { info.textContent = teks; info.classList.toggle('hidden', !teks); };
+    if (modeEdit) {
+        tampil(ada && String(ada.id) !== String(selectedLupgId) ? `Sudah ada laporan ${kelompok} ${bulan} ${tahun}. Pilih kelompok/periode lain, atau edit laporan tersebut dari tabel.` : '');
+        return;
+    }
+    const sebelumnya = selectedLupgId;
+    selectedLupgId = ada ? ada.id : null;
+    if (ada) {
+        if (String(sebelumnya) !== String(ada.id)) isiFormJenjang(ada);
+        tampil(`Laporan ${kelompok} ${bulan} ${tahun} sudah ada. Data dimuat; perubahan akan memperbarui laporan tersebut.`);
+    } else {
+        if (sebelumnya !== null) isiFormJenjang(null);
+        tampil('');
+    }
+    document.getElementById('inputLupgTitle').textContent = ada ? 'Perbarui Laporan LUPG' : 'Input Laporan LUPG';
+}
+
+function bacaNilai(prefix) {
+    const hasil = {};
+    for (const j of JENJANG) {
+        const raw = document.getElementById(prefix + j.key).value.trim();
+        if (raw === '') continue;
+        const v = Number(raw);
+        if (!Number.isFinite(v) || v < 0 || v > 100) throw new Error(`Nilai ${prefix === 'k_' ? 'kehadiran' : 'ketercapaian'} ${j.label} harus 0–100.`);
+        hasil[j.key] = v;
+    }
+    return hasil;
 }
 
 async function simpanLupg(e) {
     e.preventDefault();
-    const kelompok = document.getElementById('inputKelompokLupg').value;
-    const bulan = document.getElementById('inputBulanLupg').value;
-    const target = parseInt(document.getElementById('inputTargetLupg').value) || 100;
-    const tercapai = parseInt(document.getElementById('inputTercapaiLupg').value) || 0;
-    const status = document.getElementById('inputStatusLupg').value;
-    const catatan = document.getElementById('inputCatatanLupg').value.trim();
-
-    const newItem = {
-        kelompok,
-        bulan,
-        target,
-        tercapai,
-        status,
-        catatan: catatan || 'Laporan berhasil dicatat.'
-    };
-
     try {
-        const current = selectedLupgId !== null ? rawData.find(r => String(r.id) === String(selectedLupgId)) : null;
-        if (current) {
-            const saved = await window.PPG_DB.lupg.update(current.id, { ...newItem, tahun: tahunOf(current) });
-            rawData = rawData.map(r => String(r.id) === String(current.id) ? saved : r);
+        const kelompok = document.getElementById('inputKelompokLupg').value;
+        const bulan = document.getElementById('inputBulanLupg').value;
+        const tahun = Number(document.getElementById('inputTahunLupg').value);
+        if (!akses.canEdit) throw new Error('Anda tidak memiliki akses untuk menyimpan laporan.');
+        if (akses.kelompok !== null && kelompok !== akses.kelompok) throw new Error(`Anda hanya dapat melaporkan Kelompok ${akses.kelompok}.`);
+        const kehadiran = bacaNilai('k_'), ketercapaian = bacaNilai('t_');
+        if (!Object.keys(kehadiran).length && !Object.keys(ketercapaian).length) throw new Error('Isi minimal satu nilai kehadiran atau ketercapaian.');
+        const data = { kelompok, desa: window.PPG_WILAYAH.desaOf(kelompok), bulan, tahun, kehadiran, ketercapaian, catatan: document.getElementById('inputCatatanLupg').value.trim() };
+        TEKS_LUPG.forEach(t => { data[t.key] = document.getElementById(t.input).value.trim(); });
+        const bentrok = rawData.find(r => r.kelompok === kelompok && r.bulan === bulan && tahunOf(r) === tahun && String(r.id) !== String(selectedLupgId));
+        if (bentrok) throw new Error(`laporan ${kelompok} ${bulan} ${tahun} sudah ada.`);
+        const lama = selectedLupgId !== null ? rawData.find(r => String(r.id) === String(selectedLupgId)) : null;
+        if (lama) {
+            const saved = await window.PPG_DB.lupg.update(lama.id, data);
+            rawData = rawData.map(r => String(r.id) === String(lama.id) ? saved : r);
         } else {
-            const saved = await window.PPG_DB.lupg.insert({ ...newItem, tahun: new Date().getFullYear() });
-            rawData.unshift(saved);
+            rawData.unshift(await window.PPG_DB.lupg.insert(data));
         }
+        closeModal('modalInputLupg');
+        selectedLupgId = null;
+        modeEdit = false;
+        isiPilihanPeriode(false);
+        document.getElementById('filterBulan').value = bulan;
+        document.getElementById('filterTahun').value = String(tahun);
         renderAll();
-        closeModal('modalInputLupg'); document.getElementById('formInputLupg').reset(); showToast(`Laporan ${kelompok} (${bulan}) berhasil disimpan!`, 'success');
-        selectedLupgId=null;
-    } catch(error) { showToast(`Laporan gagal disimpan: ${error.message}`, 'error'); }
+        showToast(`Laporan ${kelompok} (${bulan} ${tahun}) berhasil disimpan!`, 'success');
+    } catch (error) { showToast(`Laporan gagal disimpan: ${error.message}`, 'error'); }
+}
+
+function bukaDetailLupg(id) {
+    const lap = rawData.find(r => String(r.id) === String(id));
+    if (!lap) return;
+    document.getElementById('detailLupgBulan').textContent = `Laporan ${lap.bulan} ${tahunOf(lap)}`;
+    document.getElementById('detailLupgKelompok').textContent = `${lap.kelompok} · Desa ${lap.desa || window.PPG_WILAYAH.desaOf(lap.kelompok) || '-'}`;
+    document.getElementById('detailLupgKehadiran').textContent = fmtPersen(rataLaporan(lap, 'kehadiran'));
+    document.getElementById('detailLupgKetercapaian').textContent = fmtPersen(rataLaporan(lap, 'ketercapaian'));
+    document.getElementById('detailLupgBody').innerHTML = JENJANG.map(j => {
+        const k = lap.kehadiran?.[j.key], t = lap.ketercapaian?.[j.key];
+        return `<tr><td class="px-3 py-1.5 text-slate-600">${esc(j.label)}</td><td class="px-3 py-1.5 text-center font-semibold ${warnaNilai(k)}">${fmtPersen(k)}</td><td class="px-3 py-1.5 text-center font-semibold ${warnaNilai(t)}">${fmtPersen(t)}</td></tr>`;
+    }).join('');
+    document.getElementById('detailLupgCatatan').textContent = lap.catatan || 'Tidak ada catatan khusus untuk periode ini.';
+    TEKS_LUPG.forEach(t => { document.getElementById(t.detail).textContent = lap[t.key] || '–'; });
+    document.getElementById('btnEditLupg').classList.toggle('hidden', !akses.canEdit);
+    document.getElementById('btnHapusLupg').classList.toggle('hidden', !akses.canEdit);
+    document.getElementById('btnHapusLupg').onclick = async function() {
+        if (!confirm(`Hapus laporan ${lap.kelompok} bulan ${lap.bulan} ${tahunOf(lap)}?`)) return;
+        try {
+            await window.PPG_DB.lupg.delete(lap.id);
+            rawData = rawData.filter(r => String(r.id) !== String(lap.id));
+            closeModal('modalDetailLupg'); renderAll(); showToast('Laporan LUPG berhasil dihapus', 'info');
+        } catch (error) { showToast(`Laporan gagal dihapus: ${error.message}`, 'error'); }
+    };
+    document.getElementById('btnEditLupg').onclick = () => { closeModal('modalDetailLupg'); bukaEditLupg(lap.id); };
+    openModal('modalDetailLupg');
 }
 
 function resetFilters() {
-    ['filterBulan','filterKelompok','filterStatus'].forEach(id=>document.getElementById(id).value='');
-    renderTable();
+    if (akses.kelompok === null) document.getElementById('filterDesa').value = '';
+    isiPilihanPeriode(true);
+    renderAll();
 }
 
-function bukaTambahLupg(){selectedLupgId=null;document.getElementById('formInputLupg').reset();openModal('modalInputLupg');}
-
+// Export dengan susunan kolom seperti lembar Excel LUPG.
 function exportCSV() {
-    const data=getFiltered();
-    if (!data.length) { showToast('Tidak ada data untuk diekspor', 'error'); return; }
-    window.PPG_DB.downloadCsv('laporan_lupg.csv', ['Kelompok','Bulan','Tahun','Target','Tercapai','Persentase','Status','Catatan'],
-        data.map(r=>[r.kelompok,r.bulan,tahunOf(r),r.target,r.tercapai,persen(r.tercapai,r.target)+'%',r.status,r.catatan]));
-    showToast('File CSV berhasil diunduh','success');
+    const periode = periodeTerpilih();
+    const rows = laporanPeriode(periode);
+    const header = ['NO', 'DESA', 'KELOMPOK', ...JENJANG.map(j => `KEHADIRAN ${j.label}`), ...JENJANG.map(j => `KETERCAPAIAN ${j.label}`), ...TEKS_LUPG.map(t => t.label.toUpperCase()), 'CATATAN'];
+    let no = 0;
+    const data = strukturTerlihat().flatMap(d => d.kelompok.map(k => {
+        const lap = rows.find(r => r.kelompok === k);
+        return [++no, d.desa, k, ...JENJANG.map(j => lap?.kehadiran?.[j.key] ?? ''), ...JENJANG.map(j => lap?.ketercapaian?.[j.key] ?? ''), ...TEKS_LUPG.map(t => lap?.[t.key] || ''), lap?.catatan || ''];
+    }));
+    window.PPG_DB.downloadCsv(`LUPG_${periode.bulan}_${periode.tahun}.csv`, header, data);
+    showToast(`File LUPG ${periode.bulan} ${periode.tahun} berhasil diunduh`, 'success');
 }
 
 function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
@@ -791,6 +942,7 @@ function updateClock() {
 }
 
 updateClock(); setInterval(updateClock,60000);
+setView('kehadiran');
 loadLupgData();
 </script>
 </body>

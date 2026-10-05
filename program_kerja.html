@@ -54,6 +54,10 @@
             pointer-events: all;
         }
         #filterContent { transition: max-height 0.3s ease, opacity 0.3s ease; }
+        /* Tombol kelola hanya untuk admin/pengurus (kelas can-manage dipasang setelah profil dimuat). */
+        body:not(.can-manage) .manage-only { display: none !important; }
+        .cal-cell { min-height: 60px; }
+        @media (min-width: 768px) { .cal-cell { min-height: 104px; } }
     </style>
 </head>
 <body class="bg-slate-100 text-gray-800">
@@ -233,7 +237,7 @@
                     <span class="font-bold text-slate-800 text-sm truncate">Program Kerja</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openTambahModal()" class="w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Tambah Program">
+                    <button onclick="openTambahModal()" class="manage-only w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Tambah Program">
                         <i class="fas fa-plus text-sm"></i>
                     </button>
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
@@ -258,7 +262,7 @@
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>Supabase Online</span>
                     </div>
-                    <button onclick="openTambahModal()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
+                    <button onclick="openTambahModal()" class="manage-only flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition shadow-sm">
                         <i class="fas fa-plus"></i> Tambah Program
                     </button>
                     <!-- User Profile Pill -->
@@ -330,7 +334,7 @@
                 </div>
                 <div class="relative mb-3">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                    <input id="searchInput" type="text" placeholder="Cari nama program atau penanggung jawab..."
+                    <input id="searchInput" type="text" placeholder="Cari nama program, penanggung jawab, atau lokasi..."
                         class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50"
                         oninput="renderCards()">
                 </div>
@@ -344,11 +348,7 @@
                             <option value="Ditunda">Ditunda</option>
                         </select>
                         <select id="filterKategori" onchange="renderCards()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
-                            <option value="">Semua Kategori</option>
-                            <option value="Pendidikan">Pendidikan</option>
-                            <option value="Sosial">Sosial</option>
-                            <option value="Keagamaan">Keagamaan</option>
-                            <option value="Organisasi">Organisasi</option>
+                            <option value="">Semua Bidang</option>
                         </select>
                         <select id="filterPriority" onchange="renderCards()" class="border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50">
                             <option value="">Semua Prioritas</option>
@@ -373,11 +373,57 @@
                     <button id="viewList" onclick="setView('list')" class="p-2 rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition" title="List View">
                         <i class="fas fa-list text-sm"></i>
                     </button>
+                    <button id="viewKalender" onclick="setView('kalender')" class="p-2 rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition" title="Kalender Kegiatan">
+                        <i class="fas fa-calendar-alt text-sm"></i>
+                    </button>
                 </div>
             </div>
 
             <!-- CARDS -->
             <div id="prokerContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6"></div>
+
+            <!-- KALENDER KEGIATAN -->
+            <div id="kalenderSection" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-3 md:p-5 min-w-0">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                        <div>
+                            <p class="text-[11px] font-semibold text-blue-600 uppercase tracking-wider">Kalender Kegiatan</p>
+                            <h3 id="calTitle" class="text-lg font-bold text-gray-800">-</h3>
+                        </div>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <button onclick="shiftCalMonth(-1)" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 transition" title="Bulan sebelumnya"><i class="fas fa-chevron-left text-xs"></i></button>
+                            <button onclick="goCalToday()" class="px-3 h-9 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold transition">Bulan Ini</button>
+                            <button onclick="shiftCalMonth(1)" class="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 transition" title="Bulan berikutnya"><i class="fas fa-chevron-right text-xs"></i></button>
+                            <input id="calMonthPicker" type="month" onchange="pickCalMonth(this.value)" class="h-9 border border-gray-200 rounded-xl px-2 text-xs focus:outline-none focus:ring-2 focus:ring-blue-300 bg-gray-50" title="Pilih bulan">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-7 gap-1 text-center text-[10px] md:text-xs font-semibold text-gray-400 uppercase mb-1">
+                        <div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div><div class="text-red-400">Min</div>
+                    </div>
+                    <div id="calGrid" class="grid grid-cols-7 gap-1"></div>
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-[11px] text-gray-500">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Aktif</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>Pending</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Selesai</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>Ditunda</span>
+                        <span class="text-gray-400">· Program &gt; 7 hari tampil di daftar "Program berjalan".</span>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 md:p-5 min-w-0">
+                    <div class="flex items-start justify-between gap-2 mb-3">
+                        <div class="min-w-0">
+                            <h3 id="calListTitle" class="text-sm font-bold text-gray-800">Kegiatan bulan ini</h3>
+                            <p id="calListSub" class="text-xs text-gray-400"></p>
+                        </div>
+                        <button id="calClearDay" onclick="selectCalDay(null)" class="hidden text-xs text-blue-600 font-semibold hover:underline shrink-0">Semua</button>
+                    </div>
+                    <div id="calList" class="space-y-2"></div>
+                    <div id="calLongWrap" class="hidden mt-5 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-bold text-gray-700 mb-2"><i class="fas fa-stream text-gray-400 mr-1"></i>Program berjalan (jangka panjang)</p>
+                        <div id="calLongList" class="space-y-2"></div>
+                    </div>
+                </div>
+            </div>
             <div id="emptyState" class="hidden text-center py-20">
                 <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <i class="fas fa-search text-gray-400 text-2xl"></i>
@@ -410,17 +456,12 @@
             <input type="hidden" id="editId">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1.5">Nama Program <span class="text-red-500">*</span></label>
-                <input id="formNama" type="text" placeholder="Contoh: Kajian Rutin Generus" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <input id="formNama" type="text" placeholder="Contoh: Ngaji Rutin Generus" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
             </div>
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Kategori</label>
-                    <select id="formKategori" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                        <option value="Pendidikan">Pendidikan</option>
-                        <option value="Keagamaan">Keagamaan</option>
-                        <option value="Sosial">Sosial</option>
-                        <option value="Organisasi">Organisasi</option>
-                    </select>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Bidang</label>
+                    <select id="formKategori" onchange="populatePJ()" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"></select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Status</label>
@@ -442,11 +483,13 @@
                     <input id="formTanggalSelesai" type="date" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                 </div>
             </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1.5">Penanggung Jawab</label>
+                <select id="formPJSelect" onchange="onPJSelectChange()" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"></select>
+                <input id="formPJ" type="text" placeholder="Tulis nama penanggung jawab" class="hidden mt-2 w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                <p id="pjHint" class="hidden mt-1.5 text-xs text-amber-600"><i class="fas fa-info-circle mr-1"></i>Belum ada pengurus untuk bidang ini. Lengkapi di <a href="struktur.html" class="font-semibold underline">Struktur Kepengurusan</a>.</p>
+            </div>
             <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Penanggung Jawab</label>
-                    <input id="formPJ" type="text" placeholder="Nama PJ" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
-                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Prioritas</label>
                     <select id="formPriority" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
@@ -454,6 +497,29 @@
                         <option value="Sedang">Sedang</option>
                         <option value="Rendah">Rendah</option>
                     </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Lokasi <span class="text-gray-400 font-normal">(opsional)</span></label>
+                    <input id="formLokasi" type="text" placeholder="Contoh: Masjid Sengka" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">RAB (Rp)</label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-gray-400">Rp</span>
+                        <input id="formAnggaran" type="text" inputmode="numeric" placeholder="0" oninput="formatRupiahInput(this)" class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 pl-11">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">File RAB (Excel) <span class="text-gray-400 font-normal">(opsional)</span></label>
+                    <input id="formRabFile" type="file" accept=".xlsx,.xls,.csv" class="w-full text-xs text-gray-600 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-green-50 file:text-green-700 file:font-semibold hover:file:bg-green-100 border border-gray-200 rounded-xl p-1.5">
+                    <div id="rabCurrent" class="hidden mt-2 flex items-center gap-2 text-xs bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                        <i class="fas fa-file-excel text-green-600"></i>
+                        <span id="rabCurrentName" class="flex-1 min-w-0 truncate text-gray-700"></span>
+                        <button type="button" id="rabRemoveBtn" onclick="toggleRabRemove()" class="text-red-600 hover:underline font-semibold shrink-0">Hapus</button>
+                    </div>
+                    <p id="rabCurrentNote" class="hidden mt-1 text-[11px] text-gray-400">Pilih file baru untuk mengganti file RAB saat ini.</p>
                 </div>
             </div>
             <div>
@@ -469,7 +535,7 @@
             </div>
             <div class="flex gap-3 pt-2">
                 <button onclick="closeModal('modalForm')" class="flex-1 border border-gray-200 text-gray-600 py-3 rounded-xl text-sm font-medium hover:bg-gray-50 transition">Batal</button>
-                <button onclick="saveProgram()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-sm font-medium hover:bg-blue-700 transition shadow-sm">
+                <button id="btnSaveProgram" onclick="saveProgram()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-sm font-medium hover:bg-blue-700 transition shadow-sm">
                     <i class="fas fa-save mr-2"></i> Simpan Program
                 </button>
             </div>
@@ -524,11 +590,33 @@ const statusBadge = {
     'Pending': { cls:'badge-pending', icon:'fas fa-clock' },
     'Ditunda': { cls:'badge-ditunda', icon:'fas fa-pause-circle' },
 };
+// Warna chip kalender per status.
+const calTone = {
+    'Aktif':   { chip:'bg-emerald-50 text-emerald-800 border-emerald-500', dot:'bg-emerald-500' },
+    'Pending': { chip:'bg-amber-50 text-amber-800 border-amber-500',       dot:'bg-amber-500' },
+    'Selesai': { chip:'bg-blue-50 text-blue-800 border-blue-500',          dot:'bg-blue-500' },
+    'Ditunda': { chip:'bg-red-50 text-red-800 border-red-500',             dot:'bg-red-500' },
+};
 const priorityColor = { 'Tinggi':'text-red-500','Sedang':'text-amber-500','Rendah':'text-gray-400' };
+const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const PJ_LAINNYA = '__lainnya__';
+const LONG_SPAN_DAYS = 7; // program lebih panjang dari ini tidak digambar di tiap sel kalender
+const esc = v => window.PPG_DB.escapeHtml(v);
 
 let programs = [];
+let struktur = [];
+let bidangList = [];
 let currentView = 'grid';
 let hapusId = null;
+let canManage = false;
+let rabRemove = false;
+const nowDate = new Date();
+let calYear = nowDate.getFullYear(), calMonth = nowDate.getMonth(), calSelectedDay = null;
+
+const findProgram = id => programs.find(p => String(p.id) === String(id));
+const jsId = id => `'${String(id).replace(/[^\w-]/g, '')}'`;
+const fmtRp = n => Number(n) ? new Intl.NumberFormat('id-ID', { style:'currency', currency:'IDR', maximumFractionDigits:0 }).format(Number(n)) : '-';
+const hasRab = pr => Boolean(pr.rabUrl || pr.rabPath);
 
 function updateKPI() {
     document.getElementById('kpiTotal').textContent = programs.length;
@@ -537,13 +625,103 @@ function updateKPI() {
     document.getElementById('kpiPending').textContent = programs.filter(p=>p.status==='Pending').length;
 }
 
+// ===== Bidang & Penanggung Jawab dari Struktur Kepengurusan =====
+const byLevelUrutan = (a, b) => (Number(a.level) || 9) - (Number(b.level) || 9) || (Number(a.urutan) || 0) - (Number(b.urutan) || 0);
+function buildBidangList() {
+    const fromStruktur = [...struktur].filter(r => (r.bidang || '').trim()).sort(byLevelUrutan).map(r => r.bidang.trim());
+    const fromProker = programs.map(p => (p.kategori || '').trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, 'id'));
+    bidangList = [...new Set([...fromStruktur, ...fromProker])];
+}
+function fillBidangSelects() {
+    const filter = document.getElementById('filterKategori');
+    const keep = filter.value;
+    filter.innerHTML = '<option value="">Semua Bidang</option>' + bidangList.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('');
+    filter.value = bidangList.includes(keep) ? keep : '';
+}
+function setFormBidang(value) {
+    const sel = document.getElementById('formKategori');
+    const list = value && !bidangList.includes(value) ? [...bidangList, value] : bidangList;
+    sel.innerHTML = list.length ? list.map(b => `<option value="${esc(b)}">${esc(b)}</option>`).join('') : '<option value="">(Belum ada bidang — isi Struktur Kepengurusan)</option>';
+    sel.value = value || list[0] || '';
+}
+function getPJ() {
+    const sel = document.getElementById('formPJSelect');
+    return sel.value === PJ_LAINNYA ? document.getElementById('formPJ').value.trim() : sel.value;
+}
+// Opsi PJ mengikuti bidang terpilih: koordinator & anggota bidang, lalu pengurus harian, lalu "Lainnya…".
+// allowOther=false (ganti bidang): PJ pilihan daftar yang tidak ada di bidang baru dikosongkan, bukan dipindah ke "Lainnya…".
+function populatePJ(keepValue = getPJ(), allowOther = document.getElementById('formPJSelect').value === PJ_LAINNYA) {
+    const bidang = document.getElementById('formKategori').value;
+    const named = struktur.filter(r => (r.nama || '').trim());
+    const bidangRows = named.filter(r => bidang && (r.bidang || '').trim() === bidang).sort(byLevelUrutan);
+    const harian = named.filter(r => Number(r.level) <= 2).sort(byLevelUrutan);
+    const opt = r => `<option value="${esc(r.nama.trim())}">${esc(r.nama.trim())}${r.jabatan ? ` — ${esc(r.jabatan)}` : ''}</option>`;
+    const sel = document.getElementById('formPJSelect');
+    sel.innerHTML = '<option value="">— Pilih Penanggung Jawab —</option>'
+        + (bidangRows.length ? `<optgroup label="Bidang ${esc(bidang)}">${bidangRows.map(opt).join('')}</optgroup>` : '')
+        + (harian.length ? `<optgroup label="Pengurus Harian">${harian.map(opt).join('')}</optgroup>` : '')
+        + `<option value="${PJ_LAINNYA}">Lainnya…</option>`;
+    document.getElementById('pjHint').classList.toggle('hidden', bidangRows.length > 0);
+    const names = [...bidangRows, ...harian].map(r => r.nama.trim());
+    if (keepValue && names.includes(keepValue)) sel.value = keepValue;
+    else if (keepValue && allowOther) { sel.value = PJ_LAINNYA; document.getElementById('formPJ').value = keepValue; }
+    else sel.value = '';
+    onPJSelectChange();
+}
+function onPJSelectChange() {
+    const other = document.getElementById('formPJSelect').value === PJ_LAINNYA;
+    const input = document.getElementById('formPJ');
+    input.classList.toggle('hidden', !other);
+    if (!other) input.value = '';
+}
+
+// ===== RAB =====
+function formatRupiahInput(el) {
+    const digits = el.value.split(',')[0].replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+    el.value = digits ? Number(digits).toLocaleString('id-ID') : '';
+}
+// Format Indonesia: titik = ribuan, koma = desimal (sen diabaikan karena RAB dicatat per rupiah).
+const parseRupiah = text => Number(String(text || '').split(',')[0].replace(/\D/g, '')) || 0;
+function renderRabCurrent(pr) {
+    const show = Boolean(pr && hasRab(pr));
+    document.getElementById('rabCurrent').classList.toggle('hidden', !show);
+    document.getElementById('rabCurrentNote').classList.toggle('hidden', !show || rabRemove);
+    if (!show) return;
+    const name = document.getElementById('rabCurrentName');
+    name.textContent = rabRemove ? `${pr.rabNama || 'File RAB'} (akan dihapus saat disimpan)` : (pr.rabNama || 'File RAB');
+    name.classList.toggle('line-through', rabRemove);
+    document.getElementById('rabRemoveBtn').textContent = rabRemove ? 'Batal' : 'Hapus';
+}
+function toggleRabRemove() { rabRemove = !rabRemove; renderRabCurrent(findProgram(document.getElementById('editId').value)); }
+// Buka/unduh file RAB. Mode demo menyimpan data URL; diubah ke blob agar bisa diunduh.
+async function openRab(id, event) {
+    event?.stopPropagation();
+    const pr = findProgram(id);
+    if (!pr || !pr.rabUrl) { showToast('Belum ada file RAB untuk program ini','info'); return; }
+    const name = pr.rabNama || `RAB-${pr.nama || 'program'}.xlsx`;
+    let href = '', revoke = false;
+    if (/^data:/i.test(pr.rabUrl)) {
+        try { href = URL.createObjectURL(await (await fetch(pr.rabUrl)).blob()); revoke = true; }
+        catch { showToast('File RAB gagal dibuka','error'); return; }
+    } else {
+        href = window.PPG_DB.safeUrl(pr.rabUrl);
+        // Signed URL Supabase: parameter download memaksa unduhan dengan nama file asli.
+        if (href && /\/storage\/v1\/object\/sign\//.test(href) && !/[?&]download=/.test(href)) href += `${href.includes('?') ? '&' : '?'}download=${encodeURIComponent(name)}`;
+    }
+    if (!href) { showToast('Tautan file RAB tidak valid','error'); return; }
+    const a = document.createElement('a');
+    a.href = href; a.download = name; a.target = '_blank'; a.rel = 'noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    if (revoke) setTimeout(() => URL.revokeObjectURL(href), 1000);
+}
+
 function getFiltered() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const s = document.getElementById('filterStatus').value;
     const k = document.getElementById('filterKategori').value;
     const p = document.getElementById('filterPriority').value;
     return programs.filter(pr=>
-        (!q||(pr.nama||"").toLowerCase().includes(q)||(pr.pj||"").toLowerCase().includes(q)) &&
+        (!q||(pr.nama||"").toLowerCase().includes(q)||(pr.pj||"").toLowerCase().includes(q)||(pr.lokasi||"").toLowerCase().includes(q)) &&
         (!s||pr.status===s) && (!k||pr.kategori===k) && (!p||pr.prioritas===p)
     );
 }
@@ -563,7 +741,10 @@ function renderCards() {
     const data = getFiltered();
     const container = document.getElementById('prokerContainer');
     const empty = document.getElementById('emptyState');
+    const kalender = currentView==='kalender';
     document.getElementById('resultCount').textContent = `Menampilkan ${data.length} dari ${programs.length} program`;
+    document.getElementById('kalenderSection').classList.toggle('hidden', !kalender);
+    if (kalender) { container.className='hidden'; container.innerHTML=''; empty.classList.add('hidden'); renderCalendar(data); return; }
     if (!data.length) { container.innerHTML=''; empty.classList.remove('hidden'); return; }
     empty.classList.add('hidden');
     if (currentView==='list') {
@@ -576,8 +757,11 @@ function renderCards() {
     setTimeout(()=>{ document.querySelectorAll('[data-progress]').forEach(el=>{ el.style.width=el.dataset.progress+'%'; }); },50);
 }
 
-function renderCard(pr) {
-    pr=window.PPG_DB.escapeRow(pr);
+const rabIconBtn = (raw, size = 'text-sm') => hasRab(raw) ? `<button onclick="openRab(${jsId(raw.id)},event)" class="text-green-600 hover:text-green-700 ${size}" title="Unduh file RAB: ${esc(raw.rabNama || 'RAB')}"><i class="fas fa-file-excel"></i></button>` : '';
+
+function renderCard(raw) {
+    const pr=window.PPG_DB.escapeRow(raw);
+    const id=jsId(raw.id);
     const c=colorMap[pr.color]||colorMap.blue;
     const sb=statusBadge[pr.status]||statusBadge['Pending'];
     const pc=progressColor(pr.progress);
@@ -587,14 +771,14 @@ function renderCard(pr) {
             <div class="absolute right-4 top-4 opacity-20 text-5xl"><i class="${pr.icon}"></i></div>
             <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mb-3"><i class="${pr.icon} text-white text-xl"></i></div>
             <h3 class="text-white font-bold text-base leading-tight">${pr.nama}</h3>
-            <span class="text-xs text-white/80 mt-1 inline-block">${pr.kategori}</span>
+            <span class="text-xs text-white/80 mt-1 inline-block">${pr.kategori || '-'}</span>
         </div>
         <div class="p-5 flex-1 flex flex-col">
             <div class="flex items-center justify-between mb-4">
                 <span class="text-xs px-2.5 py-1 rounded-full font-medium ${sb.cls}"><i class="${sb.icon} mr-1"></i>${pr.status}</span>
                 <span class="text-xs ${pb} font-medium"><i class="fas fa-flag mr-1"></i>${pr.prioritas}</span>
             </div>
-            <p class="text-xs text-gray-500 line-clamp-2 mb-4 flex-1">${pr.deskripsi}</p>
+            <p class="text-xs text-gray-500 line-clamp-2 mb-4 flex-1">${pr.deskripsi || ''}</p>
             <div class="mb-4">
                 <div class="flex justify-between text-xs mb-1.5">
                     <span class="text-gray-500 font-medium">Progress</span>
@@ -604,19 +788,21 @@ function renderCard(pr) {
                     <div class="h-full ${pc} rounded-full progress-bar" style="width:0%" data-progress="${pr.progress}"></div>
                 </div>
             </div>
-            <div class="flex items-center gap-2 mb-2 text-xs text-gray-500"><i class="fas fa-user-circle text-gray-400"></i><span>${pr.pj}</span></div>
+            <div class="flex items-center gap-2 mb-2 text-xs text-gray-500"><i class="fas fa-user-circle text-gray-400"></i><span>${pr.pj || '-'}</span></div>
+            <div class="flex items-center gap-2 mb-2 text-xs text-gray-500"><i class="fas fa-wallet text-gray-400"></i><span>RAB ${fmtRp(raw.anggaran)}</span>${rabIconBtn(raw)}</div>
             <div class="flex items-center gap-2 mb-5 text-xs text-gray-400"><i class="fas fa-calendar-alt"></i><span>${fmtDate(pr.tanggalMulai)} – ${fmtDate(pr.tanggalSelesai)}</span></div>
             <div class="flex gap-2 mt-auto">
-                <button onclick="openDetail(${pr.id})" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-eye"></i> Detail</button>
-                <button onclick="openEditModal(${pr.id})" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-edit"></i> Edit</button>
-                <button onclick="openHapus(${pr.id})" class="px-3 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-xl text-xs font-medium transition"><i class="fas fa-trash"></i></button>
+                <button onclick="openDetail(${id})" class="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-700 py-2 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-eye"></i> Detail</button>
+                <button onclick="openEditModal(${id})" class="manage-only flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl text-xs font-medium transition flex items-center justify-center gap-1.5"><i class="fas fa-edit"></i> Edit</button>
+                <button onclick="openHapus(${id})" class="manage-only px-3 bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-xl text-xs font-medium transition"><i class="fas fa-trash"></i></button>
             </div>
         </div>
     </div>`;
 }
 
-function renderListItem(pr) {
-    pr=window.PPG_DB.escapeRow(pr);
+function renderListItem(raw) {
+    const pr=window.PPG_DB.escapeRow(raw);
+    const id=jsId(raw.id);
     const c=colorMap[pr.color]||colorMap.blue;
     const sb=statusBadge[pr.status]||statusBadge['Pending'];
     const pc=progressColor(pr.progress);
@@ -626,8 +812,9 @@ function renderListItem(pr) {
             <div class="flex items-center gap-2 mb-1 flex-wrap">
                 <h3 class="font-semibold text-gray-800 text-sm">${pr.nama}</h3>
                 <span class="text-xs px-2 py-0.5 rounded-full ${sb.cls}">${pr.status}</span>
+                ${rabIconBtn(raw, 'text-xs')}
             </div>
-            <p class="text-xs text-gray-400 mb-2">${pr.pj} · ${pr.kategori}</p>
+            <p class="text-xs text-gray-400 mb-2">${pr.pj || '-'} · ${pr.kategori || '-'}${Number(raw.anggaran) ? ` · RAB ${fmtRp(raw.anggaran)}` : ''}</p>
             <div class="flex items-center gap-2">
                 <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[120px]">
                     <div class="h-full ${pc} rounded-full progress-bar" style="width:0%" data-progress="${pr.progress}"></div>
@@ -636,26 +823,30 @@ function renderListItem(pr) {
             </div>
         </div>
         <div class="flex gap-2 flex-shrink-0">
-            <button onclick="openDetail(${pr.id})" class="p-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 transition"><i class="fas fa-eye text-sm"></i></button>
-            <button onclick="openEditModal(${pr.id})" class="p-2 bg-blue-50 hover:bg-blue-100 rounded-xl text-blue-600 transition"><i class="fas fa-edit text-sm"></i></button>
-            <button onclick="openHapus(${pr.id})" class="p-2 bg-red-50 hover:bg-red-100 rounded-xl text-red-500 transition"><i class="fas fa-trash text-sm"></i></button>
+            <button onclick="openDetail(${id})" class="p-2 bg-gray-50 hover:bg-gray-100 rounded-xl text-gray-600 transition"><i class="fas fa-eye text-sm"></i></button>
+            <button onclick="openEditModal(${id})" class="manage-only p-2 bg-blue-50 hover:bg-blue-100 rounded-xl text-blue-600 transition"><i class="fas fa-edit text-sm"></i></button>
+            <button onclick="openHapus(${id})" class="manage-only p-2 bg-red-50 hover:bg-red-100 rounded-xl text-red-500 transition"><i class="fas fa-trash text-sm"></i></button>
         </div>
     </div>`;
 }
 
-function openDetail(id) {
-    const raw=programs.find(p=>p.id===id); if(!raw) return;
+function openDetail(rawId) {
+    const raw=findProgram(rawId); if(!raw) return;
     const pr=window.PPG_DB.escapeRow(raw);
+    const id=jsId(raw.id);
     const c=colorMap[pr.color]||colorMap.blue;
     const sb=statusBadge[pr.status]||statusBadge['Pending'];
     const pc=progressColor(pr.progress);
+    const rabBtn = hasRab(raw)
+        ? `<button onclick="openRab(${id},event)" class="w-11 h-11 rounded-xl bg-green-600 hover:bg-green-700 text-white flex items-center justify-center shrink-0 transition shadow-sm" title="Unduh file RAB: ${pr.rabNama || 'RAB'}"><i class="fas fa-file-excel text-lg"></i></button>`
+        : `<button disabled class="w-11 h-11 rounded-xl bg-gray-100 text-gray-300 flex items-center justify-center shrink-0 cursor-not-allowed" title="Belum ada file RAB"><i class="fas fa-file-excel text-lg"></i></button>`;
     document.getElementById('modalDetailContent').innerHTML=`
         <div class="bg-gradient-to-br ${c.grad} p-6 rounded-t-2xl relative overflow-hidden">
             <div class="absolute right-6 top-6 opacity-20 text-6xl"><i class="${pr.icon}"></i></div>
             <button onclick="closeModal('modalDetail')" class="absolute top-4 right-4 p-2 rounded-xl bg-white/20 hover:bg-white/30 transition text-white"><i class="fas fa-times"></i></button>
             <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-4"><i class="${pr.icon} text-white text-2xl"></i></div>
             <h2 class="text-white font-bold text-xl leading-tight">${pr.nama}</h2>
-            <p class="text-white/80 text-sm mt-1">${pr.kategori}</p>
+            <p class="text-white/80 text-sm mt-1">Bidang ${pr.kategori || '-'}</p>
         </div>
         <div class="p-6 space-y-5">
             <div class="flex flex-wrap gap-2">
@@ -664,18 +855,30 @@ function openDetail(id) {
             </div>
             <div>
                 <p class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-1">Deskripsi</p>
-                <p class="text-sm text-gray-700 leading-relaxed">${pr.deskripsi}</p>
+                <p class="text-sm text-gray-700 leading-relaxed">${pr.deskripsi || '-'}</p>
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-gray-50 rounded-xl p-3">
                     <p class="text-xs text-gray-400 mb-1">Penanggung Jawab</p>
-                    <p class="text-sm font-semibold text-gray-700">${pr.pj}</p>
+                    <p class="text-sm font-semibold text-gray-700">${pr.pj || '-'}</p>
                 </div>
                 <div class="bg-gray-50 rounded-xl p-3">
                     <p class="text-xs text-gray-400 mb-1">Periode</p>
                     <p class="text-sm font-semibold text-gray-700">${fmtDate(pr.tanggalMulai)}</p>
                     <p class="text-xs text-gray-400">s/d ${fmtDate(pr.tanggalSelesai)}</p>
                 </div>
+                ${pr.lokasi ? `<div class="bg-gray-50 rounded-xl p-3 col-span-2">
+                    <p class="text-xs text-gray-400 mb-1">Lokasi</p>
+                    <p class="text-sm font-semibold text-gray-700"><i class="fas fa-map-marker-alt text-gray-400 mr-1"></i>${pr.lokasi}</p>
+                </div>` : ''}
+            </div>
+            <div class="flex items-center gap-3 bg-green-50/60 border border-green-100 rounded-xl p-3">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs text-gray-400 mb-0.5">RAB (Rencana Anggaran Biaya)</p>
+                    <p class="text-base font-bold text-gray-800">${fmtRp(raw.anggaran)}</p>
+                    <p class="text-[11px] ${hasRab(raw) ? 'text-green-700' : 'text-gray-400'} truncate">${hasRab(raw) ? `<i class="fas fa-paperclip mr-1"></i>${pr.rabNama || 'File RAB'}` : 'Belum ada file RAB'}</p>
+                </div>
+                ${rabBtn}
             </div>
             <div>
                 <div class="flex justify-between mb-2">
@@ -686,86 +889,121 @@ function openDetail(id) {
                     <div class="h-full ${pc} rounded-full progress-bar" style="width:0%" data-progress="${pr.progress}"></div>
                 </div>
             </div>
-            <div class="flex gap-3 pt-2">
-                <button onclick="closeModal('modalDetail');openEditModal(${pr.id})" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-sm font-medium hover:bg-blue-700 transition"><i class="fas fa-edit mr-2"></i>Edit Program</button>
-                <button onclick="closeModal('modalDetail');openHapus(${pr.id})" class="px-4 bg-red-50 text-red-600 py-3 rounded-xl text-sm font-medium hover:bg-red-100 transition"><i class="fas fa-trash"></i></button>
+            <div class="manage-only flex gap-3 pt-2">
+                <button onclick="closeModal('modalDetail');openEditModal(${id})" class="flex-1 bg-blue-600 text-white py-3 rounded-xl text-sm font-medium hover:bg-blue-700 transition"><i class="fas fa-edit mr-2"></i>Edit Program</button>
+                <button onclick="closeModal('modalDetail');openHapus(${id})" class="px-4 bg-red-50 text-red-600 py-3 rounded-xl text-sm font-medium hover:bg-red-100 transition"><i class="fas fa-trash"></i></button>
             </div>
         </div>`;
     document.getElementById('modalDetail').classList.remove('hidden');
     setTimeout(()=>{ document.querySelectorAll('[data-progress]').forEach(el=>el.style.width=el.dataset.progress+'%'); },100);
 }
 
+function resetRabInputs(pr) {
+    rabRemove = false;
+    document.getElementById('formRabFile').value = '';
+    renderRabCurrent(pr);
+}
+
 function openTambahModal() {
+    if (!canManage) { showToast('Akun Anda tidak memiliki izin menambah program','error'); return; }
     document.getElementById('editId').value='';
     document.getElementById('modalFormTitle').textContent='Tambah Program Kerja';
-    ['formNama','formPJ','formDeskripsi'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('formKategori').value='Pendidikan';
+    ['formNama','formPJ','formDeskripsi','formLokasi','formAnggaran'].forEach(id=>document.getElementById(id).value='');
+    setFormBidang(document.getElementById('filterKategori').value || bidangList[0] || '');
+    populatePJ('', false);
     document.getElementById('formStatus').value='Aktif';
     document.getElementById('formTanggalMulai').value='';
     document.getElementById('formTanggalSelesai').value='';
     document.getElementById('formPriority').value='Sedang';
     document.getElementById('formProgress').value=0;
     document.getElementById('progressVal').textContent='0%';
+    resetRabInputs(null);
     document.getElementById('modalForm').classList.remove('hidden');
 }
 
 function openEditModal(id) {
-    const pr=programs.find(p=>p.id===id); if(!pr) return;
-    document.getElementById('editId').value=id;
+    if (!canManage) { showToast('Akun Anda tidak memiliki izin mengubah program','error'); return; }
+    const pr=findProgram(id); if(!pr) return;
+    document.getElementById('editId').value=pr.id;
     document.getElementById('modalFormTitle').textContent='Edit Program Kerja';
-    document.getElementById('formNama').value=pr.nama;
-    document.getElementById('formKategori').value=pr.kategori;
-    document.getElementById('formStatus').value=pr.status;
-    document.getElementById('formTanggalMulai').value=pr.tanggalMulai;
-    document.getElementById('formTanggalSelesai').value=pr.tanggalSelesai;
-    document.getElementById('formPJ').value=pr.pj;
-    document.getElementById('formPriority').value=pr.prioritas;
-    document.getElementById('formProgress').value=pr.progress;
-    document.getElementById('progressVal').textContent=pr.progress+'%';
-    document.getElementById('formDeskripsi').value=pr.deskripsi;
+    document.getElementById('formNama').value=pr.nama||'';
+    setFormBidang(pr.kategori||'');
+    document.getElementById('formPJ').value='';
+    populatePJ(pr.pj||'', true);
+    document.getElementById('formStatus').value=pr.status||'Aktif';
+    document.getElementById('formTanggalMulai').value=pr.tanggalMulai||'';
+    document.getElementById('formTanggalSelesai').value=pr.tanggalSelesai||'';
+    document.getElementById('formPriority').value=pr.prioritas||'Sedang';
+    document.getElementById('formProgress').value=pr.progress||0;
+    document.getElementById('progressVal').textContent=(pr.progress||0)+'%';
+    document.getElementById('formDeskripsi').value=pr.deskripsi||'';
+    document.getElementById('formLokasi').value=pr.lokasi||'';
+    document.getElementById('formAnggaran').value=Number(pr.anggaran) ? Math.round(Number(pr.anggaran)).toLocaleString('id-ID') : '';
+    resetRabInputs(pr);
     document.getElementById('modalForm').classList.remove('hidden');
 }
 
+const RAB_MAX_MB = 10;
 async function saveProgram() {
     const nama=document.getElementById('formNama').value.trim();
     if(!nama){showToast('Nama program wajib diisi!','error');return;}
+    const tanggalMulai=document.getElementById('formTanggalMulai').value, tanggalSelesai=document.getElementById('formTanggalSelesai').value;
+    if(tanggalMulai&&tanggalSelesai&&tanggalSelesai<tanggalMulai){showToast('Tanggal selesai tidak boleh sebelum tanggal mulai','error');return;}
+    const file=document.getElementById('formRabFile').files[0];
+    if(file&&!/\.(xlsx|xls|csv)$/i.test(file.name)){showToast('File RAB harus berformat .xlsx, .xls, atau .csv','error');return;}
+    if(file&&file.size>RAB_MAX_MB*1024*1024){showToast(`Ukuran file RAB maksimal ${RAB_MAX_MB} MB`,'error');return;}
     const editId=document.getElementById('editId').value;
+    const old=editId?findProgram(editId):null;
     const data={
         nama,
         kategori:document.getElementById('formKategori').value,
         status:document.getElementById('formStatus').value,
-        tanggalMulai:document.getElementById('formTanggalMulai').value,
-        tanggalSelesai:document.getElementById('formTanggalSelesai').value,
-        pj:document.getElementById('formPJ').value,
+        tanggalMulai, tanggalSelesai,
+        pj:getPJ(),
         prioritas:document.getElementById('formPriority').value,
         progress:parseInt(document.getElementById('formProgress').value),
         deskripsi:document.getElementById('formDeskripsi').value,
+        lokasi:document.getElementById('formLokasi').value.trim(),
+        anggaran:parseRupiah(document.getElementById('formAnggaran').value),
     };
     const iconMap={Pendidikan:'fas fa-book-open',Keagamaan:'fas fa-mosque',Sosial:'fas fa-hands-helping',Organisasi:'fas fa-sitemap'};
     const colorList=Object.keys(colorMap);
+    const btn=document.getElementById('btnSaveProgram'); btn.disabled=true;
+    let uploaded=null;
     try {
+        // Pola sama dengan Dokumentasi/Arsip: unggah file baru → simpan baris → hapus file lama setelah berhasil.
+        if(file){ uploaded=await window.PPG_DB.storage.uploadRab(file); Object.assign(data,{rabPath:uploaded.path||null,rabNama:file.name,rabUrl:uploaded.publicUrl}); }
+        else if(old&&rabRemove){ Object.assign(data,{rabPath:null,rabNama:null,rabUrl:null}); }
         if(editId){
             const saved=await window.PPG_DB.proker.update(editId,data);
-            const idx=programs.findIndex(p=>String(p.id)===String(editId)); programs[idx]={...programs[idx],...saved};
+            const idx=programs.findIndex(p=>String(p.id)===String(editId)); if(idx>=0) programs[idx]=saved;
+            if(old?.rabPath&&'rabPath' in data&&old.rabPath!==data.rabPath) await window.PPG_DB.storage.removeRab(old.rabPath);
             showToast('Program berhasil diperbarui','success');
         } else {
             const visual={...data,icon:iconMap[data.kategori]||'fas fa-tasks',color:colorList[(programs.length+1)%colorList.length]};
             const saved=await window.PPG_DB.proker.insert(visual); programs.unshift(saved);
             showToast('Program baru berhasil ditambahkan','success');
         }
+        buildBidangList(); fillBidangSelects();
         updateKPI(); renderCards(); closeModal('modalForm');
-    } catch(error) { showToast(`Program gagal disimpan: ${error.message}`,'error'); }
+    } catch(error) {
+        if(uploaded?.path) await window.PPG_DB.storage.removeRab(uploaded.path);
+        showToast(`Program gagal disimpan: ${error.message}`,'error');
+    } finally { btn.disabled=false; }
 }
 
 function openHapus(id) {
-    hapusId=id;
-    const pr=programs.find(p=>p.id===id);
-    document.getElementById('hapusNama').textContent=`Yakin ingin menghapus "${pr?.nama}"? Tindakan ini tidak bisa dibatalkan.`;
+    if (!canManage) { showToast('Akun Anda tidak memiliki izin menghapus program','error'); return; }
+    const pr=findProgram(id); if(!pr) return;
+    hapusId=pr.id;
+    document.getElementById('hapusNama').textContent=`Yakin ingin menghapus "${pr.nama}"? Tindakan ini tidak bisa dibatalkan.`;
     document.getElementById('modalHapus').classList.remove('hidden');
 }
 async function confirmHapus() {
+    const pr=findProgram(hapusId);
     try {
         await window.PPG_DB.proker.delete(hapusId);
+        if(pr?.rabPath) await window.PPG_DB.storage.removeRab(pr.rabPath);
         programs=programs.filter(p=>String(p.id)!==String(hapusId));
         updateKPI(); renderCards(); closeModal('modalHapus'); showToast('Program berhasil dihapus','success');
     } catch(error) { showToast(`Program gagal dihapus: ${error.message}`,'error'); }
@@ -774,9 +1012,96 @@ function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
 function setView(v) {
     currentView=v;
-    document.getElementById('viewGrid').className=v==='grid'?'p-2 rounded-xl bg-blue-600 text-white transition':'p-2 rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition';
-    document.getElementById('viewList').className=v==='list'?'p-2 rounded-xl bg-blue-600 text-white transition':'p-2 rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition';
+    const on='p-2 rounded-xl bg-blue-600 text-white transition', off='p-2 rounded-xl bg-gray-200 text-gray-600 hover:bg-gray-300 transition';
+    document.getElementById('viewGrid').className=v==='grid'?on:off;
+    document.getElementById('viewList').className=v==='list'?on:off;
+    document.getElementById('viewKalender').className=v==='kalender'?on:off;
+    const hash=v==='kalender'?'#kalender':'';
+    if(location.hash!==hash) history.replaceState(null,'',location.pathname+location.search+hash);
     renderCards();
+}
+
+// ===== KALENDER KEGIATAN =====
+const pad2 = n => String(n).padStart(2,'0');
+const ymd = (y,m,d) => `${y}-${pad2(m+1)}-${pad2(d)}`;
+function prokerRange(p) {
+    let s=String(p.tanggalMulai||'').slice(0,10), e=String(p.tanggalSelesai||'').slice(0,10);
+    if(!s) s=e; if(!e) e=s; if(!s) return null;
+    if(e<s) [s,e]=[e,s];
+    return { s, e, days: Math.round((Date.parse(e)-Date.parse(s))/86400000)+1 };
+}
+const fmtShort = str => new Date(`${str}T00:00:00`).toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+function rangeLabel(r, monthStart, monthEnd) {
+    if (r.s<=monthStart && r.e>=monthEnd) return 'Sepanjang bulan';
+    return r.s===r.e ? fmtShort(r.s) : `${fmtShort(r.s)} – ${fmtShort(r.e)}`;
+}
+function shiftCalMonth(delta) { const d=new Date(calYear,calMonth+delta,1); calYear=d.getFullYear(); calMonth=d.getMonth(); calSelectedDay=null; renderCards(); }
+function goCalToday() { const d=new Date(); calYear=d.getFullYear(); calMonth=d.getMonth(); calSelectedDay=null; renderCards(); }
+function pickCalMonth(value) { const m=/^(\d{4})-(\d{2})$/.exec(value||''); if(!m) return; calYear=Number(m[1]); calMonth=Number(m[2])-1; calSelectedDay=null; renderCards(); }
+function selectCalDay(day) { calSelectedDay = day && day!==calSelectedDay ? day : null; renderCards(); }
+
+function calItem(p, r, monthStart, monthEnd) {
+    const pr=window.PPG_DB.escapeRow(p);
+    const tone=calTone[p.status]||calTone.Pending;
+    const sb=statusBadge[p.status]||statusBadge.Pending;
+    return `<button onclick="openDetail(${jsId(p.id)})" class="w-full text-left flex items-start gap-2.5 p-2.5 rounded-xl border border-gray-100 hover:border-blue-200 hover:bg-blue-50/40 transition">
+        <span class="w-2.5 h-2.5 rounded-full ${tone.dot} mt-1.5 shrink-0"></span>
+        <span class="flex-1 min-w-0">
+            <span class="flex items-center gap-1.5"><span class="block text-xs font-semibold text-gray-800 truncate">${pr.nama}</span>${hasRab(p)?'<i class="fas fa-file-excel text-green-600 text-[10px]"></i>':''}</span>
+            <span class="block text-[11px] text-gray-500 truncate"><i class="far fa-calendar mr-1"></i>${rangeLabel(r,monthStart,monthEnd)} · ${pr.kategori||'-'}</span>
+            <span class="block text-[11px] text-gray-400 truncate">${pr.pj||'-'}${pr.lokasi?` · ${pr.lokasi}`:''}</span>
+        </span>
+        <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${sb.cls} shrink-0">${pr.status}</span>
+    </button>`;
+}
+
+function renderCalendar(data) {
+    const monthStart=ymd(calYear,calMonth,1);
+    const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+    const monthEnd=ymd(calYear,calMonth,daysInMonth);
+    const today=(d=>ymd(d.getFullYear(),d.getMonth(),d.getDate()))(new Date());
+    const label=`${BULAN[calMonth]} ${calYear}`;
+    document.getElementById('calTitle').textContent=label;
+    document.getElementById('calMonthPicker').value=`${calYear}-${pad2(calMonth+1)}`;
+
+    const inMonth=data.map(p=>({p,r:prokerRange(p)})).filter(x=>x.r&&x.r.s<=monthEnd&&x.r.e>=monthStart)
+        .sort((a,b)=>a.r.s.localeCompare(b.r.s)||String(a.p.nama||'').localeCompare(String(b.p.nama||'')));
+    const shortItems=inMonth.filter(x=>x.r.days<=LONG_SPAN_DAYS);
+    const longItems=inMonth.filter(x=>x.r.days>LONG_SPAN_DAYS);
+
+    const offset=(new Date(calYear,calMonth,1).getDay()+6)%7;
+    const totalCells=Math.ceil((offset+daysInMonth)/7)*7;
+    let html='';
+    for(let i=0;i<totalCells;i++){
+        const day=i-offset+1;
+        if(day<1||day>daysInMonth){ html+='<div class="cal-cell rounded-lg bg-gray-50/60"></div>'; continue; }
+        const date=ymd(calYear,calMonth,day);
+        const items=shortItems.filter(x=>x.r.s<=date&&x.r.e>=date);
+        const isToday=date===today, isSel=date===calSelectedDay, isSunday=i%7===6;
+        const chips=items.slice(0,3).map(({p})=>{
+            const tone=calTone[p.status]||calTone.Pending;
+            return `<span role="button" onclick="event.stopPropagation();openDetail(${jsId(p.id)})" class="block truncate text-[10px] leading-4 px-1.5 rounded border-l-2 ${tone.chip} hover:brightness-95" title="${esc(p.nama)}">${esc(p.nama)}</span>`;
+        }).join('');
+        const more=items.length>3?`<span class="block text-[10px] text-gray-500 font-medium px-1">+${items.length-3} lainnya</span>`:'';
+        const dots=items.slice(0,4).map(({p})=>`<span class="w-1.5 h-1.5 rounded-full ${(calTone[p.status]||calTone.Pending).dot}"></span>`).join('');
+        html+=`<div onclick="selectCalDay('${date}')" class="cal-cell rounded-lg border ${isSel?'border-blue-500 ring-2 ring-blue-200':'border-gray-100'} ${items.length?'bg-white':'bg-white/70'} hover:border-blue-300 p-1 cursor-pointer flex flex-col gap-0.5 min-w-0 overflow-hidden transition">
+            <span class="text-[11px] md:text-xs font-semibold ${isToday?'bg-blue-600 text-white rounded-full w-5 h-5 md:w-6 md:h-6 flex items-center justify-center':isSunday?'text-red-400 px-0.5':'text-gray-600 px-0.5'}">${day}</span>
+            <div class="hidden md:flex flex-col gap-0.5 min-w-0">${chips}${more}</div>
+            <div class="flex md:hidden flex-wrap gap-0.5 px-0.5">${dots}</div>
+        </div>`;
+    }
+    document.getElementById('calGrid').innerHTML=html;
+
+    // Daftar samping: semua kegiatan bulan ini, atau kegiatan pada tanggal terpilih.
+    const listEl=document.getElementById('calList');
+    const sel=calSelectedDay&&calSelectedDay>=monthStart&&calSelectedDay<=monthEnd?calSelectedDay:null;
+    document.getElementById('calClearDay').classList.toggle('hidden',!sel);
+    const listItems=sel?inMonth.filter(x=>x.r.s<=sel&&x.r.e>=sel&&x.r.days<=LONG_SPAN_DAYS):shortItems;
+    document.getElementById('calListTitle').textContent=sel?`Kegiatan ${new Date(`${sel}T00:00:00`).toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}`:`Kegiatan bulan ${label}`;
+    document.getElementById('calListSub').textContent=`${inMonth.length} program berlangsung bulan ini${longItems.length?` · ${longItems.length} jangka panjang`:''}`;
+    listEl.innerHTML=listItems.length?listItems.map(x=>calItem(x.p,x.r,monthStart,monthEnd)).join(''):`<p class="text-xs text-gray-400 text-center py-6">${sel?'Tidak ada kegiatan terjadwal pada tanggal ini.':'Tidak ada kegiatan terjadwal khusus bulan ini.'}</p>`;
+    document.getElementById('calLongWrap').classList.toggle('hidden',!longItems.length);
+    document.getElementById('calLongList').innerHTML=longItems.map(x=>calItem(x.p,x.r,monthStart,monthEnd)).join('');
 }
 
         // === MOBILE DRAWER SIDEBAR ===
@@ -830,13 +1155,24 @@ document.querySelectorAll('.modal-overlay').forEach(el=>{
 
 updateClock();
 setInterval(updateClock,60000);
+
+// Hak akses: tombol tambah/edit/hapus hanya untuk admin/pengurus.
+window.PPG_DB.profile.me().then(p=>{
+    canManage=window.PPG_DB.profile.canManage(p);
+    document.body.classList.toggle('can-manage',canManage);
+}).catch(error=>console.warn('Profil gagal dimuat:',error.message));
+
 async function loadPrograms() {
-    try {
-        const saved=await window.PPG_DB.proker.list();
-        programs=saved;
-        updateKPI(); renderCards();
-    } catch(error) { programs=[]; showToast(`Data program gagal dimuat: ${error.message}`,'error'); updateKPI(); renderCards(); }
+    const [prokerRes, strukturRes] = await Promise.allSettled([window.PPG_DB.proker.list(), window.PPG_DB.struktur.list()]);
+    if (prokerRes.status==='fulfilled') programs=prokerRes.value;
+    else { programs=[]; showToast(`Data program gagal dimuat: ${prokerRes.reason?.message||''}`,'error'); }
+    if (strukturRes.status==='fulfilled') struktur=strukturRes.value;
+    else { struktur=[]; console.warn('Struktur kepengurusan gagal dimuat:', strukturRes.reason?.message); }
+    buildBidangList(); fillBidangSelects();
+    updateKPI(); renderCards();
 }
+if (location.hash==='#kalender') setView('kalender');
+window.addEventListener('hashchange',()=>{ if(location.hash==='#kalender'&&currentView!=='kalender') setView('kalender'); });
 loadPrograms();
 </script>
 </body>

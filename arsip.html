@@ -521,7 +521,7 @@
         if (elDok) elDok.textContent = `${cDok} berkas`;
         if (elGen) elGen.textContent = `${cGen} berkas`;
 
-        const bulanIni = new Date().toISOString().slice(0, 7);
+        const bulanIni = window.PPG_DB.tanggalLokal().slice(0, 7);
         const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
         setText("statTotalArsip", currentArsipList.length);
         setText("statLupgArsip", cLupg);

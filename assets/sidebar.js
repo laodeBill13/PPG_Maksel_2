@@ -1,6 +1,53 @@
-// Global Sidebar Active Link & Mobile Drawer Handler
+// Menu tambahan disisipkan ke semua sidebar (desktop + drawer mobile) agar markup tiap halaman tidak perlu diubah.
+const EXTRA_MENU = [
+    { href: 'struktur.html', icon: 'fa-sitemap', label: 'Struktur Kepengurusan', after: 'arsip.html' },
+    { href: 'pengguna.html', icon: 'fa-user-check', label: 'Persetujuan User', after: 'struktur.html', adminOnly: true, badge: 'pengguna' },
+];
+
+function injectMenu(item) {
+    document.querySelectorAll('nav').forEach(nav => {
+        if (nav.querySelector(`a.sidebar-link[href="${item.href}"]`)) return;
+        const anchor = nav.querySelector(`a.sidebar-link[href="${item.after}"]`);
+        if (!anchor) return;
+        const link = document.createElement('a');
+        link.href = item.href;
+        link.className = 'sidebar-link flex items-center justify-between px-4 py-3 rounded-xl transition text-sm font-medium';
+        link.innerHTML = `<div class="flex items-center gap-3.5"><i class="fas ${item.icon} w-5 text-center text-base"></i><span>${item.label}</span></div>`
+            + (item.badge ? `<span data-badge="${item.badge}" class="hidden bg-red-500 text-white text-[11px] px-2 py-0.5 rounded-full font-semibold"></span>` : '');
+        anchor.after(link);
+    });
+}
+
+function highlightActiveLinks() {
+    const currentPage = window.location.pathname.split("/").pop().split("?")[0].split("#")[0] || "dashboard.html";
+    document.querySelectorAll(".sidebar-link").forEach((link) => {
+        const href = link.getAttribute("href");
+        if (!href) return;
+        const linkPage = href.split("/").pop().split("?")[0].split("#")[0];
+        if (linkPage === currentPage) {
+            link.classList.add("bg-white", "text-blue-700", "font-semibold", "shadow-sm");
+            link.classList.remove("hover:bg-blue-600", "text-white");
+        } else {
+            link.classList.remove("bg-white", "text-blue-700", "font-semibold", "shadow-sm");
+            link.classList.add("text-white", "hover:bg-blue-600");
+        }
+    });
+}
+
+// Kartu di kaki sidebar menampilkan akun yang sedang login.
+function showAccount(profile) {
+    if (!profile) return;
+    const label = profile.jabatan || window.PPG_DB.profile.ROLES[profile.role] || profile.role;
+    document.querySelectorAll('aside .border-t .bg-blue-800\\/60').forEach(card => {
+        const [nameEl, roleEl] = card.querySelectorAll('p');
+        if (nameEl) nameEl.textContent = profile.nama || profile.email || 'Pengguna';
+        if (roleEl) roleEl.textContent = profile.kelompok ? `${label} · ${profile.kelompok}` : label;
+    });
+}
+
 async function initSidebar() {
-    if (window.PPG_DB?.isLive()) {
+    const live = window.PPG_DB?.isLive();
+    if (live) {
         try {
             const session = await window.PPG_DB.auth.getSession();
             if (!session) { window.location.replace('login.html'); return; }
@@ -9,24 +56,26 @@ async function initSidebar() {
             window.location.replace('login.html'); return;
         }
     }
-    const currentPath = window.location.pathname;
-    const currentPage = currentPath.split("/").pop().split("?")[0].split("#")[0] || "dashboard.html";
 
-    const sidebarLinks = document.querySelectorAll(".sidebar-link");
+    EXTRA_MENU.filter(item => !item.adminOnly).forEach(injectMenu);
+    highlightActiveLinks();
 
-    sidebarLinks.forEach((link) => {
-        const href = link.getAttribute("href");
-        if (!href) return;
-        const linkPage = href.split("/").pop().split("?")[0].split("#")[0];
-
-        if (linkPage === currentPage || (currentPage === "" && linkPage === "dashboard.html")) {
-            link.classList.add("bg-white", "text-blue-700", "font-semibold", "shadow-sm");
-            link.classList.remove("hover:bg-blue-600", "text-white");
-        } else {
-            link.classList.remove("bg-white", "text-blue-700", "font-semibold", "shadow-sm");
-            link.classList.add("text-white", "hover:bg-blue-600");
-        }
-    });
+    // Akun yang belum disetujui admin tidak boleh membuka halaman aplikasi.
+    // Gagal memuat profil (mis. jaringan) tidak mengunci halaman; RLS tetap membatasi data.
+    let profile = null, profileLoaded = false;
+    try { profile = await window.PPG_DB?.profile.me(); profileLoaded = true; }
+    catch (error) { console.warn('Profil gagal dimuat:', error.message); }
+    if (live && profileLoaded && profile?.status !== 'approved') {
+        try { await window.PPG_DB.auth.signOut(); } catch {}
+        window.location.replace(`login.html?status=${profile?.status || 'pending'}`); return;
+    }
+    window.PPG_PROFILE = profile;
+    if (window.PPG_DB?.profile.isAdmin(profile)) {
+        EXTRA_MENU.filter(item => item.adminOnly).forEach(injectMenu);
+        highlightActiveLinks();
+    }
+    showAccount(profile);
+    document.dispatchEvent(new CustomEvent('ppg:profile', { detail: profile }));
 
     refreshSidebarBadges();
 
@@ -52,9 +101,15 @@ async function refreshSidebarBadges() {
             const rows = await window.PPG_DB.absensi.list();
             return rows.length ? `${(rows.filter(r => r.status === 'Hadir').length / rows.length * 100).toFixed(0)}%` : '0%';
         },
-        proker: async () => `${(await window.PPG_DB.proker.list()).filter(p => p.status === 'Aktif').length} Aktif`
+        proker: async () => `${(await window.PPG_DB.proker.list()).filter(p => p.status === 'Aktif').length} Aktif`,
+        pengguna: async () => {
+            const pending = window.PPG_DB.isLive() ? (await window.PPG_DB.profile.list()).filter(p => p.status === 'pending').length : 0;
+            document.querySelectorAll('[data-badge="pengguna"]').forEach(el => el.classList.toggle('hidden', !pending));
+            return String(pending);
+        }
     };
     for (const [name, load] of Object.entries(loaders)) {
+        if (!document.querySelector(`[data-badge="${name}"]`)) continue;
         try {
             const text = await load();
             document.querySelectorAll(`[data-badge="${name}"]`).forEach(el => { el.textContent = text; });

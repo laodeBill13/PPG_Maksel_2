@@ -213,6 +213,9 @@
                     </p>
                 </div>
 
+                <!-- Status akun (menunggu persetujuan / ditolak / baru mendaftar) -->
+                <div id="statusNotice" class="hidden mb-5 rounded-xl border px-4 py-3 text-sm" role="status"></div>
+
                 <!-- Form -->
                 <form id="loginForm">
 
@@ -266,6 +269,21 @@
 
                 </form>
 
+                <!-- Akses ke pendaftaran akun -->
+                <div class="mt-6">
+                    <div class="flex items-center gap-3 text-xs text-slate-400">
+                        <span class="flex-1 h-px bg-slate-200"></span>
+                        <span>Belum punya akun?</span>
+                        <span class="flex-1 h-px bg-slate-200"></span>
+                    </div>
+                    <a href="register.html"
+                        class="mt-4 flex items-center justify-center gap-2.5 w-full border-2 border-blue-600 text-blue-700 hover:bg-blue-50 py-3 rounded-xl font-semibold text-sm transition">
+                        <i class="fas fa-user-plus text-sm"></i>
+                        <span>Daftar Akun Baru</span>
+                    </a>
+                    <p class="mt-2 text-center text-[11px] text-slate-400">Untuk pengurus kelompok &amp; pengurus PPG. Akun aktif setelah disetujui admin.</p>
+                </div>
+
             </div>
 
             <!-- Footer (below card) -->
@@ -303,6 +321,20 @@
             }
         }
 
+        const STATUS_TEXT = {
+            pending: ['amber', 'Akun Anda sedang menunggu persetujuan admin (Ketua/Wakil/Sekretaris). Silakan coba login lagi setelah disetujui.'],
+            rejected: ['red', 'Pendaftaran akun Anda ditolak. Hubungi pengurus PPG Maksel 2 untuk informasi lebih lanjut.'],
+            registered: ['emerald', 'Pendaftaran berhasil! Akun Anda akan aktif setelah disetujui admin. Jika diminta, konfirmasi dulu email Anda.'],
+        };
+        function showStatus(status) {
+            const [color, text] = STATUS_TEXT[status] || STATUS_TEXT.pending;
+            const box = document.getElementById('statusNotice');
+            box.className = `mb-5 rounded-xl border px-4 py-3 text-sm bg-${color}-50 border-${color}-200 text-${color}-800`;
+            box.textContent = text;
+        }
+        const initialStatus = new URLSearchParams(location.search).get('status');
+        if (initialStatus) showStatus(initialStatus);
+
         document.getElementById('loginForm').addEventListener('submit', async (event) => {
             event.preventDefault();
             const email=document.getElementById('emailInput').value.trim();
@@ -312,8 +344,18 @@
             errorBox.classList.add('hidden');
             if(!email || !password){errorBox.textContent='Email dan password wajib diisi.';errorBox.classList.remove('hidden');return;}
             button.disabled=true;button.classList.add('opacity-60');button.querySelector('span').textContent='Memverifikasi...';
-            try { await window.PPG_DB.auth.signIn(email,password); window.location.href='dashboard.html'; }
-            catch(error){errorBox.textContent=error.message||'Login gagal. Periksa kembali akun Anda.';errorBox.classList.remove('hidden');}
+            try {
+                await window.PPG_DB.auth.signIn(email,password);
+                // Akun hasil registrasi baru bisa masuk setelah disetujui admin.
+                const profile=await window.PPG_DB.profile.me();
+                if(window.PPG_DB.isLive() && profile?.status!=='approved'){
+                    await window.PPG_DB.auth.signOut();
+                    showStatus(profile?.status||'pending');
+                    return;
+                }
+                window.location.href='dashboard.html';
+            }
+            catch(error){errorBox.textContent=/email not confirmed/i.test(error.message||'')?'Email belum dikonfirmasi. Buka email dari sistem lalu klik link konfirmasi.':(error.message||'Login gagal. Periksa kembali akun Anda.');errorBox.classList.remove('hidden');}
             finally{button.disabled=false;button.classList.remove('opacity-60');button.querySelector('span').textContent='Masuk ke Sistem';}
         });
     </script>
