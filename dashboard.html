@@ -263,9 +263,7 @@
                         <i class="fas fa-bell text-sm"></i>
                         <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full ring-2 ring-white animate-pulse"></span>
                     </button>
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                        A
-                    </div>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" data-user-initial aria-hidden="true"></div>
                 </div>
             </header>
 
@@ -290,7 +288,7 @@
                     <!-- Real-Time Date & Clock Badge -->
                     <div class="hidden md:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3.5 py-2 rounded-xl text-xs font-medium text-slate-600">
                         <i class="far fa-calendar-alt text-blue-600"></i>
-                        <span id="liveDateText">Kamis, 28 Agustus 2026</span>
+                        <span id="liveDateText"></span>
                         <span class="text-slate-300">|</span>
                         <i class="far fa-clock text-blue-600"></i>
                         <span id="liveTimeText" class="font-mono">16:40 WITA</span>
@@ -331,14 +329,11 @@
 
                     <!-- User Profile Dropdown / Pill -->
                     <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-                            A
-                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" data-user-initial aria-hidden="true"></div>
                         <div class="hidden sm:block">
-                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="font-semibold text-xs text-slate-800 leading-tight" data-user-name>Memuat...</p>
                             <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                Super Admin
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span data-user-role></span>
                             </p>
                         </div>
                     </div>
@@ -424,7 +419,7 @@
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-blue-600">
-                                <span>528 Generus</span>
+                                <span id="dashboardShortGenerus">– Generus</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -462,7 +457,7 @@
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-amber-600">
-                                <span>21 Agenda</span>
+                                <span id="dashboardShortProker">– Agenda</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -481,7 +476,7 @@
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-purple-600">
-                                <span>91% Terisi</span>
+                                <span id="dashboardShortLupg">– Terisi</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -500,7 +495,7 @@
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-rose-600">
-                                <span>24 Album</span>
+                                <span id="dashboardShortDok">– Album</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -519,7 +514,7 @@
                                 </p>
                             </div>
                             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-cyan-700">
-                                <span>185 Berkas</span>
+                                <span id="dashboardShortArsip">– Berkas</span>
                                 <i class="fas fa-arrow-right text-[11px] group-hover:translate-x-1 transition"></i>
                             </div>
                         </a>
@@ -560,13 +555,13 @@
                             </span>
                         </div>
                         <div class="flex items-baseline gap-2 mt-3">
-                            <h3 class="text-3xl font-extrabold text-emerald-600">32</h3>
+                            <h3 class="text-3xl font-extrabold text-emerald-600" id="dashboardPengurusCount">–</h3>
                             <span class="text-xs font-semibold text-emerald-600 flex items-center gap-0.5">
-                                <i class="fas fa-check text-[10px]"></i> 100% Aktif
+                                <i class="fas fa-check text-[10px]"></i> <span id="dashboardPengurusTerisi">–</span>
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1">6 Bidang Kepengurusan</p>
-                        <a href="pengaturan.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-800">
+                        <p class="text-xs text-slate-500 mt-1" id="dashboardPengurusBidang">– Bidang Kepengurusan</p>
+                        <a href="struktur.html" class="mt-4 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 hover:text-emerald-800">
                             <span>Struktur Pengurus</span>
                             <i class="fas fa-chevron-right text-[10px]"></i>
                         </a>
@@ -1056,10 +1051,15 @@
 
             const greetingEl = document.getElementById("greetingText");
             if (greetingEl) {
-                greetingEl.innerText = `${greeting}, Administrator! 👋`;
+                // Nama depan akun yang login (profil dimuat oleh sidebar.js).
+                const namaDepan = String(window.PPG_PROFILE?.nama || '').trim().split(/\s+/)[0];
+                greetingEl.innerText = namaDepan ? `${greeting}, ${namaDepan}! 👋` : `${greeting}! 👋`;
             }
 
             // Real-time time formatting in WITA (Makassar)
+            const dateEl = document.getElementById("liveDateText");
+            if (dateEl) dateEl.innerText = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
             const timeEl = document.getElementById("liveTimeText");
             if (timeEl) {
                 const timeString = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -1067,13 +1067,14 @@
             }
         }
         updateLiveGreeting();
+        document.addEventListener('ppg:profile', updateLiveGreeting);
         setInterval(updateLiveGreeting, 30000);
 
         const esc = value => window.PPG_DB.escapeHtml(value);
         const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
         const fmtTanggal = (value, opts = { day: 'numeric', month: 'short', year: 'numeric' }) => value ? new Date(value).toLocaleDateString('id-ID', opts) : '-';
         const pct = (part, total) => total ? Math.round(part / total * 1000) / 10 : 0;
-        let dashboardData = { generus: [], absensi: [], proker: [], lupg: [], arsip: [], dokumentasi: [] };
+        let dashboardData = { generus: [], absensi: [], proker: [], lupg: [], arsip: [], dokumentasi: [], struktur: [] };
         let previewDocId = null;
 
         async function loadDashboardSummary() {
@@ -1108,6 +1109,22 @@
             const bulanIni = window.PPG_DB.tanggalLokal().slice(0, 7);
             setText('dashboardArsipCount', arsip.length);
             setText('dashboardArsipBulanIni', `+${arsip.filter(a => String(a.tanggal || '').startsWith(bulanIni)).length} bln ini`);
+            // Kartu pintasan modul.
+            const { lupg, dokumentasi, struktur } = dashboardData;
+            const periodeKey = r => (Number(r.tahun) || 0) * 12 + BULAN.indexOf(r.bulan);
+            const lupgTerbaru = lupg.reduce((best, r) => (!best || periodeKey(r) > periodeKey(best)) ? r : best, null);
+            const lapor = lupgTerbaru ? new Set(lupg.filter(r => periodeKey(r) === periodeKey(lupgTerbaru)).map(r => r.kelompok)).size : 0;
+            const totalKelompok = window.PPG_WILAYAH?.kelompok.length || 0;
+            setText('dashboardShortGenerus', `${generus.length} Generus`);
+            setText('dashboardShortProker', `${proker.length} Agenda`);
+            setText('dashboardShortLupg', totalKelompok ? `${Math.round(lapor / totalKelompok * 100)}% Terisi` : '– Terisi');
+            setText('dashboardShortDok', `${dokumentasi.length} Album`);
+            setText('dashboardShortArsip', `${arsip.length} Berkas`);
+            // Total pengurus dari Struktur Kepengurusan: jabatan yang sudah ada namanya.
+            const terisi = struktur.filter(p => String(p.nama || '').trim());
+            setText('dashboardPengurusCount', terisi.length);
+            setText('dashboardPengurusTerisi', `${terisi.length}/${struktur.length} jabatan terisi`);
+            setText('dashboardPengurusBidang', `${new Set(struktur.map(p => p.bidang).filter(Boolean)).size} Bidang Kepengurusan`);
         }
 
         // --- 2. Notification Dropdown Toggle ---

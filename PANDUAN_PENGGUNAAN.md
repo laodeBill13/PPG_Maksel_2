@@ -195,8 +195,8 @@ Klik salah satu **kartu folder** untuk melihat berkas per kategori. Berkas juga 
 
 ### ⚙️ Pengaturan
 - **Profil Organisasi**: nama organisasi, deskripsi, dan tahun kepengurusan (khusus Admin).
-- **Akun Pengguna**: pengelolaan akun dan peran dilakukan oleh admin teknis.
-- **Konfigurasi Database**: khusus admin teknis, tidak perlu diubah.
+- **Profil akun** (bagian atas): nama, email, dan jabatan akun yang sedang login.
+- **Akun Pengguna**: menampilkan akun Anda. Tombol **Persetujuan & Hak Akses User** membuka halaman untuk menyetujui pendaftar baru dan mengatur peran (khusus Admin).
 
 ---
 

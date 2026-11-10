@@ -1,6 +1,14 @@
 // Central data gateway for PPG Maksel 2: Supabase live mode + local demo mode.
 (function (window) {
     "use strict";
+    // Link reset password dari email bisa mendarat di halaman lain (mis. Site URL = login.html) bila
+    // reset_password.html belum terdaftar di Redirect URLs Supabase. Pindahkan ke halaman reset SEBELUM
+    // client Supabase dibuat, karena client akan langsung memakai token itu untuk login tanpa ganti password.
+    // Hosting seperti Cloudflare Pages menyajikan halaman tanpa ".html", jadi keduanya dianggap halaman reset.
+    if (/(^#|&)type=recovery(&|$)/.test(window.location.hash) && !/\/reset_password(\.html)?$/.test(window.location.pathname)) {
+        window.location.replace(new URL("reset_password.html" + window.location.hash, window.location.href).href);
+        return;
+    }
     const URL_KEY = "ppg_supabase_url";
     const ANON_KEY = "ppg_supabase_key";
     const DEMO_SESSION = "ppg_demo_session";
@@ -54,6 +62,14 @@
     // Pesan error Supabase/PostgREST yang bisa dipahami pengguna.
     function friendlyError(error) {
         const code = error?.code;
+        const pesan = String(error?.message || "");
+        // Pesan Supabase Auth (bahasa Inggris) untuk login, lupa & reset password.
+        if (/invalid login credentials/i.test(pesan)) return new Error("Email atau password salah.");
+        if (/rate limit|too many requests/i.test(pesan) || code === "over_email_send_rate_limit") return new Error("Terlalu banyak permintaan email. Tunggu sekitar 1 jam, lalu coba lagi.");
+        if (/address not authorized|not authorized to send/i.test(pesan)) return new Error("Email tidak dapat dikirim ke alamat ini karena layanan email sistem belum diatur. Hubungi pengelola aplikasi.");
+        if (/should be different|same as the old/i.test(pesan) || code === "same_password") return new Error("Password baru harus berbeda dari password lama.");
+        if (/password should be at least|weak password/i.test(pesan) || code === "weak_password") return new Error("Password terlalu lemah. Gunakan minimal 8 karakter, campuran huruf dan angka.");
+        if (/auth session missing|session.*expired|invalid.*(link|token)|has expired/i.test(pesan)) return new Error("Link sudah kedaluwarsa atau sudah dipakai. Minta link reset baru dari halaman Lupa Password.");
         if (code === "42501" || /row-level security/i.test(error?.message || "")) return new Error("Akun Anda tidak memiliki izin untuk mengubah data ini.");
         if (code === "PGRST116") return new Error("Data tidak ditemukan atau akun Anda tidak memiliki izin mengubahnya.");
         if (code === "23505") return new Error("Data untuk periode/kelompok ini sudah ada.");

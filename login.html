@@ -353,6 +353,8 @@
                     showStatus(profile?.status||'pending');
                     return;
                 }
+                // Tanda untuk menampilkan pop-up kredit sekali di halaman pertama setelah login.
+                try { sessionStorage.setItem('ppg_kredit_login', '1'); } catch {}
                 window.location.href='dashboard.html';
             }
             catch(error){errorBox.textContent=/email not confirmed/i.test(error.message||'')?'Email belum dikonfirmasi. Buka email dari sistem lalu klik link konfirmasi.':(error.message||'Login gagal. Periksa kembali akun Anda.');errorBox.classList.remove('hidden');}

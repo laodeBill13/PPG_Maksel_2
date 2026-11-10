@@ -34,15 +34,22 @@ function highlightActiveLinks() {
     });
 }
 
-// Kartu di kaki sidebar menampilkan akun yang sedang login.
+// Nama, peran, email & inisial akun yang sedang login: kartu kaki sidebar, profil di pojok kanan atas,
+// dan elemen lain yang bertanda data-user-name / data-user-role / data-user-email / data-user-initial.
 function showAccount(profile) {
-    if (!profile) return;
-    const label = profile.jabatan || window.PPG_DB.profile.ROLES[profile.role] || profile.role;
+    const nama = profile?.nama || profile?.email || 'Pengguna';
+    const label = profile ? (profile.jabatan || window.PPG_DB.profile.ROLES[profile.role] || profile.role || '') : '';
+    const labelLengkap = profile?.kelompok ? `${label} · ${profile.kelompok}` : label;
     document.querySelectorAll('aside .border-t .bg-blue-800\\/60').forEach(card => {
+        if (!profile) return;
         const [nameEl, roleEl] = card.querySelectorAll('p');
-        if (nameEl) nameEl.textContent = profile.nama || profile.email || 'Pengguna';
-        if (roleEl) roleEl.textContent = profile.kelompok ? `${label} · ${profile.kelompok}` : label;
+        if (nameEl) nameEl.textContent = nama;
+        if (roleEl) roleEl.textContent = labelLengkap;
     });
+    document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = nama; });
+    document.querySelectorAll('[data-user-role]').forEach(el => { el.textContent = labelLengkap; });
+    document.querySelectorAll('[data-user-email]').forEach(el => { el.textContent = profile?.email || ''; });
+    document.querySelectorAll('[data-user-initial]').forEach(el => { el.textContent = nama.trim().charAt(0).toUpperCase() || '?'; });
 }
 
 async function initSidebar() {
@@ -78,6 +85,7 @@ async function initSidebar() {
     document.dispatchEvent(new CustomEvent('ppg:profile', { detail: profile }));
 
     refreshSidebarBadges();
+    tampilkanKreditSetelahLogin();
 
     document.querySelectorAll('a[href="login.html"]').forEach(link => {
         if (link.dataset.logoutBound) return;
@@ -117,6 +125,93 @@ async function refreshSidebarBadges() {
     }
 }
 window.refreshSidebarBadges = refreshSidebarBadges;
+
+// Pop-up kredit pembuat aplikasi: kartu besar di tengah layar, tampil sekali setelah login,
+// tertutup otomatis dalam 5 detik (hitungan berhenti selama kursor berada di atas kartu).
+function tampilkanKreditSetelahLogin() {
+    try {
+        if (sessionStorage.getItem('ppg_kredit_login') !== '1') return;
+        sessionStorage.removeItem('ppg_kredit_login');
+    } catch { return; }
+    const DURASI = 5000;
+    const URL_STUDIO = 'https://nadhestudio.id';
+
+    const latar = document.createElement('div');
+    latar.className = 'fixed inset-0 z-[95] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0';
+    latar.setAttribute('role', 'dialog');
+    latar.setAttribute('aria-modal', 'true');
+    latar.setAttribute('aria-labelledby', 'kreditJudul');
+
+    const kartu = document.createElement('a');
+    kartu.href = URL_STUDIO;
+    kartu.target = '_blank';
+    kartu.rel = 'noopener';
+    kartu.className = 'relative block w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden text-center transition-all duration-300 scale-95 opacity-0 hover:shadow-blue-900/30';
+    kartu.innerHTML = `
+        <div class="bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-600 px-8 pt-10 pb-14">
+            <div class="w-20 h-20 mx-auto rounded-3xl bg-white/15 border border-white/30 text-white flex items-center justify-center text-3xl shadow-lg"><i class="fas fa-code"></i></div>
+        </div>
+        <div class="px-8 pb-8 -mt-8">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 px-6 py-5">
+                <p class="text-sm text-slate-500">Aplikasi ini dibuat oleh</p>
+                <h2 id="kreditJudul" class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 mt-1">NadheStudio</h2>
+            </div>
+            <span class="mt-6 inline-flex items-center justify-center gap-2 w-full bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3.5 rounded-xl transition">
+                Kunjungi nadhestudio.id <i class="fas fa-arrow-up-right-from-square text-sm"></i>
+            </span>
+            <p class="mt-4 text-xs text-slate-400">Menutup otomatis dalam <span data-kredit-detik>5</span> detik</p>
+        </div>
+        <div class="h-1.5 bg-slate-100"><div data-kredit-bar class="h-full bg-blue-600" style="width:100%"></div></div>`;
+
+    const tutup = document.createElement('button');
+    tutup.type = 'button';
+    tutup.setAttribute('aria-label', 'Tutup');
+    tutup.className = 'absolute top-3 right-3 w-10 h-10 rounded-xl text-white/80 hover:text-white hover:bg-white/15 flex items-center justify-center';
+    tutup.innerHTML = '<i class="fas fa-times"></i>';
+    kartu.appendChild(tutup);
+    latar.appendChild(kartu);
+    document.body.appendChild(latar);
+
+    const bar = kartu.querySelector('[data-kredit-bar]');
+    const detik = kartu.querySelector('[data-kredit-detik]');
+    let sisa = DURASI, mulai = 0, timer = null, ticker = null, selesai = false;
+    const hilang = () => {
+        if (selesai) return; selesai = true;
+        clearTimeout(timer); clearInterval(ticker);
+        document.removeEventListener('keydown', escTutup);
+        latar.classList.add('opacity-0');
+        kartu.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => latar.remove(), 300);
+    };
+    const escTutup = event => { if (event.key === 'Escape') hilang(); };
+    const jalan = () => {
+        if (selesai) return;
+        mulai = Date.now();
+        bar.style.transition = `width ${sisa}ms linear`;
+        bar.style.width = '0%';
+        timer = setTimeout(hilang, sisa);
+        clearInterval(ticker);
+        ticker = setInterval(() => { detik.textContent = Math.max(1, Math.ceil((sisa - (Date.now() - mulai)) / 1000)); }, 200);
+    };
+    const jeda = () => {
+        clearTimeout(timer); clearInterval(ticker);
+        sisa = Math.max(0, sisa - (Date.now() - mulai));
+        bar.style.transition = 'none';
+        bar.style.width = `${(sisa / DURASI) * 100}%`;
+    };
+
+    kartu.addEventListener('mouseenter', jeda);
+    kartu.addEventListener('mouseleave', jalan);
+    tutup.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); hilang(); });
+    kartu.addEventListener('click', () => setTimeout(hilang, 100));
+    latar.addEventListener('click', event => { if (event.target === latar) hilang(); });
+    document.addEventListener('keydown', escTutup);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        latar.classList.remove('opacity-0');
+        kartu.classList.remove('scale-95', 'opacity-0');
+        jalan();
+    }));
+}
 
 // Global Mobile Drawer Functions
 function openMobileDrawer() {

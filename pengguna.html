@@ -203,7 +203,7 @@
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
-                        <span class="text-xs text-emerald-700 font-medium">Supabase Online</span>
+                        <span class="text-xs text-emerald-700 font-medium">Sistem Online</span>
                     </div>
                     <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" data-user-initial>A</div>
@@ -343,14 +343,6 @@
     }
     updateClock(); setInterval(updateClock, 30000);
     // Topbar menampilkan akun yang sedang login.
-    function showTopUser(p) {
-        if (!p) return;
-        const nama = p.nama || p.email || 'Pengguna';
-        document.querySelectorAll('[data-user-initial]').forEach(el => { el.textContent = nama.trim().charAt(0).toUpperCase(); });
-        document.querySelectorAll('[data-user-name]').forEach(el => { el.textContent = nama; });
-        document.querySelectorAll('[data-user-role]').forEach(el => { el.textContent = p.jabatan || window.PPG_DB.profile.ROLES[p.role] || p.role; });
-    }
-
     const P = window.PPG_DB.profile;
     let users = [], me = null, tab = 'pending', editing = null;
     const STATUS_BADGE = {
@@ -468,7 +460,6 @@
 
     async function init() {
         try { me = await P.me(); } catch (error) { showToast(`Profil gagal dimuat: ${error.message}`, 'error'); }
-        showTopUser(me);
         if (!P.isAdmin(me)) { document.getElementById('noAccess').classList.remove('hidden'); return; }
         document.getElementById('adminArea').classList.remove('hidden');
         document.getElementById('demoNotice').classList.toggle('hidden', window.PPG_DB.isLive());

@@ -177,7 +177,7 @@
                     <span class="font-bold text-slate-800 text-sm truncate">Pengaturan</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">A</div>
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" data-user-initial aria-hidden="true"></div>
                 </div>
             </header>
 
@@ -203,14 +203,14 @@
                     </div>
                     <div class="flex items-center gap-2 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
                         <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse inline-block"></span>
-                        <span class="text-xs text-emerald-700 font-medium">Supabase Online</span>
+                        <span class="text-xs text-emerald-700 font-medium">Sistem Online</span>
                     </div>
                     <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
-                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">A</div>
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" data-user-initial aria-hidden="true"></div>
                         <div class="hidden sm:block">
-                            <p class="font-semibold text-xs text-slate-800 leading-tight">Admin PPG</p>
+                            <p class="font-semibold text-xs text-slate-800 leading-tight" data-user-name>Memuat...</p>
                             <p class="text-[11px] text-emerald-600 font-medium flex items-center gap-1">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Super Admin
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span><span data-user-role></span>
                             </p>
                         </div>
                     </div>
@@ -226,17 +226,17 @@
                         <i class="fas fa-user-shield"></i>
                     </div>
                     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 relative z-1">
-                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center text-3xl font-bold border-2 border-white/30 shrink-0">A</div>
+                        <div class="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center text-3xl font-bold border-2 border-white/30 shrink-0" data-user-initial aria-hidden="true"></div>
                         <div class="flex-1">
-                            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight">Admin Maksel</h2>
-                            <p class="text-blue-200 text-sm">admin@ppgmaksel2.org</p>
+                            <h2 class="text-xl sm:text-2xl font-extrabold tracking-tight" data-user-name>Memuat...</h2>
+                            <p class="text-blue-200 text-sm" data-user-email></p>
                             <div class="flex flex-wrap gap-2 mt-2">
-                                <span class="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium">Administrator</span>
+                                <span class="text-xs bg-white/20 px-2.5 py-1 rounded-full font-medium" data-user-role></span>
                                 <span class="text-xs bg-emerald-500/40 px-2.5 py-1 rounded-full font-medium"><i class="fas fa-circle text-emerald-300 text-[8px] mr-1"></i>Aktif</span>
                             </div>
                         </div>
                         <button onclick="document.getElementById('orgName').focus();document.getElementById('orgName').scrollIntoView({behavior:'smooth',block:'center'})" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition flex items-center gap-2 shrink-0">
-                            <i class="fas fa-edit"></i> Edit Profil
+                            <i class="fas fa-edit"></i> Profil Organisasi
                         </button>
                     </div>
                 </div>
@@ -260,7 +260,7 @@
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Deskripsi</label>
-                                <textarea rows="2" id="orgDescription" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-none">Sistem Informasi Generus PPG Masjid As-Salam 2</textarea>
+                                <textarea rows="2" id="orgDescription" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50 resize-none">Sistem Informasi Generus PPG Maksel 2</textarea>
                             </div>
                             <div>
                                 <label class="block text-xs text-slate-400 mb-1">Tahun Aktif</label>
@@ -282,26 +282,13 @@
                             </div>
                         </div>
                         <div class="space-y-3 mb-5">
+                            <p class="text-xs text-slate-500">Anda masuk sebagai:</p>
                             <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">A</div>
-                                    <div><p class="text-sm font-medium text-slate-800">Admin Maksel</p><p class="text-xs text-slate-400">Administrator</p></div>
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0" data-user-initial aria-hidden="true"></div>
+                                    <div class="min-w-0"><p class="text-sm font-medium text-slate-800 truncate" data-user-name>Memuat...</p><p class="text-xs text-slate-400 truncate" data-user-role></p></div>
                                 </div>
-                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold">P</div>
-                                    <div><p class="text-sm font-medium text-slate-800">Pengurus</p><p class="text-xs text-slate-400">Editor</p></div>
-                                </div>
-                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 bg-amber-500 rounded-full flex items-center justify-center text-white text-sm font-bold">V</div>
-                                    <div><p class="text-sm font-medium text-slate-800">Viewer</p><p class="text-xs text-slate-400">Read Only</p></div>
-                                </div>
-                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium">Aktif</span>
+                                <span class="text-xs bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-medium shrink-0">Aktif</span>
                             </div>
                         </div>
                         <a href="pengguna.html" class="w-full border border-slate-200 hover:bg-slate-50 text-slate-700 py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
@@ -350,36 +337,6 @@
                         </button>
                     </div>
 
-                    <!-- Supabase Config -->
-                    <div class="setting-card bg-white rounded-2xl shadow-xs border border-slate-200/80 p-6">
-                        <div class="flex items-start gap-4 mb-5">
-                            <div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0"><i class="fas fa-database text-emerald-600 text-xl"></i></div>
-                            <div>
-                                <h3 class="font-semibold text-slate-800">Konfigurasi Supabase</h3>
-                                <p class="text-sm text-slate-500 mt-0.5">Koneksi database cloud</p>
-                            </div>
-                        </div>
-                        <div class="space-y-3 mb-5">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Project URL</label>
-                                <input type="text" id="supabaseUrlInput" placeholder="https://YOUR_PROJECT_ID.supabase.co" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 font-mono text-xs">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">Anon Public Key</label>
-                                <input type="password" id="supabaseKeyInput" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-slate-50 font-mono text-xs">
-                            </div>
-                            <div id="supabaseStatusBox" class="flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 transition-colors">
-                                <i id="supabaseStatusIcon" class="fas fa-info-circle text-blue-500"></i>
-                                <div>
-                                    <p id="supabaseStatusTitle" class="text-xs font-medium text-slate-700">Mode Lokal (Offline / Demo)</p>
-                                    <p id="supabaseStatusDesc" class="text-xs text-slate-500">Masukkan Project URL & Anon Key untuk menghubungkan database live</p>
-                                </div>
-                            </div>
-                        </div>
-                        <button id="supabaseSaveButton" onclick="saveSupabaseConfig()" class="disabled:opacity-50 disabled:cursor-not-allowed w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
-                            <i class="fas fa-plug"></i> Simpan & Hubungkan Database
-                        </button>
-                    </div>
                 </div>
 
                 <!-- DANGER ZONE -->
@@ -432,76 +389,6 @@
     <script src="assets/supabase-client.js"></script>
     <script src="assets/sidebar.js"></script>
     <script>
-    // Supabase Live Sync Handler
-    function refreshSupabaseUI() {
-        const urlInput = document.getElementById('supabaseUrlInput');
-        const keyInput = document.getElementById('supabaseKeyInput');
-        const box = document.getElementById('supabaseStatusBox');
-        const icon = document.getElementById('supabaseStatusIcon');
-        const title = document.getElementById('supabaseStatusTitle');
-        const desc = document.getElementById('supabaseStatusDesc');
-
-        const cfg = window.PPG_DB ? window.PPG_DB.getConfig() : { url: '', key: '' };
-        if (urlInput) urlInput.value = cfg.url || '';
-        if (keyInput) keyInput.value = cfg.key || '';
-        const locked = window.PPG_DB?.isConfigLocked();
-        [urlInput, keyInput, document.getElementById('supabaseSaveButton')].forEach(el => { if (el) el.disabled = Boolean(locked); });
-
-        if (window.PPG_DB && window.PPG_DB.isLive()) {
-            box.className = 'flex items-center gap-2 p-3 bg-emerald-50 rounded-xl border border-emerald-200 transition-colors';
-            icon.className = 'fas fa-check-circle text-emerald-600';
-            title.textContent = 'Terhubung ke Supabase Cloud (Live)';
-            title.className = 'text-xs font-semibold text-emerald-800';
-            desc.textContent = locked ? 'Dikonfigurasi lewat assets/config.js untuk semua pengguna.' : 'Database cloud aktif dan siap sinkronisasi data.';
-            desc.className = 'text-xs text-emerald-600';
-        } else {
-            box.className = 'flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200 transition-colors';
-            icon.className = 'fas fa-info-circle text-blue-500';
-            title.textContent = 'Mode Lokal (Offline / Demo)';
-            title.className = 'text-xs font-medium text-slate-700';
-            desc.textContent = 'Data disimpan di browser (localStorage). Masukkan URL & Anon Key untuk menghubungkan database live.';
-            desc.className = 'text-xs text-slate-500';
-        }
-    }
-
-    async function saveSupabaseConfig() {
-        const url = document.getElementById('supabaseUrlInput').value.trim();
-        const key = document.getElementById('supabaseKeyInput').value.trim();
-
-        if (!url || !key) {
-            if (confirm('Kosongkan konfigurasi dan kembali ke Mode Lokal (Demo)?')) {
-                window.PPG_DB.setConfig('', '');
-                refreshSupabaseUI();
-                showToast('Kembali ke mode penyimpanan lokal (Demo)', 'info');
-            }
-            return;
-        }
-
-        showToast('Memverifikasi koneksi ke Supabase...', 'info');
-
-        try {
-            const isOk = window.PPG_DB.setConfig(url, key);
-            if (isOk) {
-                // Test ping query
-                const client = window.PPG_DB.getClient();
-                const { error } = await client.from('pengaturan_sistem').select('id').limit(1);
-                refreshSupabaseUI();
-                if (error) {
-                    const authNeeded=/row-level|permission|jwt/i.test(error.message||'');
-                    showToast(authNeeded?'Konfigurasi tersimpan. Silakan logout lalu login dengan akun Supabase.':'Terkoneksi ke server, tapi schema belum siap. Jalankan schema.sql di SQL Editor.', 'info');
-                } else {
-                    showToast('Berhasil terhubung ke Supabase Database!', 'success');
-                }
-            } else {
-                refreshSupabaseUI();
-                showToast('Gagal inisialisasi Supabase. Periksa URL dan Anon Key.', 'error');
-            }
-        } catch (e) {
-            refreshSupabaseUI();
-            showToast('Error koneksi: ' + e.message, 'error');
-        }
-    }
-
     async function loadOrganization() {
         try {
             const rows=await window.PPG_DB.pengaturan.list(); const data=rows.find(row=>row.id==='config_utama')||rows[0]; if(!data)return;
@@ -518,7 +405,7 @@
     }
 
     document.addEventListener('DOMContentLoaded',()=>{
-        refreshSupabaseUI();loadOrganization();
+        loadOrganization();
         try{const states=JSON.parse(localStorage.getItem('ppg_notification_settings')||'null');if(Array.isArray(states))document.querySelectorAll('.toggle-switch').forEach((button,index)=>{if(states[index]!==undefined&&states[index]!== (button.dataset.on==='true'))toggleSwitch(button);});}catch{}
     });
 
