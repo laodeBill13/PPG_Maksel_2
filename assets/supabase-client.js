@@ -19,6 +19,9 @@
     const config = fileConfigured
         ? { url: window.SUPABASE_URL, key: window.SUPABASE_ANON_KEY }
         : { url: localStorage.getItem(URL_KEY) || "", key: localStorage.getItem(ANON_KEY) || "" };
+    // Alamat halaman untuk link di email. Pakai window.APP_URL (config.js) bila diisi, supaya link
+    // tetap ke domain production meski permintaan dikirim dari localhost/preview.
+    const appUrl = page => new URL(page, window.APP_URL ? String(window.APP_URL).replace(/\/?$/, "/") : window.location.href).href;
     let client = null;
 
     function initClient() {
@@ -253,9 +256,9 @@
         auth:{
             async signIn(email,password){if(!client){const s={user:{email,user_metadata:{nama:"Administrator"}},demo:true};sessionStorage.setItem(DEMO_SESSION,JSON.stringify(s));return s;}const{data,error}=await client.auth.signInWithPassword({email,password});if(error)throw friendlyError(error);return data;},
             // Registrasi: profil dibuat trigger handle_new_user dengan status pending sampai disetujui admin.
-            async signUp({email,password,nama,noHp,jabatan,kelompok,desa}){if(!client)throw new Error("Mode demo: registrasi membutuhkan koneksi Supabase.");const emailRedirectTo=new URL("login.html",window.location.href).href;const{data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{nama,no_hp:noHp,jabatan,kelompok:kelompok||"",desa:desa||""}}});if(error)throw friendlyError(error);return data;},
+            async signUp({email,password,nama,noHp,jabatan,kelompok,desa}){if(!client)throw new Error("Mode demo: registrasi membutuhkan koneksi Supabase.");const emailRedirectTo=appUrl("login.html");const{data,error}=await client.auth.signUp({email,password,options:{emailRedirectTo,data:{nama,no_hp:noHp,jabatan,kelompok:kelompok||"",desa:desa||""}}});if(error)throw friendlyError(error);return data;},
             async signOut(){myProfilePromise=null;sessionStorage.removeItem(DEMO_SESSION);if(client){const{error}=await client.auth.signOut();if(error)throw friendlyError(error);}},
-            async resetPassword(email){if(!client)return{demo:true};const redirectTo=new URL("reset_password.html",window.location.href).href;const{data,error}=await client.auth.resetPasswordForEmail(email,{redirectTo});if(error)throw friendlyError(error);return data;},
+            async resetPassword(email){if(!client)return{demo:true};const redirectTo=appUrl("reset_password.html");const{data,error}=await client.auth.resetPasswordForEmail(email,{redirectTo});if(error)throw friendlyError(error);return data;},
             async updatePassword(password){if(!client)throw new Error("Mode demo: hubungkan Supabase untuk mengganti password.");const{data,error}=await client.auth.updateUser({password});if(error)throw friendlyError(error);return data;},
             onAuthStateChange(callback){return client?client.auth.onAuthStateChange(callback):{data:{subscription:{unsubscribe(){}}}};},
             async getSession(){if(!client){try{return JSON.parse(sessionStorage.getItem(DEMO_SESSION)||"null");}catch{return null;}}const{data,error}=await client.auth.getSession();if(error)throw friendlyError(error);return data.session;}
