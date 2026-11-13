@@ -259,7 +259,7 @@
                     <span class="font-bold text-slate-800 text-sm truncate">Absensi & Presensi</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openModal('modalAddAbsensi')" class="w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Presensi">
+                    <button onclick="openModal('modalAddAbsensi')" class="manage-only w-10 h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition" title="Input Presensi">
                         <i class="fas fa-plus text-sm"></i>
                     </button>
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" data-user-initial aria-hidden="true"></div>
@@ -336,7 +336,7 @@
 
                         <!-- Top Action Buttons -->
                         <div class="flex flex-wrap items-center gap-3">
-                            <button onclick="openModal('modalAddAbsensi')" class="bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <button onclick="openModal('modalAddAbsensi')" class="manage-only bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                                 <i class="fas fa-plus-circle text-blue-600"></i>
                                 + Input Presensi Baru
                             </button>
@@ -1003,19 +1003,19 @@
                 const item = window.PPG_DB.escapeRow(raw);
                 let statusBadge = "";
                 if (item.status === "Hadir") {
-                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="manage-click bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
                         <i class="fas fa-check-circle mr-1"></i> Hadir
                     </button>`;
                 } else if (item.status === "Izin") {
-                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="manage-click bg-amber-100 text-amber-700 hover:bg-amber-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
                         <i class="fas fa-envelope-open mr-1"></i> Izin
                     </button>`;
                 } else if (item.status === "Sakit") {
-                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="manage-click bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
                         <i class="fas fa-medkit mr-1"></i> Sakit
                     </button>`;
                 } else {
-                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
+                    statusBadge = `<button onclick="cycleStatus(${item.id})" class="manage-click bg-rose-100 text-rose-700 hover:bg-rose-200 font-bold px-3 py-1 rounded-full transition" title="Klik untuk ubah status">
                         <i class="fas fa-times-circle mr-1"></i> Alpha
                     </button>`;
                 }
@@ -1059,10 +1059,10 @@
                                 <button onclick="showAbsensiDetail(${item.id})" class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition" title="Lihat Tiket Presensi">
                                     <i class="fas fa-eye text-xs"></i>
                                 </button>
-                                <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition" title="Edit Data Presensi">
+                                <button onclick="openEditModal(${item.id})" class="manage-only p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition" title="Edit Data Presensi">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
-                                <button onclick="openDeleteModal(${item.id})" class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Hapus Data">
+                                <button onclick="openDeleteModal(${item.id})" class="manage-only p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Hapus Data">
                                     <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </div>

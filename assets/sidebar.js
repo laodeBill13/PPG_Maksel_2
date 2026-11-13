@@ -77,6 +77,7 @@ async function initSidebar() {
         window.location.replace(`login.html?status=${profile?.status || 'pending'}`); return;
     }
     window.PPG_PROFILE = profile;
+    terapkanHakAkses(profile, profileLoaded);
     if (window.PPG_DB?.profile.isAdmin(profile)) {
         EXTRA_MENU.filter(item => item.adminOnly).forEach(injectMenu);
         highlightActiveLinks();
@@ -257,4 +258,24 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initSidebar);
 } else {
     initSidebar();
+}
+
+// Tombol sesuai role. Tandai elemen dengan kelas:
+//   manage-only  → hanya admin & pengurus      admin-only → hanya admin
+//   lupg-only    → admin, pengurus & user kelompok (isi LUPG)
+//   manage-click → terlihat semua, tapi hanya admin & pengurus yang bisa klik
+// Bila profil gagal dimuat (mis. jaringan), tombol tetap tampil; RLS Supabase tetap menolak perubahan tanpa izin.
+function terapkanHakAkses(profile, profileLoaded) {
+    if (!document.getElementById('ppgHakAksesStyle')) {
+        const style = document.createElement('style');
+        style.id = 'ppgHakAksesStyle';
+        style.textContent = 'body:not(.can-manage) .manage-only, body:not(.is-admin) .admin-only, body:not(.can-lupg) .lupg-only { display: none !important; }'
+            + ' body:not(.can-manage) .manage-click { pointer-events: none; cursor: default; }';
+        document.head.appendChild(style);
+    }
+    const P = window.PPG_DB?.profile;
+    const manage = !profileLoaded || Boolean(P?.canManage(profile));
+    document.body.classList.toggle('can-manage', manage);
+    document.body.classList.toggle('is-admin', !profileLoaded || Boolean(P?.isAdmin(profile)));
+    document.body.classList.toggle('can-lupg', manage || Boolean(P?.isKelompokUser(profile)));
 }

@@ -235,7 +235,7 @@
                                 <span class="text-xs bg-emerald-500/40 px-2.5 py-1 rounded-full font-medium"><i class="fas fa-circle text-emerald-300 text-[8px] mr-1"></i>Aktif</span>
                             </div>
                         </div>
-                        <button onclick="document.getElementById('orgName').focus();document.getElementById('orgName').scrollIntoView({behavior:'smooth',block:'center'})" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition flex items-center gap-2 shrink-0">
+                        <button onclick="document.getElementById('orgName').focus();document.getElementById('orgName').scrollIntoView({behavior:'smooth',block:'center'})" class="admin-only bg-white/20 hover:bg-white/30 text-white px-4 py-2.5 rounded-xl text-xs font-medium transition flex items-center gap-2 shrink-0">
                             <i class="fas fa-edit"></i> Profil Organisasi
                         </button>
                     </div>
@@ -267,7 +267,7 @@
                                 <input type="text" id="orgYear" value="2026/2027" class="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 bg-slate-50">
                             </div>
                         </div>
-                        <button onclick="saveOrganization()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
+                        <button onclick="saveOrganization()" class="admin-only w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl text-sm font-medium transition flex items-center justify-center gap-2">
                             <i class="fas fa-save"></i> Simpan Perubahan
                         </button>
                     </div>
@@ -349,13 +349,13 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <button onclick="backupLocalData()" class="flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
+                        <button onclick="backupLocalData()" class="admin-only flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
                             <i class="fas fa-download text-blue-600"></i> Backup Data
                         </button>
-                        <button onclick="restoreLocalData()" class="flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
+                        <button onclick="restoreLocalData()" class="admin-only flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-50 text-slate-700 py-3 rounded-xl text-sm font-medium transition">
                             <i class="fas fa-upload text-amber-600"></i> Restore Data
                         </button>
-                        <button onclick="openModal('modalReset')" class="flex items-center justify-center gap-2 border border-red-200 hover:bg-red-50 text-red-600 py-3 rounded-xl text-sm font-medium transition">
+                        <button onclick="openModal('modalReset')" class="admin-only flex items-center justify-center gap-2 border border-red-200 hover:bg-red-50 text-red-600 py-3 rounded-xl text-sm font-medium transition">
                             <i class="fas fa-trash-alt text-red-600"></i> Reset Semua Data
                         </button>
                     </div>
@@ -437,6 +437,11 @@
         const input=document.createElement('input');input.type='file';input.accept='application/json';input.onchange=async()=>{try{const parsed=JSON.parse(await input.files[0].text());if(parsed.version!==1||!parsed.data)throw new Error('Format backup tidak valid');const allowed=new Set(['proker_data','ppg_maksel2_generus_data','ppg_maksel2_absensi_data','ppg_laporan_data','ppg_dokumentasi_data','ppg_arsip_data','ppg_struktur_data','ppg_pengaturan_data','ppg_notification_settings']);Object.entries(parsed.data).forEach(([key,value])=>{if(allowed.has(key)&&typeof value==='string')localStorage.setItem(key,value);});showToast('Backup berhasil dipulihkan. Halaman akan dimuat ulang.','success');setTimeout(()=>location.reload(),900);}catch(error){showToast(`Restore gagal: ${error.message}`,'error');}};input.click();
     }
 
+    // Profil organisasi hanya bisa diubah admin; role lain melihatnya sebagai teks baca saja.
+    document.addEventListener('ppg:profile', () => {
+        if (document.body.classList.contains('is-admin')) return;
+        ['orgName', 'orgDescription', 'orgYear'].forEach(id => { const el = document.getElementById(id); if (el) el.readOnly = true; });
+    });
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 

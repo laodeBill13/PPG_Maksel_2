@@ -227,7 +227,7 @@
                             Kelola, simpan, dan akses seluruh dokumen penting seperti LUPG, SK, surat-menyurat, dan laporan kegiatan PPG Maksel 2.
                         </p>
                         <div class="flex flex-wrap items-center gap-3 mt-6">
-                            <button onclick="bukaUploadArsip()" class="bg-white text-cyan-700 hover:bg-cyan-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <button onclick="bukaUploadArsip()" class="manage-only bg-white text-cyan-700 hover:bg-cyan-50 font-semibold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                                 <i class="fas fa-cloud-upload-alt text-cyan-600"></i>
                                 + Unggah Dokumen
                             </button>
@@ -596,8 +596,8 @@
                         <button onclick="unduhArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-cyan-100 text-slate-600 hover:text-cyan-700 flex items-center justify-center transition text-xs shadow-xs" title="Unduh File">
                             <i class="fas fa-download"></i>
                         </button>
-                        <button onclick="editArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition text-xs" title="Edit Metadata"><i class="fas fa-edit"></i></button>
-                        <button onclick="hapusArsip(${Number(raw.id)})" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 flex items-center justify-center transition text-xs shadow-xs" title="Hapus Berkas">
+                        <button onclick="editArsip(${Number(raw.id)})" class="manage-only w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 flex items-center justify-center transition text-xs" title="Edit Metadata"><i class="fas fa-edit"></i></button>
+                        <button onclick="hapusArsip(${Number(raw.id)})" class="manage-only w-8 h-8 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-600 hover:text-rose-700 flex items-center justify-center transition text-xs shadow-xs" title="Hapus Berkas">
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </div>

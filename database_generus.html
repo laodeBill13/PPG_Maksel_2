@@ -262,7 +262,7 @@
                     <span class="font-bold text-slate-800 text-sm truncate">Database Generus</span>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <button onclick="openModal('modalAddGenerus')" class="w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Tambah Generus">
+                    <button onclick="openModal('modalAddGenerus')" class="manage-only w-10 h-10 rounded-xl bg-blue-700 hover:bg-blue-800 text-white flex items-center justify-center transition" title="Tambah Generus">
                         <i class="fas fa-user-plus text-sm"></i>
                     </button>
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm" data-user-initial aria-hidden="true"></div>
@@ -339,7 +339,7 @@
 
                         <!-- Top Action Buttons -->
                         <div class="flex flex-wrap items-center gap-3">
-                            <button onclick="openModal('modalAddGenerus')" class="bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
+                            <button onclick="openModal('modalAddGenerus')" class="manage-only bg-white text-blue-800 hover:bg-blue-50 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 shadow-sm transition">
                                 <i class="fas fa-user-plus text-blue-600"></i>
                                 + Tambah Generus Baru
                             </button>
@@ -1166,7 +1166,7 @@
                             ${item.phone || '<span class="text-slate-400">-</span>'}
                         </td>
                         <td class="p-4 text-center">
-                            <button onclick="toggleStatus(${item.id})" class="${statusColor} font-semibold text-[11px] px-3 py-1 rounded-full hover:opacity-80 transition" title="Klik untuk ubah status">
+                            <button onclick="toggleStatus(${item.id})" class="manage-click ${statusColor} font-semibold text-[11px] px-3 py-1 rounded-full hover:opacity-80 transition" title="Klik untuk ubah status">
                                 ${item.status}
                             </button>
                         </td>
@@ -1175,10 +1175,10 @@
                                 <button onclick="showGenerusDetail(${item.id})" class="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition" title="Lihat Detail Profil">
                                     <i class="fas fa-eye text-xs"></i>
                                 </button>
-                                <button onclick="openEditModal(${item.id})" class="p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition" title="Edit Data">
+                                <button onclick="openEditModal(${item.id})" class="manage-only p-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 transition" title="Edit Data">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
-                                <button onclick="openDeleteModal(${item.id})" class="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Hapus Data">
+                                <button onclick="openDeleteModal(${item.id})" class="manage-only p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" title="Hapus Data">
                                     <i class="fas fa-trash-alt text-xs"></i>
                                 </button>
                             </div>

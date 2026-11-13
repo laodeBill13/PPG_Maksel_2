@@ -285,7 +285,9 @@ LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
 AS $$ SELECT kelompok FROM public.profiles WHERE id = auth.uid() AND status = 'approved' $$;
 
 -- Seluruh data aplikasi hanya dapat dibaca oleh pengguna yang sudah login dan disetujui.
-CREATE POLICY "Authenticated read generus" ON public.generus FOR SELECT TO authenticated USING (public.is_approved());
+-- User kelompok hanya melihat generus kelompoknya sendiri; admin, pengurus & viewer melihat semua.
+CREATE POLICY "Authenticated read generus" ON public.generus FOR SELECT TO authenticated
+USING (public.is_approved() AND (NOT public.is_kelompok_user() OR kelompok = public.my_kelompok()));
 CREATE POLICY "Authenticated read absensi" ON public.absensi FOR SELECT TO authenticated USING (public.is_approved());
 CREATE POLICY "Authenticated read proker" ON public.program_kerja FOR SELECT TO authenticated USING (public.is_approved());
 -- User kelompok hanya melihat laporan kelompoknya sendiri.
