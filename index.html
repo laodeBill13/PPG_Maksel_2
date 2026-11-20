@@ -3,6 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
+    <script>
+        // Link dari email Supabase bisa mendarat di halaman utama (Site URL). Teruskan ke halaman yang menanganinya.
+        (function () {
+            var h = window.location.hash, q = window.location.search;
+            if (/(^#|&)type=recovery(&|$)/.test(h)) { window.location.replace('reset_password.html' + h); return; }
+            if (/(^#|&)(access_token|error_code)=/.test(h) || /[?&](code|error_code)=/.test(q)) window.location.replace('login.html' + q + h);
+        })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPG Maksel2 - Demo Client</title>
     <script src="https://cdn.tailwindcss.com"></script>
