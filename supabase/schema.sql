@@ -262,8 +262,9 @@ DROP POLICY IF EXISTS "Users read own profile" ON public.profiles;
 -- Hak akses. Semua fungsi mensyaratkan akun sudah disetujui (status = 'approved').
 -- admin    : Ketua, Wakil Ketua, Sekretaris — CRUD semua data + persetujuan user.
 -- pengurus : CRUD semua data.
--- kelompok : baca data; tulis LUPG & Dokumentasi hanya untuk kelompoknya sendiri.
--- viewer   : baca saja.
+-- kelompok : Generus & LUPG kelompoknya sendiri (isi LUPG), Struktur. Tanpa Absensi/Proker/Dokumentasi/Arsip.
+-- viewer   : baca Generus, LUPG, Struktur. Tanpa Absensi/Proker/Dokumentasi/Arsip.
+-- Absensi, Program Kerja, Dokumentasi & Arsip hanya untuk admin (Ketua/Wakil/Sekretaris) dan pengurus bidang.
 CREATE OR REPLACE FUNCTION public.is_approved() RETURNS BOOLEAN
 LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
 AS $$ SELECT EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND status = 'approved') $$;
@@ -288,13 +289,13 @@ AS $$ SELECT kelompok FROM public.profiles WHERE id = auth.uid() AND status = 'a
 -- User kelompok hanya melihat generus kelompoknya sendiri; admin, pengurus & viewer melihat semua.
 CREATE POLICY "Authenticated read generus" ON public.generus FOR SELECT TO authenticated
 USING (public.is_approved() AND (NOT public.is_kelompok_user() OR kelompok = public.my_kelompok()));
-CREATE POLICY "Authenticated read absensi" ON public.absensi FOR SELECT TO authenticated USING (public.is_approved());
-CREATE POLICY "Authenticated read proker" ON public.program_kerja FOR SELECT TO authenticated USING (public.is_approved());
+CREATE POLICY "Authenticated read absensi" ON public.absensi FOR SELECT TO authenticated USING (public.can_manage_ppg());
+CREATE POLICY "Authenticated read proker" ON public.program_kerja FOR SELECT TO authenticated USING (public.can_manage_ppg());
 -- User kelompok hanya melihat laporan kelompoknya sendiri.
 CREATE POLICY "Authenticated read lupg" ON public.laporan_lupg FOR SELECT TO authenticated
 USING (public.is_approved() AND (NOT public.is_kelompok_user() OR kelompok = public.my_kelompok()));
-CREATE POLICY "Authenticated read dokumentasi" ON public.dokumentasi FOR SELECT TO authenticated USING (public.is_approved());
-CREATE POLICY "Authenticated read arsip" ON public.arsip_dokumen FOR SELECT TO authenticated USING (public.is_approved());
+CREATE POLICY "Authenticated read dokumentasi" ON public.dokumentasi FOR SELECT TO authenticated USING (public.can_manage_ppg());
+CREATE POLICY "Authenticated read arsip" ON public.arsip_dokumen FOR SELECT TO authenticated USING (public.can_manage_ppg());
 CREATE POLICY "Authenticated read pengaturan" ON public.pengaturan_sistem FOR SELECT TO authenticated USING (public.is_approved());
 
 
@@ -371,6 +372,19 @@ END; $$;
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- Admin menghapus akun (mis. pendaftar yang ditolak) agar emailnya bisa dipakai daftar ulang.
+-- Profil ikut terhapus (ON DELETE CASCADE); trigger jaga_admin_terakhir tetap melindungi admin aktif terakhir.
+CREATE OR REPLACE FUNCTION public.hapus_pengguna(target UUID) RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+BEGIN
+    IF NOT public.is_ppg_admin() THEN RAISE EXCEPTION 'Hanya admin yang dapat menghapus akun.'; END IF;
+    IF target = auth.uid() THEN RAISE EXCEPTION 'Tidak bisa menghapus akun Anda sendiri.'; END IF;
+    DELETE FROM auth.users WHERE id = target;
+END; $$;
+REVOKE ALL ON FUNCTION public.hapus_pengguna(UUID) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.hapus_pengguna(UUID) TO authenticated;
+
 -- Storage buckets dan policy file.
 -- Bucket privat: file hanya bisa diakses lewat signed URL yang dibuat aplikasi. Batas 50 MB per file.
 INSERT INTO storage.buckets (id, name, public, file_size_limit) VALUES ('ppg-dokumentasi', 'ppg-dokumentasi', false, 52428800), ('ppg-arsip', 'ppg-arsip', false, 52428800)
@@ -379,15 +393,13 @@ DROP POLICY IF EXISTS "Authenticated read PPG files" ON storage.objects;
 DROP POLICY IF EXISTS "Managers upload PPG files" ON storage.objects;
 DROP POLICY IF EXISTS "Managers update PPG files" ON storage.objects;
 DROP POLICY IF EXISTS "Managers delete PPG files" ON storage.objects;
-CREATE POLICY "Authenticated read PPG files" ON storage.objects FOR SELECT TO authenticated USING (bucket_id IN ('ppg-dokumentasi', 'ppg-arsip') AND public.is_approved());
+CREATE POLICY "Authenticated read PPG files" ON storage.objects FOR SELECT TO authenticated USING (bucket_id IN ('ppg-dokumentasi', 'ppg-arsip') AND public.can_manage_ppg());
 CREATE POLICY "Managers upload PPG files" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id IN ('ppg-dokumentasi', 'ppg-arsip') AND public.can_manage_ppg());
 CREATE POLICY "Managers update PPG files" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id IN ('ppg-dokumentasi', 'ppg-arsip') AND public.can_manage_ppg());
 CREATE POLICY "Managers delete PPG files" ON storage.objects FOR DELETE TO authenticated USING (bucket_id IN ('ppg-dokumentasi', 'ppg-arsip') AND public.can_manage_ppg());
--- User kelompok boleh mengunggah foto dokumentasi dan menghapus file unggahannya sendiri.
+-- Dokumentasi khusus pengurus: user kelompok tidak lagi mengunggah/menghapus file dokumentasi.
 DROP POLICY IF EXISTS "Kelompok upload dokumentasi" ON storage.objects;
 DROP POLICY IF EXISTS "Kelompok delete own dokumentasi" ON storage.objects;
-CREATE POLICY "Kelompok upload dokumentasi" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'ppg-dokumentasi' AND public.is_kelompok_user());
-CREATE POLICY "Kelompok delete own dokumentasi" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'ppg-dokumentasi' AND public.is_kelompok_user() AND owner = auth.uid());
 
 -- ==============================================================================
 -- 9. INITIAL SEED DATA
@@ -430,10 +442,8 @@ ALTER TABLE public.dokumentasi ADD COLUMN IF NOT EXISTS drive_url TEXT;
 ALTER TABLE public.dokumentasi ADD COLUMN IF NOT EXISTS diunggah_oleh UUID DEFAULT auth.uid();
 CREATE INDEX IF NOT EXISTS idx_dokumentasi_kelompok ON public.dokumentasi(kelompok, tingkatan);
 
+-- Dokumentasi khusus pengurus (lihat bagian 8); policy tulis untuk user kelompok dihapus.
 DROP POLICY IF EXISTS "Kelompok write own dokumentasi" ON public.dokumentasi;
-CREATE POLICY "Kelompok write own dokumentasi" ON public.dokumentasi FOR ALL TO authenticated
-USING (public.is_kelompok_user() AND kelompok = public.my_kelompok())
-WITH CHECK (public.is_kelompok_user() AND kelompok = public.my_kelompok());
 
 -- Struktur kepengurusan pondok. level: 1 Pimpinan, 2 Pengurus Harian, 3 Koordinator Bidang, 4 Anggota Bidang.
 -- Daftar bidang di sini juga menjadi pilihan Bidang & Penanggung Jawab pada form Program Kerja.

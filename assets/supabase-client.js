@@ -201,6 +201,16 @@
             if (error) throw friendlyError(error);
             return profileFromDb(data);
         },
+        // Hapus akun login + profil (fungsi hapus_pengguna, khusus admin) agar email bisa dipakai daftar ulang.
+        async hapus(id) {
+            if (!client) throw new Error("Mode demo: hubungkan Supabase untuk mengelola pengguna.");
+            const { error } = await client.rpc("hapus_pengguna", { target: id });
+            if (error) {
+                if (error.code === "PGRST202" || /could not find the function/i.test(error.message || "")) throw new Error("Fitur hapus akun belum aktif. Jalankan file migrasi 2026-11-26 di Supabase SQL Editor.");
+                throw friendlyError(error);
+            }
+            return true;
+        },
         ROLES, ADMIN_JABATAN
     };
 

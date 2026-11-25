@@ -32,9 +32,11 @@ Hak akses dijaga langsung oleh database, tidak hanya oleh tampilan.
 | Peran | Untuk | Hak akses |
 |---|---|---|
 | **Admin** | Ketua, Wakil Ketua, Sekretaris | Seluruh data, persetujuan pengguna, struktur kepengurusan, pengaturan |
-| **Pengurus** | Pengurus PPG lainnya | Menambah, mengubah, dan menghapus seluruh data |
-| **User Kelompok** | Pengurus kelompok | Hanya Laporan LUPG dan Dokumentasi milik kelompoknya sendiri |
-| **Viewer** | Pemantau | Hanya melihat |
+| **Pengurus** | Pengurus bidang | Menambah, mengubah, dan menghapus seluruh data |
+| **User Kelompok** | Pengurus kelompok | Generus dan Laporan LUPG kelompoknya sendiri (mengisi LUPG), Struktur |
+| **Viewer** | Pemantau | Melihat Generus, Laporan LUPG, dan Struktur |
+
+Menu **Absensi, Program Kerja, Dokumentasi, dan Arsip** hanya muncul untuk Admin dan Pengurus. User Kelompok dan Viewer tidak melihat menu tersebut, dan bila membuka alamatnya langsung akan dialihkan ke Dashboard.
 
 ### Tampilan Akun
 - Nama, jabatan, dan inisial akun yang sedang login tampil di pojok kanan atas, di sidebar, dan di halaman Pengaturan.

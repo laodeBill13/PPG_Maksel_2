@@ -42,15 +42,17 @@ Semua yang diisi di satu menu otomatis ikut terhitung di **Dashboard**. Contohny
 
 ## 3. Hak Akses Pengguna
 
-Setiap akun memiliki salah satu dari tiga peran:
+Setiap akun memiliki salah satu dari empat peran:
 
-| Peran | Melihat data | Menambah / mengubah / menghapus data | Mengubah profil organisasi |
-|---|:---:|:---:|:---:|
-| **Admin**       | ✅ | ✅ | ✅ |
-| **Pengurus**  | ✅ | ✅ | ❌ |
-| **Viewer** | ✅ | ❌ | ❌ |
+| Menu | Admin (Ketua, Wakil, Sekretaris) | Pengurus (bidang) | User Kelompok | Viewer |
+|---|:---:|:---:|:---:|:---:|
+| Database Generus | Kelola | Kelola | Lihat (kelompok sendiri) | Lihat |
+| Laporan LUPG | Kelola | Kelola | Isi (kelompok sendiri) | Lihat |
+| Absensi, Program Kerja, Dokumentasi, Arsip | Kelola | Kelola | ❌ | ❌ |
+| Struktur Kepengurusan | Kelola | Lihat | Lihat | Lihat |
+| Persetujuan User, Pengaturan | Kelola | ❌ | ❌ | ❌ |
 
-Akun baru otomatis berperan **Viewer** (hanya bisa melihat). Untuk mendapatkan akses mengubah data, hubungi admin. Jika Anda mencoba menyimpan data tanpa izin, akan muncul pesan *"Akun Anda tidak memiliki izin"*.
+Menu yang bertanda ❌ tidak muncul di sidebar. Pendaftar yang memilih kelompok otomatis menjadi **User Kelompok**, selainnya **Viewer**; admin menyesuaikan peran saat menyetujui akun.
 
 ---
 

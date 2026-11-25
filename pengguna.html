@@ -377,11 +377,12 @@
             const wilayah = u.kelompok ? `${esc(u.kelompok)}${u.desa ? ` · Desa ${esc(u.desa)}` : ''}` : 'PPG Maksel 2';
             const actions = u.status === 'pending'
                 ? `<button onclick="openAkses('${esc(u.id)}')" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold"><i class="fas fa-check mr-1"></i>Setujui</button>
-                   <button onclick="setStatus('${esc(u.id)}','rejected')" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold"><i class="fas fa-times mr-1"></i>Tolak</button>`
+                   <button onclick="hapusAkun('${esc(u.id)}')" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold"><i class="fas fa-times mr-1"></i>Tolak</button>`
                 : u.status === 'approved'
                 ? `<button onclick="openAkses('${esc(u.id)}')" class="px-3 py-2 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold"><i class="fas fa-user-cog mr-1"></i>Ubah Akses</button>
                    ${self ? '' : `<button onclick="setStatus('${esc(u.id)}','rejected')" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold"><i class="fas fa-ban mr-1"></i>Nonaktifkan</button>`}`
-                : `<button onclick="openAkses('${esc(u.id)}')" class="px-3 py-2 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"><i class="fas fa-undo mr-1"></i>Setujui Ulang</button>`;
+                : `<button onclick="openAkses('${esc(u.id)}')" class="px-3 py-2 rounded-lg border border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs font-semibold"><i class="fas fa-undo mr-1"></i>Setujui Ulang</button>
+                   ${self ? '' : `<button onclick="hapusAkun('${esc(u.id)}')" class="px-3 py-2 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold"><i class="fas fa-trash mr-1"></i>Hapus Akun</button>`}`;
             return `<div class="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center gap-3">
                 <div class="flex items-start gap-3 flex-1 min-w-0">
                     <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">${esc((u.nama || u.email || '?').trim().charAt(0).toUpperCase())}</div>
@@ -444,6 +445,20 @@
             render(); window.refreshSidebarBadges?.();
         } catch (error) { err.textContent = error.message; err.classList.remove('hidden'); }
     });
+
+    // Tolak pendaftar / hapus akun nonaktif: akun dihapus permanen sehingga email bisa dipakai daftar ulang.
+    async function hapusAkun(id) {
+        const u = users.find(x => x.id === id);
+        if (!u || u.id === me?.id) return;
+        const verb = u.status === 'pending' ? 'Tolak pendaftaran' : 'Hapus akun';
+        if (!confirm(`${verb} ${u.nama || u.email}?\n\nAkun akan dihapus permanen. Email ${u.email || ''} bisa dipakai untuk mendaftar ulang.`)) return;
+        try {
+            await P.hapus(id);
+            users = users.filter(x => x.id !== id);
+            showToast(u.status === 'pending' ? 'Pendaftaran ditolak dan akun dihapus' : 'Akun dihapus', 'info');
+            render(); window.refreshSidebarBadges?.();
+        } catch (error) { showToast(error.message, 'error'); }
+    }
 
     async function setStatus(id, status) {
         const u = users.find(x => x.id === id);

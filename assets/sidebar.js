@@ -78,6 +78,11 @@ async function initSidebar() {
     }
     window.PPG_PROFILE = profile;
     terapkanHakAkses(profile, profileLoaded);
+    // Halaman khusus pengurus (admin & pengurus bidang): role lain dialihkan ke Dashboard.
+    const halaman = window.location.pathname.split('/').pop().replace(/\.html$/, '') + '.html';
+    if (profileLoaded && HALAMAN_PENGURUS.includes(halaman) && !window.PPG_DB?.profile.canManage(profile)) {
+        window.location.replace('dashboard.html?akses=terbatas'); return;
+    }
     if (window.PPG_DB?.profile.isAdmin(profile)) {
         EXTRA_MENU.filter(item => item.adminOnly).forEach(injectMenu);
         highlightActiveLinks();
@@ -260,17 +265,24 @@ if (document.readyState === 'loading') {
     initSidebar();
 }
 
+// Absensi, Program Kerja, Dokumentasi & Arsip hanya untuk Ketua/Wakil/Sekretaris (admin) dan pengurus bidang (pengurus).
+// Menu & semua link ke halaman ini disembunyikan untuk User Kelompok dan Viewer.
+const HALAMAN_PENGURUS = ['absensi.html', 'program_kerja.html', 'dokumentasi.html', 'arsip.html'];
+
 // Tombol sesuai role. Tandai elemen dengan kelas:
 //   manage-only  → hanya admin & pengurus      admin-only → hanya admin
 //   lupg-only    → admin, pengurus & user kelompok (isi LUPG)
 //   manage-click → terlihat semua, tapi hanya admin & pengurus yang bisa klik
+//   manage-full  → untuk role lain, kartu dilebarkan penuh (pasangannya di grid disembunyikan)
 // Bila profil gagal dimuat (mis. jaringan), tombol tetap tampil; RLS Supabase tetap menolak perubahan tanpa izin.
 function terapkanHakAkses(profile, profileLoaded) {
     if (!document.getElementById('ppgHakAksesStyle')) {
         const style = document.createElement('style');
         style.id = 'ppgHakAksesStyle';
-        style.textContent = 'body:not(.can-manage) .manage-only, body:not(.is-admin) .admin-only, body:not(.can-lupg) .lupg-only { display: none !important; }'
-            + ' body:not(.can-manage) .manage-click { pointer-events: none; cursor: default; }';
+        const linkPengurus = HALAMAN_PENGURUS.map(h => `body:not(.can-manage) a[href^="${h}"]`).join(', ');
+        style.textContent = 'body:not(.can-manage) .manage-only, body:not(.is-admin) .admin-only, body:not(.can-lupg) .lupg-only, ' + linkPengurus + ' { display: none !important; }'
+            + ' body:not(.can-manage) .manage-click { pointer-events: none; cursor: default; }'
+            + ' body:not(.can-manage) .manage-full { grid-column: 1 / -1; }';
         document.head.appendChild(style);
     }
     const P = window.PPG_DB?.profile;
