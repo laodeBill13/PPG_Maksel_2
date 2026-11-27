@@ -234,11 +234,11 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <label class="flex items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm cursor-pointer has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                 <input type="radio" name="regTipe" value="kelompok" checked class="mt-1 custom-checkbox">
-                                <span><span class="font-semibold text-slate-800">Pengurus Kelompok</span><br><span class="text-xs text-slate-500">Isi LUPG &amp; dokumentasi kelompok</span></span>
+                                <span><span class="font-semibold text-slate-800">Guru / Pengajar Kelompok</span><br><span class="text-xs text-slate-500">Isi LUPG &amp; data generus kelompok</span></span>
                             </label>
                             <label class="flex items-start gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm cursor-pointer has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
                                 <input type="radio" name="regTipe" value="daerah" class="mt-1 custom-checkbox">
-                                <span><span class="font-semibold text-slate-800">Pengurus PPG Maksel 2</span><br><span class="text-xs text-slate-500">Pengurus tingkat daerah</span></span>
+                                <span><span class="font-semibold text-slate-800">Pengurus PPG Maksel 2</span><br><span class="text-xs text-slate-500">Ketua, Wakil, Sekretaris, Bidang Pendidikan</span></span>
                             </label>
                         </div>
                     </div>
@@ -305,16 +305,15 @@
     <script src="assets/supabase-client.js"></script>
     <script>
         // Jabatan yang diajukan hanya informasi untuk admin; hak akses ditentukan admin saat menyetujui.
-        const JABATAN = {
-            kelompok: ["Ketua Kelompok", "Wakil Ketua Kelompok", "Sekretaris Kelompok", "Bendahara Kelompok", "Guru / Pengajar", "Pengurus Kelompok"],
-            daerah: ["Ketua", "Wakil Ketua", "Sekretaris", "Bendahara", "Koordinator Bidang", "Anggota Bidang", "Pengurus"],
-        };
+        const JABATAN = { kelompok: window.PPG_DB.profile.JABATAN_KELOMPOK, daerah: window.PPG_DB.profile.JABATAN_DAERAH };
         const tipe = () => document.querySelector('input[name="regTipe"]:checked').value;
         function syncTipe() {
             const isKelompok = tipe() === 'kelompok';
             document.getElementById('regWilayahBox').classList.toggle('hidden', !isKelompok);
             const select = document.getElementById('regJabatan');
-            select.replaceChildren(new Option('Pilih jabatan', ''), ...JABATAN[tipe()].map(j => new Option(j, j)));
+            const pilihan = JABATAN[tipe()];
+            select.replaceChildren(new Option('Pilih jabatan', ''), ...pilihan.map(j => new Option(j, j)));
+            if (pilihan.length === 1) select.value = pilihan[0];
         }
         document.querySelectorAll('input[name="regTipe"]').forEach(r => r.addEventListener('change', syncTipe));
         syncTipe();

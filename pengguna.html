@@ -282,27 +282,24 @@
                 </div>
                 <div>
                     <label for="aksesJabatan" class="block text-xs font-semibold text-slate-600 mb-1.5">Jabatan</label>
-                    <input id="aksesJabatan" list="jabatanList" maxlength="100" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-500">
-                    <datalist id="jabatanList">
-                        <option value="Ketua"></option><option value="Wakil Ketua"></option><option value="Sekretaris"></option><option value="Bendahara"></option>
-                        <option value="Koordinator Bidang"></option><option value="Anggota Bidang"></option><option value="Pengurus"></option>
-                        <option value="Ketua Kelompok"></option><option value="Wakil Ketua Kelompok"></option><option value="Sekretaris Kelompok"></option><option value="Pengurus Kelompok"></option><option value="Guru / Pengajar"></option>
-                    </datalist>
+                    <select id="aksesJabatan" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
+                    <p id="aksesJabatanLama" class="hidden text-[11px] text-amber-700 mt-1.5"></p>
                 </div>
                 <div>
                     <label for="aksesRole" class="block text-xs font-semibold text-slate-600 mb-1.5">Hak Akses</label>
-                    <select id="aksesRole" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-500">
-                        <option value="admin">Admin — Ketua / Wakil / Sekretaris (semua data + persetujuan user)</option>
-                        <option value="pengurus">Pengurus — ubah semua data</option>
-                        <option value="kelompok">User Kelompok — LUPG &amp; dokumentasi kelompoknya</option>
-                        <option value="viewer">Viewer — hanya melihat</option>
+                    <!-- Hak akses mengikuti jabatan (lihat JABATAN_ROLE di assets/supabase-client.js). -->
+                    <select id="aksesRole" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-600">
+                        <option value="">— Pilih jabatan dulu —</option>
+                        <option value="admin">Admin — semua data, persetujuan user, pengaturan</option>
+                        <option value="pengurus">Bidang Pendidikan — ubah semua data</option>
+                        <option value="kelompok">Guru / Pengajar — generus &amp; LUPG kelompoknya</option>
                     </select>
-                    <p id="aksesRoleHint" class="hidden text-[11px] text-amber-700 mt-1.5"><i class="fas fa-exclamation-triangle mr-1"></i>Jabatan ini biasanya mendapat akses Admin.</p>
+                    <p class="text-[11px] text-slate-500 mt-1.5">Hak akses otomatis mengikuti jabatan. Pastikan jabatan pendaftar sudah Anda verifikasi.</p>
                 </div>
                 <div id="aksesKelompokBox">
                     <label for="aksesKelompok" class="block text-xs font-semibold text-slate-600 mb-1.5">Kelompok</label>
                     <select id="aksesKelompok" data-wilayah="kelompok" data-semua="— Tidak terikat kelompok —" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:border-blue-500"></select>
-                    <p class="text-[11px] text-slate-500 mt-1.5">User Kelompok hanya bisa mengisi LUPG dan dokumentasi kelompok ini.</p>
+                    <p class="text-[11px] text-slate-500 mt-1.5">Guru / Pengajar hanya melihat generus dan mengisi LUPG kelompok ini.</p>
                 </div>
                 <p id="aksesError" class="hidden text-sm text-red-600" role="alert"></p>
                 <div class="flex gap-3 pt-1">
@@ -398,16 +395,17 @@
         }).join('');
     }
 
+    // Jabatan yang tersedia: Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan (daerah) dan Guru / Pengajar (kelompok).
+    // Hak akses diturunkan dari jabatan yang dipilih admin, bukan dari isian pendaftar.
+    const selectJabatan = document.getElementById('aksesJabatan');
+    selectJabatan.replaceChildren(new Option('Pilih jabatan', ''),
+        ...Object.keys(P.JABATAN_ROLE).map(j => new Option(j, j)));
     function syncRoleUi() {
-        const role = document.getElementById('aksesRole').value;
-        const jabatan = document.getElementById('aksesJabatan').value.trim();
-        document.getElementById('aksesKelompokBox').classList.toggle('hidden', role === 'admin' || role === 'pengurus');
-        document.getElementById('aksesRoleHint').classList.toggle('hidden', !(P.ADMIN_JABATAN.includes(jabatan) && role !== 'admin'));
+        const role = P.JABATAN_ROLE[selectJabatan.value] || '';
+        document.getElementById('aksesRole').value = role;
+        document.getElementById('aksesKelompokBox').classList.toggle('hidden', role !== 'kelompok');
     }
-    document.getElementById('aksesRole').addEventListener('change', syncRoleUi);
-    // Jabatan Ketua/Wakil/Sekretaris hanya memunculkan saran Admin; role tidak diubah otomatis
-    // karena jabatan diisi sendiri oleh pendaftar dan belum tentu benar.
-    document.getElementById('aksesJabatan').addEventListener('change', syncRoleUi);
+    selectJabatan.addEventListener('change', syncRoleUi);
 
     function openAkses(id) {
         editing = users.find(u => u.id === id);
@@ -417,11 +415,15 @@
         document.getElementById('aksesSubmit').innerHTML = approving ? '<i class="fas fa-check mr-1.5"></i>Setujui' : '<i class="fas fa-save mr-1.5"></i>Simpan';
         document.getElementById('aksesNama').textContent = editing.nama || '-';
         document.getElementById('aksesEmail').textContent = editing.email || '';
-        document.getElementById('aksesJabatan').value = editing.jabatan || '';
-        document.getElementById('aksesRole').value = P.ROLES[editing.role] ? editing.role : 'viewer';
+        const jabatanDikenal = Boolean(P.JABATAN_ROLE[editing.jabatan]);
+        selectJabatan.value = jabatanDikenal ? editing.jabatan : '';
+        const lama = document.getElementById('aksesJabatanLama');
+        lama.textContent = `Jabatan tercatat "${editing.jabatan}" tidak tersedia lagi. Pilih salah satu jabatan di atas.`;
+        lama.classList.toggle('hidden', jabatanDikenal || !editing.jabatan);
         document.getElementById('aksesKelompok').value = editing.kelompok || '';
-        // Admin tidak boleh menurunkan aksesnya sendiri agar tidak terkunci.
-        document.getElementById('aksesRole').disabled = editing.id === me?.id;
+        // Admin tidak boleh menurunkan aksesnya sendiri agar tidak terkunci: hanya jabatan admin yang bisa dipilih.
+        const self = editing.id === me?.id;
+        [...selectJabatan.options].forEach(o => { o.disabled = self && Boolean(o.value) && P.JABATAN_ROLE[o.value] !== 'admin'; });
         document.getElementById('aksesError').classList.add('hidden');
         syncRoleUi();
         openModal('modalAkses');
@@ -429,11 +431,13 @@
 
     document.getElementById('aksesForm').addEventListener('submit', async event => {
         event.preventDefault();
-        const role = document.getElementById('aksesRole').value;
-        const kelompok = role === 'admin' || role === 'pengurus' ? '' : document.getElementById('aksesKelompok').value;
+        const jabatan = selectJabatan.value;
+        const role = P.JABATAN_ROLE[jabatan];
+        const kelompok = role === 'kelompok' ? document.getElementById('aksesKelompok').value : '';
         const err = document.getElementById('aksesError');
-        if (role === 'kelompok' && !kelompok) { err.textContent = 'User Kelompok wajib memiliki kelompok.'; err.classList.remove('hidden'); return; }
-        const fields = { jabatan: document.getElementById('aksesJabatan').value.trim(), role, kelompok, desa: kelompok ? window.PPG_WILAYAH.desaOf(kelompok) : '', status: 'approved' };
+        if (!role) { err.textContent = 'Pilih jabatan pengguna.'; err.classList.remove('hidden'); return; }
+        if (role === 'kelompok' && !kelompok) { err.textContent = 'Guru / Pengajar wajib memiliki kelompok.'; err.classList.remove('hidden'); return; }
+        const fields = { jabatan, role, kelompok, desa: kelompok ? window.PPG_WILAYAH.desaOf(kelompok) : '', status: 'approved' };
         if (editing.id === me?.id) delete fields.role;
         if (fields.role === 'admin' && editing.role !== 'admin'
             && !confirm(`Jadikan ${editing.nama || editing.email} sebagai ADMIN?\n\nAdmin bisa mengubah semua data dan menyetujui/menonaktifkan pengguna lain. Pastikan jabatannya sudah Anda verifikasi.`)) return;

@@ -42,17 +42,17 @@ Semua yang diisi di satu menu otomatis ikut terhitung di **Dashboard**. Contohny
 
 ## 3. Hak Akses Pengguna
 
-Setiap akun memiliki salah satu dari empat peran:
+Jabatan yang bisa mendaftar hanya **Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan** (pengurus PPG) dan **Guru / Pengajar** (kelompok). Hak akses otomatis mengikuti jabatan:
 
-| Menu | Admin (Ketua, Wakil, Sekretaris) | Pengurus (bidang) | User Kelompok | Viewer |
-|---|:---:|:---:|:---:|:---:|
-| Database Generus | Kelola | Kelola | Lihat (kelompok sendiri) | Lihat |
-| Laporan LUPG | Kelola | Kelola | Isi (kelompok sendiri) | Lihat |
-| Absensi, Program Kerja, Dokumentasi, Arsip | Kelola | Kelola | ❌ | ❌ |
-| Struktur Kepengurusan | Kelola | Lihat | Lihat | Lihat |
-| Persetujuan User, Pengaturan | Kelola | ❌ | ❌ | ❌ |
+| Menu | Admin (Ketua, Wakil, Sekretaris) | Bidang Pendidikan | Guru / Pengajar |
+|---|:---:|:---:|:---:|
+| Database Generus | Kelola | Kelola | Lihat (kelompok sendiri) |
+| Laporan LUPG | Kelola | Kelola | Isi (kelompok sendiri) |
+| Absensi, Program Kerja, Dokumentasi, Arsip | Kelola | Kelola | ❌ |
+| Struktur Kepengurusan | Kelola | Lihat | Lihat |
+| Persetujuan User, Pengaturan | Kelola | ❌ | ❌ |
 
-Menu yang bertanda ❌ tidak muncul di sidebar. Pendaftar yang memilih kelompok otomatis menjadi **User Kelompok**, selainnya **Viewer**; admin menyesuaikan peran saat menyetujui akun.
+Menu yang bertanda ❌ tidak muncul di sidebar. Saat menyetujui pendaftar, admin memastikan jabatannya benar; hak akses langsung mengikuti jabatan yang dipilih. Guru / Pengajar wajib memiliki kelompok.
 
 ---
 
@@ -224,7 +224,7 @@ Klik salah satu **kartu folder** untuk melihat berkas per kategori. Berkas juga 
 Ya. Data tersimpan online. Pengurus lain cukup memuat ulang halaman untuk melihat data terbaru.
 
 **Kenapa saya tidak bisa menyimpan data?**
-Kemungkinan akun Anda berperan *Viewer*. Hubungi admin untuk mengubah peran.
+Akun Guru / Pengajar hanya bisa mengisi LUPG kelompoknya sendiri, dan menu lain hanya untuk dilihat. Bila jabatan Anda belum sesuai, hubungi admin.
 
 **Kenapa saya diarahkan kembali ke halaman login?**
 Sesi Anda sudah berakhir atau Anda belum login. Silakan masuk kembali.

@@ -166,9 +166,14 @@
     const identity = x => x;
 
     // ===== Profil & hak akses pengguna =====
-    // role: admin (Ketua/Wakil/Sekretaris), pengurus, kelompok (pengurus kelompok), viewer. status: pending/approved/rejected.
-    const ROLES = { admin:"Admin", pengurus:"Pengurus", kelompok:"User Kelompok", viewer:"Viewer" };
-    const ADMIN_JABATAN = ["Ketua", "Wakil Ketua", "Sekretaris"];
+    // role: admin (Ketua/Wakil/Sekretaris), pengurus (Bidang Pendidikan), kelompok (Guru / Pengajar), viewer.
+    // viewer hanya peran sementara pendaftar sebelum disetujui. status: pending/approved/rejected.
+    const ROLES = { admin:"Admin", pengurus:"Bidang Pendidikan", kelompok:"Guru / Pengajar", viewer:"Belum ditentukan" };
+    // Jabatan yang tersedia, dan hak akses yang diberikan saat admin menyetujui.
+    const JABATAN_ROLE = { "Ketua":"admin", "Wakil Ketua":"admin", "Sekretaris":"admin", "Bidang Pendidikan":"pengurus", "Guru / Pengajar":"kelompok" };
+    const JABATAN_DAERAH = ["Ketua", "Wakil Ketua", "Sekretaris", "Bidang Pendidikan"];
+    const JABATAN_KELOMPOK = ["Guru / Pengajar"];
+    const ADMIN_JABATAN = Object.keys(JABATAN_ROLE).filter(j => JABATAN_ROLE[j] === "admin");
     const profileFromDb = r => ({id:r.id,nama:r.nama,email:r.email,noHp:r.no_hp,jabatan:r.jabatan,kelompok:r.kelompok,desa:r.desa,role:r.role,status:r.status,createdAt:r.created_at});
     const profileToDb = r => { const x={}; put(x,"nama",r.nama); put(x,"no_hp",r.noHp); put(x,"jabatan",r.jabatan); put(x,"kelompok",r.kelompok===undefined?undefined:(r.kelompok||null)); put(x,"desa",r.desa===undefined?undefined:(r.desa||null)); put(x,"role",r.role); put(x,"status",r.status); return x; };
     const DEMO_PROFILE = { id:"demo", nama:"Administrator", email:"demo@ppgmaksel2.local", jabatan:"Ketua", role:"admin", status:"approved" };
@@ -211,7 +216,7 @@
             }
             return true;
         },
-        ROLES, ADMIN_JABATAN
+        ROLES, ADMIN_JABATAN, JABATAN_ROLE, JABATAN_DAERAH, JABATAN_KELOMPOK
     };
 
     function fileDataUrl(file) { return new Promise((resolve,reject)=>{ const reader=new FileReader(); reader.onload=()=>resolve(reader.result); reader.onerror=()=>reject(reader.error||new Error("File gagal dibaca")); reader.readAsDataURL(file); }); }
