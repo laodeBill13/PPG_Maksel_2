@@ -98,10 +98,43 @@ async function initSidebar() {
         link.dataset.logoutBound = 'true';
         link.addEventListener('click', async event => {
             event.preventDefault();
+            closeMobileDrawer();
+            if (!(await konfirmasiKeluar())) return;
             try { await window.PPG_DB?.auth.signOut(); }
             catch (error) { console.error('Logout gagal:', error); }
             window.location.href = 'login.html';
         });
+    });
+}
+
+// Konfirmasi sebelum keluar: tombol "Ya" dan "Tidak". Menghasilkan true bila pengguna memilih Ya.
+function konfirmasiKeluar() {
+    return new Promise(resolve => {
+        const latar = document.createElement('div');
+        latar.className = 'fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm';
+        latar.setAttribute('role', 'dialog');
+        latar.setAttribute('aria-modal', 'true');
+        latar.setAttribute('aria-labelledby', 'keluarJudul');
+        latar.innerHTML = `
+            <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center">
+                <div class="w-14 h-14 mx-auto rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl"><i class="fas fa-sign-out-alt"></i></div>
+                <h3 id="keluarJudul" class="mt-4 text-lg font-bold text-slate-800">Keluar dari aplikasi?</h3>
+                <p class="mt-1 text-sm text-slate-500">Anda perlu login kembali untuk membuka aplikasi.</p>
+                <div class="mt-6 flex gap-3">
+                    <button type="button" data-jawab="tidak" class="flex-1 border border-slate-200 text-slate-700 hover:bg-slate-50 py-2.5 rounded-xl text-sm font-semibold">Tidak</button>
+                    <button type="button" data-jawab="ya" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-2.5 rounded-xl text-sm font-semibold">Ya, Keluar</button>
+                </div>
+            </div>`;
+        const selesai = jawaban => { document.removeEventListener('keydown', esc); latar.remove(); resolve(jawaban); };
+        const esc = event => { if (event.key === 'Escape') selesai(false); };
+        latar.addEventListener('click', event => {
+            if (event.target === latar) return selesai(false);
+            const tombol = event.target.closest('[data-jawab]');
+            if (tombol) selesai(tombol.dataset.jawab === 'ya');
+        });
+        document.addEventListener('keydown', esc);
+        document.body.appendChild(latar);
+        latar.querySelector('[data-jawab="tidak"]').focus();
     });
 }
 

@@ -460,9 +460,9 @@
 
                         <!-- Kategori Dropdown -->
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori</label>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kategori / Jenjang</label>
                             <select id="filterCategory" onchange="applyFilters()" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition">
-                                <option value="">Semua Kategori</option>
+                                <option value="">Semua Kategori / Jenjang</option>
                                 <option value="PAUD">PAUD</option>
                                 <option value="Caberawit">Caberawit</option>
                                 <option value="Pra Remaja">Pra Remaja</option>
@@ -557,7 +557,7 @@
                             <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-100 uppercase tracking-wider text-[11px]">
                                 <tr>
                                     <th class="p-4">Nama Generus</th>
-                                    <th class="p-4 hidden sm:table-cell">Kategori</th>
+                                    <th class="p-4 hidden sm:table-cell">Kategori / Jenjang</th>
                                     <th class="p-4 hidden md:table-cell">Kelompok & Desa</th>
                                     <th class="p-4 hidden lg:table-cell">Tgl Lahir / Usia</th>
                                     <th class="p-4 hidden lg:table-cell">Kontak Wali</th>
@@ -651,7 +651,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori <span class="text-red-500">*</span></label>
+                        <label class="block font-semibold text-slate-700 mb-1">Kategori / Jenjang <span class="text-red-500">*</span></label>
                         <select id="addCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="PAUD">PAUD (3-5 Thn)</option>
                             <option value="Caberawit">Caberawit (6-11 Thn)</option>
@@ -749,7 +749,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-semibold text-slate-700 mb-1">Jenjang Kategori <span class="text-red-500">*</span></label>
+                        <label class="block font-semibold text-slate-700 mb-1">Kategori / Jenjang <span class="text-red-500">*</span></label>
                         <select id="editCategory" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                             <option value="PAUD">PAUD (3-5 Thn)</option>
                             <option value="Caberawit">Caberawit (6-11 Thn)</option>
@@ -823,7 +823,7 @@
                         <h3 id="detailName" class="text-base font-bold text-slate-800 leading-tight">Nama Generus</h3>
                         <span id="detailGenderBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700">L</span>
                     </div>
-                    <p id="detailCategoryGroup" class="text-xs text-slate-500 mt-1">Kategori • Kelompok</p>
+                    <p id="detailCategoryGroup" class="text-xs text-slate-500 mt-1">Kategori / Jenjang • Kelompok</p>
                     <span id="detailStatusPill" class="inline-block mt-1.5 text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
                         Aktif
                     </span>
@@ -917,6 +917,17 @@
                         <option value="">Semua Status</option>
                         <option value="Aktif">Aktif</option>
                         <option value="Tidak Aktif">Tidak Aktif</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="exportKategori" class="block font-semibold text-slate-700 mb-1">Kategori / Jenjang</label>
+                    <select id="exportKategori" class="w-full border border-slate-300 rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                        <option value="">Semua Kategori / Jenjang</option>
+                        <option value="PAUD">PAUD</option>
+                        <option value="Caberawit">Caberawit</option>
+                        <option value="Pra Remaja">Pra Remaja</option>
+                        <option value="Remaja">Remaja</option>
+                        <option value="Usia Nikah">Usia Nikah</option>
                     </select>
                 </div>
                 <div class="pt-2 flex gap-3">
@@ -1434,16 +1445,16 @@
             const status = document.getElementById("filterStatus").value;
             return { desa, kelompok, status, data: dataCakupan({ desa, kelompok, status }) };
         }
-        function dataCakupan({ desa, kelompok, status }) {
-            return generusList.filter(g => (!desa || desaGenerus(g) === desa) && (!kelompok || g.group === kelompok) && (!status || g.status === status));
+        function dataCakupan({ desa, kelompok, status, kategori }) {
+            return generusList.filter(g => (!desa || desaGenerus(g) === desa) && (!kelompok || g.group === kelompok) && (!status || g.status === status) && (!kategori || g.category === kategori));
         }
         function hitung(list) {
             const row = Object.fromEntries(TINGKATAN.map(t => [t, list.filter(g => g.category === t).length]));
             return { ...row, total: list.length, L: list.filter(g => g.gender === "L").length, P: list.filter(g => g.gender === "P").length };
         }
-        function labelCakupan({ desa, kelompok, status }) {
+        function labelCakupan({ desa, kelompok, status, kategori }) {
             const wilayah = kelompok ? `Kelompok ${kelompok} (Desa ${desa || window.PPG_WILAYAH.desaOf(kelompok)})` : desa ? `Desa ${desa}` : "Seluruh Maksel 2";
-            return `${wilayah} · ${status ? `Status ${status}` : "Semua status"}`;
+            return `${wilayah} · ${status ? `Status ${status}` : "Semua status"}${kategori ? ` · Kategori/Jenjang ${kategori}` : ""}`;
         }
         // Baris rekap: semua desa -> per desa; satu desa -> per kelompok; satu kelompok -> kelompok itu.
         function barisRekap(c) {
@@ -1491,6 +1502,7 @@
             if (c.desa) document.getElementById("exportDesa").value = c.desa;
             if (c.kelompok) document.getElementById("exportKelompok").value = c.kelompok;
             document.getElementById("exportStatus").value = c.status;
+            document.getElementById("exportKategori").value = document.getElementById("filterCategory").value;
             onExportScope();
             openModal("modalExportGenerus");
         }
@@ -1506,13 +1518,14 @@
             const kelompok = scope === "kelompok" ? document.getElementById("exportKelompok").value : "";
             const desa = scope === "desa" ? document.getElementById("exportDesa").value : "";
             const status = document.getElementById("exportStatus").value;
+            const kategori = document.getElementById("exportKategori").value;
             if ((scope === "kelompok" && !kelompok) || (scope === "desa" && !desa)) { triggerToast("Pilih Cakupan", `Pilih ${scope} terlebih dahulu.`, "warning"); return; }
-            const c = { desa, kelompok, status, data: dataCakupan({ desa, kelompok, status }) };
+            const c = { desa, kelompok, status, kategori, data: dataCakupan({ desa, kelompok, status, kategori }) };
             if (!c.data.length) { triggerToast("Export Gagal", "Tidak ada data generus pada cakupan ini.", "warning"); return; }
             closeModal("modalExportGenerus");
 
             const wilayah = kelompok ? `Kelompok ${kelompok}` : desa ? `Desa ${desa}` : "Maksel 2";
-            const namaFile = ["Rekap_Generus", (kelompok ? `Kelompok_${kelompok}` : desa ? `Desa_${desa}` : "Maksel2_Keseluruhan"), status, window.PPG_DB.tanggalLokal()]
+            const namaFile = ["Rekap_Generus", (kelompok ? `Kelompok_${kelompok}` : desa ? `Desa_${desa}` : "Maksel2_Keseluruhan"), kategori, status, window.PPG_DB.tanggalLokal()]
                 .filter(Boolean).join("_").replace(/[^A-Za-z0-9-]+/g, "_");
             const header = ["No", "Desa", "Kelompok", ...TINGKATAN, "Total", "L", "P"];
             const nilai = r => [...TINGKATAN.map(t => r[t]), r.total, r.L, r.P];

@@ -166,13 +166,15 @@
     const identity = x => x;
 
     // ===== Profil & hak akses pengguna =====
-    // role: admin (Ketua/Wakil/Sekretaris), pengurus (Bidang Pendidikan), kelompok (Guru / Pengajar), viewer.
+    // role: admin (Ketua/Wakil/Sekretaris), pengurus (Bidang Pendidikan / Kurikulum), kelompok (Guru / Pengajar), viewer.
     // viewer hanya peran sementara pendaftar sebelum disetujui. status: pending/approved/rejected.
-    const ROLES = { admin:"Admin", pengurus:"Bidang Pendidikan", kelompok:"Guru / Pengajar", viewer:"Belum ditentukan" };
+    const ROLES = { admin:"Admin", pengurus:"Bidang Pendidikan / Kurikulum", kelompok:"Guru / Pengajar", viewer:"Belum ditentukan" };
     // Jabatan yang tersedia, dan hak akses yang diberikan saat admin menyetujui.
-    const JABATAN_ROLE = { "Ketua":"admin", "Wakil Ketua":"admin", "Sekretaris":"admin", "Bidang Pendidikan":"pengurus", "Guru / Pengajar":"kelompok" };
-    const JABATAN_DAERAH = ["Ketua", "Wakil Ketua", "Sekretaris", "Bidang Pendidikan"];
+    const JABATAN_ROLE = { "Ketua":"admin", "Wakil Ketua":"admin", "Sekretaris":"admin", "Bidang Pendidikan":"pengurus", "Bidang Kurikulum":"pengurus", "Guru / Pengajar":"kelompok" };
+    const JABATAN_DAERAH = ["Ketua", "Wakil Ketua", "Sekretaris", "Bidang Pendidikan", "Bidang Kurikulum"];
     const JABATAN_KELOMPOK = ["Guru / Pengajar"];
+    // Bidang yang selalu tersedia di Struktur Kepengurusan & Program Kerja, walau belum ada datanya.
+    const BIDANG_BAWAAN = ["Pendidikan"];
     const ADMIN_JABATAN = Object.keys(JABATAN_ROLE).filter(j => JABATAN_ROLE[j] === "admin");
     const profileFromDb = r => ({id:r.id,nama:r.nama,email:r.email,noHp:r.no_hp,jabatan:r.jabatan,kelompok:r.kelompok,desa:r.desa,role:r.role,status:r.status,createdAt:r.created_at});
     const profileToDb = r => { const x={}; put(x,"nama",r.nama); put(x,"no_hp",r.noHp); put(x,"jabatan",r.jabatan); put(x,"kelompok",r.kelompok===undefined?undefined:(r.kelompok||null)); put(x,"desa",r.desa===undefined?undefined:(r.desa||null)); put(x,"role",r.role); put(x,"status",r.status); return x; };
@@ -257,6 +259,7 @@
     initClient();
     window.PPG_DB = {
         isLive:()=>Boolean(client), getClient:()=>client, getConfig:()=>({...config}), isConfigLocked:()=>fileConfigured, setConfig,
+        BIDANG_BAWAAN: () => [...BIDANG_BAWAAN],
         escapeHtml, escapeRow, safeUrl, downloadCsv, tanggalLokal, LUPG_JENJANG,
         generus:service({table:"generus",key:"ppg_maksel2_generus_data",toDb:generusToDb,fromDb:generusFromDb}),
         absensi:service({table:"absensi",key:"ppg_maksel2_absensi_data",toDb:absensiToDb,fromDb:absensiFromDb}),

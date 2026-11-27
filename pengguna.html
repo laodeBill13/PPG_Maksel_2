@@ -291,7 +291,7 @@
                     <select id="aksesRole" disabled class="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-600">
                         <option value="">— Pilih jabatan dulu —</option>
                         <option value="admin">Admin — semua data, persetujuan user, pengaturan</option>
-                        <option value="pengurus">Bidang Pendidikan — ubah semua data</option>
+                        <option value="pengurus">Bidang Pendidikan / Kurikulum — ubah semua data</option>
                         <option value="kelompok">Guru / Pengajar — generus &amp; LUPG kelompoknya</option>
                     </select>
                     <p class="text-[11px] text-slate-500 mt-1.5">Hak akses otomatis mengikuti jabatan. Pastikan jabatan pendaftar sudah Anda verifikasi.</p>
@@ -395,7 +395,7 @@
         }).join('');
     }
 
-    // Jabatan yang tersedia: Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan (daerah) dan Guru / Pengajar (kelompok).
+    // Jabatan yang tersedia: Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan, Bidang Kurikulum (daerah) dan Guru / Pengajar (kelompok).
     // Hak akses diturunkan dari jabatan yang dipilih admin, bukan dari isian pendaftar.
     const selectJabatan = document.getElementById('aksesJabatan');
     selectJabatan.replaceChildren(new Option('Pilih jabatan', ''),

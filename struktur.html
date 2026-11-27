@@ -335,7 +335,9 @@
     const BIDANG_COLORS = ['blue', 'emerald', 'amber', 'purple', 'rose', 'cyan', 'indigo', 'orange'];
     let rows = [], canEdit = false, editing = null;
     const byUrutan = (a, b) => (a.urutan ?? 0) - (b.urutan ?? 0) || String(a.jabatan).localeCompare(String(b.jabatan));
-    const bidangList = () => [...new Set(rows.filter(r => r.bidang).sort(byUrutan).map(r => r.bidang))];
+    const bidangTerisi = () => [...new Set(rows.filter(r => r.bidang).sort(byUrutan).map(r => r.bidang))];
+    // Pilihan di form: bidang bawaan (mis. Pendidikan) + bidang yang sudah ada di struktur.
+    const bidangPilihan = () => [...new Set([...window.PPG_DB.BIDANG_BAWAAN(), ...bidangTerisi()])];
 
     function card(r, opts = {}) {
         const nama = r.nama ? esc(r.nama) : '<span class="italic text-slate-400 font-normal">(belum diisi)</span>';
@@ -363,7 +365,7 @@
         }
         const pimpinan = rows.filter(r => r.level === 1).sort(byUrutan);
         const harian = rows.filter(r => r.level === 2).sort(byUrutan);
-        const bidang = bidangList();
+        const bidang = bidangTerisi();
         const parts = [];
         if (pimpinan.length) parts.push(`<div class="flex flex-wrap justify-center gap-3">${pimpinan.map(r => card(r, { tone: 'blue', wide: true })).join('')}</div>`);
         if (harian.length) {
@@ -400,7 +402,7 @@
         editing = id ? rows.find(r => Number(r.id) === Number(id)) : null;
         document.getElementById('formTitle').textContent = editing ? 'Ubah Pengurus' : 'Tambah Pengurus';
         document.getElementById('btnHapus').classList.toggle('hidden', !editing);
-        document.getElementById('bidangList').replaceChildren(...bidangList().map(b => new Option(b, b)));
+        document.getElementById('bidangList').replaceChildren(...bidangPilihan().map(b => new Option(b, b)));
         document.getElementById('fLevel').value = String(editing?.level || 3);
         document.getElementById('fBidang').value = editing?.bidang || '';
         document.getElementById('fJabatan').value = editing?.jabatan || '';

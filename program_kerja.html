@@ -628,7 +628,7 @@ const byLevelUrutan = (a, b) => (Number(a.level) || 9) - (Number(b.level) || 9) 
 function buildBidangList() {
     const fromStruktur = [...struktur].filter(r => (r.bidang || '').trim()).sort(byLevelUrutan).map(r => r.bidang.trim());
     const fromProker = programs.map(p => (p.kategori || '').trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, 'id'));
-    bidangList = [...new Set([...fromStruktur, ...fromProker])];
+    bidangList = [...new Set([...window.PPG_DB.BIDANG_BAWAAN(), ...fromStruktur, ...fromProker])];
 }
 function fillBidangSelects() {
     const filter = document.getElementById('filterKategori');

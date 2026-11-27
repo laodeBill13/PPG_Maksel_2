@@ -42,9 +42,9 @@ Semua yang diisi di satu menu otomatis ikut terhitung di **Dashboard**. Contohny
 
 ## 3. Hak Akses Pengguna
 
-Jabatan yang bisa mendaftar hanya **Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan** (pengurus PPG) dan **Guru / Pengajar** (kelompok). Hak akses otomatis mengikuti jabatan:
+Jabatan yang bisa mendaftar hanya **Ketua, Wakil Ketua, Sekretaris, Bidang Pendidikan, Bidang Kurikulum** (pengurus PPG) dan **Guru / Pengajar** (kelompok). Hak akses otomatis mengikuti jabatan:
 
-| Menu | Admin (Ketua, Wakil, Sekretaris) | Bidang Pendidikan | Guru / Pengajar |
+| Menu | Admin (Ketua, Wakil, Sekretaris) | Bidang Pendidikan / Kurikulum | Guru / Pengajar |
 |---|:---:|:---:|:---:|
 | Database Generus | Kelola | Kelola | Lihat (kelompok sendiri) |
 | Laporan LUPG | Kelola | Kelola | Isi (kelompok sendiri) |
